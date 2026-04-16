@@ -100,6 +100,10 @@ class AnalyzerTest {
         assertTrue(fitness.overall_score in 0..100)
         assertTrue(fitness.subscores.any { it.name == "navigability" })
         assertTrue(fitness.metrics["agent_relevant_method_count"] ?: 0.0 >= 1.0)
+        val capabilities = manager.capabilities()
+        assertTrue(capabilities.languages.contains("java"))
+        assertTrue(capabilities.available_tools.contains("get_capabilities"))
+        assertTrue(capabilities.build_context_bundle_supported)
         val clusterId = manager.clusterDetail("cluster:com.app.payment").cluster.cluster_id
         val clusterFitness = manager.clusterFitness(clusterId)
         assertEquals(clusterId, clusterFitness.cluster.cluster_id)
@@ -107,6 +111,12 @@ class AnalyzerTest {
         val validationTargets = manager.validationTargets(nodeId = processNode.id)
         assertEquals(processNode.id, validationTargets.target_node_id)
         assertTrue(validationTargets.validation_targets.any { it.kind == "module" })
+        val bundle = manager.buildContextBundle(nodeId = processNode.id, tokenBudget = 1200)
+        assertEquals(processNode.id, bundle.chosen_node_id)
+        assertTrue(bundle.focus_nodes.any { it.id == processNode.id })
+        assertTrue(bundle.source_slices.any { it.node_id == processNode.id })
+        val taskBundle = manager.buildContextBundle(task = "Insert validation in processPayment", tokenBudget = 1200)
+        assertNotNull(taskBundle.chosen_node_id)
     }
 
     @Test

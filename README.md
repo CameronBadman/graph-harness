@@ -76,8 +76,11 @@ That demo now exercises the intended edit loop:
 
 The available tools are:
 
+- `get_capabilities`
+- `build_context_bundle`
 - `get_summary_map`
 - `get_edit_candidates`
+- `resolve_edit_target`
 - `verify_candidate`
 - `plan_edit`
 - `validate_edit`
@@ -98,6 +101,12 @@ The available tools are:
 - `get_source`
 - `get_source_batch`
 
+For orchestration-heavy clients, the intended higher-level context flow is:
+
+- `get_capabilities`
+- `build_context_bundle`
+- expand with narrower traversal or source tools only when the bundle is not enough
+
 ## Notes
 
 - Every response includes a `snapshot_id`.
@@ -115,4 +124,6 @@ The available tools are:
 - `get_agent_fitness` reports a repo-wide structural fitness score, subscores, issues, and recommended actions for how well the codebase supports graph-guided agent workflows.
 - `get_cluster_fitness` drills the same fitness model down to a single cluster so you can identify which subsystem is actually dragging the repo-wide score down.
 - `get_validation_targets` uses impact plus build-root layout to suggest the most relevant modules, tests, and validation command shapes for a node or planned edit.
+- `get_capabilities` is the explicit capability handshake for orchestration. It reports supported languages, engine/backend details, edit operations, validation modes, confidence semantics, and degraded-mode flags in one place.
+- `build_context_bundle` compresses the common orientation flow into one response: focus node resolution, key graph relationships, likely impact files, and a budget-limited set of source slices.
 # code-agent

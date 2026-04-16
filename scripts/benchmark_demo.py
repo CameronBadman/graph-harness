@@ -178,6 +178,49 @@ def harness_run(server: str, project_root: str) -> BenchmarkResult:
     )
 
 
+def harness_bundle_run(server: str, project_root: str) -> BenchmarkResult:
+    session = JsonRpcSession([server, project_root])
+    tokens = 0
+    notes: list[str] = []
+    artifacts: list[str] = []
+
+    try:
+        session.request("initialize", {})
+
+        capabilities = session.tool_call("get_capabilities")
+        tokens += estimate_tokens(json.dumps(capabilities, separators=(",", ":")))
+        notes.append(f"analysis_engine={capabilities.get('analysis_engine', 'unknown')}")
+
+        summary = session.tool_call("get_summary_map")
+        tokens += estimate_tokens(json.dumps(summary, separators=(",", ":")))
+        chosen_entrypoint = choose_entrypoint(summary)
+        notes.append(f"chosen_entrypoint={chosen_entrypoint['name']}")
+
+        bundle = session.tool_call(
+            "build_context_bundle",
+            {
+                "node_id": chosen_entrypoint["id"],
+                "token_budget": 2200,
+            },
+        )
+        tokens += estimate_tokens(json.dumps(bundle, separators=(",", ":")))
+        artifacts.extend(node["name"] for node in bundle.get("focus_nodes", []))
+        artifacts.extend(node["name"] for node in bundle.get("entrypoints", []))
+        artifacts.extend(bundle.get("impact_files", []))
+        artifacts.extend(slice_["node_id"] for slice_ in bundle.get("source_slices", []))
+        notes.append(f"bundle_summary_mode={bundle.get('summary_mode', 'unknown')}")
+        notes.append(f"bundle_notes={','.join(bundle.get('notes', []))}")
+    finally:
+        session.close()
+
+    return BenchmarkResult(
+        label="graphharness-bundle",
+        tokens=tokens,
+        artifacts=sorted(set(artifacts)),
+        notes=notes,
+    )
+
+
 def harness_contract_run(server: str, project_root: str) -> BenchmarkResult:
     session = JsonRpcSession([server, project_root])
     tokens = 0
@@ -391,6 +434,7 @@ def main() -> int:
     args = parser.parse_args()
 
     harness = harness_run(args.server, args.project_root)
+    harness_bundle = harness_bundle_run(args.server, args.project_root)
     naive = naive_run(args.project_root)
     harness_contract = harness_contract_run(args.server, args.project_root)
     naive_contract = naive_contract_run(args.project_root)
@@ -398,6 +442,7 @@ def main() -> int:
     naive_edit_patch, naive_edit_rename = naive_edit_run(args.project_root)
 
     print_result(harness)
+    print_result(harness_bundle)
     print_result(naive)
     print_result(harness_contract)
     print_result(naive_contract)
@@ -417,6 +462,25 @@ def main() -> int:
             "token_reduction_percent": round(reduction, 2),
             "artifact_overlap": overlap,
             "graphharness_tokens": harness.tokens,
+            "naive_tokens": naive.tokens,
+        },
+        indent=2,
+    ))
+    bundle_reduction = 0.0
+    if naive.tokens:
+        bundle_reduction = 100.0 * (1.0 - (harness_bundle.tokens / naive.tokens))
+    bundle_vs_multicall = 0.0
+    if harness.tokens:
+        bundle_vs_multicall = 100.0 * (1.0 - (harness_bundle.tokens / harness.tokens))
+    bundle_overlap = sorted({normalize_artifact(item) for item in harness_bundle.artifacts} & {normalize_artifact(item) for item in naive.artifacts})
+    print("\n## comparison(bundle)")
+    print(json.dumps(
+        {
+            "token_reduction_percent_vs_naive": round(bundle_reduction, 2),
+            "token_reduction_percent_vs_multicall": round(bundle_vs_multicall, 2),
+            "artifact_overlap": bundle_overlap,
+            "graphharness_bundle_tokens": harness_bundle.tokens,
+            "graphharness_multicall_tokens": harness.tokens,
             "naive_tokens": naive.tokens,
         },
         indent=2,

@@ -363,6 +363,43 @@ data class ValidationTargetsResult(
     val generated_at: String,
 )
 
+data class CapabilitiesResult(
+    val languages: List<String>,
+    val analysis_engine: String,
+    val engine_version: String? = null,
+    val available_tools: List<String>,
+    val edit_operations: List<String>,
+    val validation_modes: List<String>,
+    val confidence_semantics: List<String>,
+    val degraded_mode_flags: List<String>,
+    val snapshot_semantics: String,
+    val analysis_engine_capabilities: List<String>,
+    val build_context_bundle_supported: Boolean,
+    val analysis_engine_first_backend: Boolean,
+    val snapshot_id: String,
+    val generated_at: String,
+)
+
+data class ContextBundleResult(
+    val task: String? = null,
+    val node_id: String? = null,
+    val chosen_node_id: String? = null,
+    val token_budget: Int,
+    val summary_mode: String,
+    val clusters: List<ClusterSummary>,
+    val entrypoints: List<OrientationNode>,
+    val focus_nodes: List<NodeSummary>,
+    val relationships: List<EdgeSummary>,
+    val impact_files: List<String>,
+    val source_slices: List<SourceBatchItem>,
+    val notes: List<String>,
+    val analysis_engine: String,
+    val engine_version: String? = null,
+    val build_duration_ms: Long,
+    val snapshot_id: String,
+    val generated_at: String,
+)
+
 data class ToolDefinition(
     val name: String,
     val description: String,

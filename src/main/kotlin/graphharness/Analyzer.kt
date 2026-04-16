@@ -494,6 +494,217 @@ class SnapshotManager(private val projectRoot: Path) {
         )
     }
 
+    private fun resolveBundleNode(task: String, snapshot: Snapshot, notes: MutableList<String>): NodeSummary? {
+        val resolved = runCatching { resolveEditTarget(task, 4, snapshot) }.getOrNull()
+        val resolvedCandidate = resolved?.resolved_candidate
+        if (resolvedCandidate != null && !resolved.needs_disambiguation) {
+            notes += "bundle_resolution=resolve_edit_target"
+            return resolvedCandidate.node
+        }
+        if (resolved != null && resolved.needs_disambiguation) {
+            notes += "bundle_resolution=resolve_edit_target_ambiguous"
+        }
+
+        val searchTerms = Regex("""[A-Za-z_]\w+""")
+            .findAll(task)
+            .map { it.value }
+            .filter { it.length >= 4 }
+            .toList()
+        for (term in searchTerms) {
+            val match = search(term, "method", null, null, snapshot).results.firstOrNull()
+            if (match != null) {
+                notes += "bundle_resolution=search_graph:$term"
+                return match
+            }
+        }
+
+        val fallback = summaryMap(snapshot).entrypoints.firstOrNull()?.let { snapshot.nodeSummaries[it.id] }
+        if (fallback != null) {
+            notes += "bundle_resolution=entrypoint_fallback"
+        }
+        return fallback
+    }
+
+    private fun estimateBundleTokenUsage(
+        summaryMode: String,
+        task: String?,
+        chosenNode: NodeSummary?,
+        clusters: List<ClusterSummary>,
+        entrypoints: List<OrientationNode>,
+        focusNodes: List<NodeSummary>,
+        relationships: List<EdgeSummary>,
+        impactFiles: List<String>,
+        notes: List<String>,
+    ): Int {
+        val payload = buildMap<String, Any?> {
+            put("summary_mode", summaryMode)
+            put("task", task)
+            put("chosen_node", chosenNode?.name)
+            put("clusters", clusters)
+            put("entrypoints", entrypoints)
+            put("focus_nodes", focusNodes)
+            put("relationships", relationships)
+            put("impact_files", impactFiles)
+            put("notes", notes)
+        }
+        return estimateTextTokens(graphHarnessJson.encode(payload).stringify())
+    }
+
+    private fun estimateTextTokens(text: String): Int = maxOf(1, (text.length / 4) + 1)
+
+    fun capabilities(snapshot: Snapshot = current()): CapabilitiesResult =
+        CapabilitiesResult(
+            languages = listOf("java"),
+            analysis_engine = snapshot.analysisEngine,
+            engine_version = snapshot.engineVersion,
+            available_tools = listOf(
+                "get_capabilities",
+                "build_context_bundle",
+                "get_summary_map",
+                "get_cluster_detail",
+                "search_graph",
+                "get_node_detail",
+                "get_call_paths",
+                "get_callers",
+                "get_callees",
+                "get_implementations",
+                "get_type_hierarchy",
+                "get_dependencies",
+                "get_impact",
+                "get_source",
+                "get_source_batch",
+                "get_edit_candidates",
+                "resolve_edit_target",
+                "verify_candidate",
+                "plan_edit",
+                "apply_edit",
+                "validate_edit",
+                "get_validation_targets",
+                "get_agent_fitness",
+                "get_cluster_fitness",
+            ),
+            edit_operations = listOf("modify_method_body", "rename_node"),
+            validation_modes = listOf("auto", "compile", "test"),
+            confidence_semantics = listOf(
+                "analysis_confidence fields are heuristic 0-1 scores rather than formal guarantees",
+                "candidate and validation target confidence values indicate ranking confidence for orchestration",
+                "degraded validation means repo-aware validation failed or was blocked and a fallback path was attempted",
+            ),
+            degraded_mode_flags = listOf("degraded", "attempted_validators", "summary_mode"),
+            snapshot_semantics = "Node ids are snapshot-scoped and responses carry snapshot_id; delta/rebinding support is not implemented yet.",
+            analysis_engine_capabilities = listOf(
+                "joern-backed java analysis",
+                "snapshot-based traversal",
+                "graph-guided edit planning",
+                "scratch-copy validation",
+                "repo and cluster fitness scoring",
+            ),
+            build_context_bundle_supported = true,
+            analysis_engine_first_backend = snapshot.analysisEngine == "joern",
+            snapshot_id = snapshot.id,
+            generated_at = snapshot.generatedAt,
+        )
+
+    fun buildContextBundle(
+        task: String? = null,
+        nodeId: String? = null,
+        tokenBudget: Int = 1800,
+        snapshot: Snapshot = current(),
+    ): ContextBundleResult {
+        require(!task.isNullOrBlank() || !nodeId.isNullOrBlank()) { "Provide task or node_id" }
+        val budget = tokenBudget.coerceIn(400, 12000)
+        val notes = mutableListOf<String>()
+        val summary = summaryMap(snapshot)
+        val chosenNode = when {
+            !nodeId.isNullOrBlank() -> snapshot.nodeSummaries[nodeId] ?: error("Unknown node_id: $nodeId")
+            else -> resolveBundleNode(task!!.trim(), snapshot, notes)
+        }
+        val chosenNodeId = chosenNode?.id
+        val focusIds = linkedSetOf<String>()
+        val focusNodes = mutableListOf<NodeSummary>()
+        val relationships = mutableListOf<EdgeSummary>()
+        val impactFiles = mutableListOf<String>()
+        val sourceSlices = mutableListOf<SourceBatchItem>()
+        val clusters = mutableListOf<ClusterSummary>()
+        val entrypoints = summary.entrypoints.take(3)
+
+        if (chosenNode != null) {
+            focusIds += chosenNode.id
+            focusNodes += chosenNode
+            val cluster = snapshot.clusters.firstOrNull { chosenNode.id in snapshot.clusterNodes[it.cluster_id].orEmpty() }
+            if (cluster != null) clusters += cluster
+
+            val detail = nodeDetail(chosenNode.id, snapshot)
+            (listOf(chosenNode) + detail.callers.take(2).map { it.node } + detail.callees.take(3).map { it.node } + detail.implementations.take(2))
+                .forEach { node ->
+                    if (node.id != chosenNode.id && focusIds.add(node.id)) {
+                        focusNodes += node
+                    }
+                }
+            relationships += snapshot.edges
+                .filter { it.from in focusIds && it.to in focusIds }
+                .filter { it.relationship in setOf("calls", "implements", "extends", "uses_type") }
+                .take(12)
+            val impact = impact(chosenNode.id, 2, snapshot)
+            impactFiles += impact.affected_files.take(6)
+            notes += "chosen_node=${chosenNode.name}"
+            notes += "impact_basis=${impact.analysis_basis.joinToString(",")}"
+        } else {
+            notes += "no_node_resolved"
+        }
+
+        if (clusters.isEmpty()) {
+            clusters += summary.clusters.take(2)
+        }
+
+        val sourceBudget = budget - estimateBundleTokenUsage(
+            summaryMode = summary.summary_mode,
+            task = task,
+            chosenNode = chosenNode,
+            clusters = clusters,
+            entrypoints = entrypoints,
+            focusNodes = focusNodes,
+            relationships = relationships,
+            impactFiles = impactFiles,
+            notes = notes,
+        )
+        var consumed = 0
+        val orderedSourceIds = mutableListOf<String>().apply {
+            chosenNodeId?.let { add(it) }
+            addAll(focusNodes.map { it.id }.filter { it != chosenNodeId })
+        }
+        orderedSourceIds.forEach { id ->
+            val source = source(id, 0, snapshot)
+            val tokens = estimateTextTokens(source.source) + 24
+            if (sourceSlices.isNotEmpty() && consumed + tokens > sourceBudget) return@forEach
+            consumed += tokens
+            sourceSlices += SourceBatchItem(id, source.source, source.file, source.line_range)
+        }
+        if (sourceSlices.size < orderedSourceIds.size) {
+            notes += "source_slices_truncated_for_budget"
+        }
+
+        return ContextBundleResult(
+            task = task,
+            node_id = nodeId,
+            chosen_node_id = chosenNodeId,
+            token_budget = budget,
+            summary_mode = summary.summary_mode,
+            clusters = clusters.take(2),
+            entrypoints = entrypoints,
+            focus_nodes = focusNodes,
+            relationships = relationships.distinctBy { Triple(it.from, it.to, it.relationship) },
+            impact_files = impactFiles.distinct(),
+            source_slices = sourceSlices,
+            notes = notes,
+            analysis_engine = snapshot.analysisEngine,
+            engine_version = snapshot.engineVersion,
+            build_duration_ms = snapshot.buildDurationMs,
+            snapshot_id = snapshot.id,
+            generated_at = snapshot.generatedAt,
+        )
+    }
+
     fun agentFitness(snapshot: Snapshot = current()): AgentFitnessResult {
         val report = buildFitnessReport(
             relevantMethods = snapshot.methodInfos.values.filter(::isAgentRelevantMethod),

@@ -9,6 +9,22 @@ import java.time.Instant
 class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
     private val tools = listOf(
         tool(
+            "get_capabilities",
+            "Return an explicit capability handshake for languages, engines, edit operations, validation modes, and degraded-mode semantics.",
+            objectSchema(),
+        ),
+        tool(
+            "build_context_bundle",
+            "Build a task-oriented context bundle with graph facts and the minimum relevant source slices for prompt packing.",
+            objectSchema(
+                properties = mapOf(
+                    "task" to stringSchema("Natural-language task to orient around."),
+                    "node_id" to stringSchema("Optional focus node id to build the bundle around."),
+                    "token_budget" to intSchema("Approximate token budget for the bundle.", minimum = 400, maximum = 12000),
+                ),
+            ),
+        ),
+        tool(
             "get_edit_candidates",
             "Suggest likely edit targets and operations from a natural-language task description.",
             objectSchema(
@@ -372,6 +388,16 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
                 snapshotManager.validateEdit(
                     editId = arguments.requiredString("edit_id"),
                     mode = arguments.optionalString("mode") ?: "auto",
+                ),
+            )
+            "get_capabilities" -> graphHarnessJson.encode(
+                snapshotManager.capabilities(),
+            )
+            "build_context_bundle" -> graphHarnessJson.encode(
+                snapshotManager.buildContextBundle(
+                    task = arguments.optionalString("task"),
+                    nodeId = arguments.optionalString("node_id"),
+                    tokenBudget = arguments.optionalInt("token_budget") ?: 1800,
                 ),
             )
 
@@ -740,6 +766,41 @@ internal class JsonCodec {
             "edit_id" to value.edit_id,
             "validation_targets" to value.validation_targets,
             "command_hints" to value.command_hints,
+            "analysis_engine" to value.analysis_engine,
+            "engine_version" to value.engine_version,
+            "build_duration_ms" to value.build_duration_ms,
+            "snapshot_id" to value.snapshot_id,
+            "generated_at" to value.generated_at,
+        )
+        is CapabilitiesResult -> jObject(
+            "languages" to value.languages,
+            "analysis_engine" to value.analysis_engine,
+            "engine_version" to value.engine_version,
+            "available_tools" to value.available_tools,
+            "edit_operations" to value.edit_operations,
+            "validation_modes" to value.validation_modes,
+            "confidence_semantics" to value.confidence_semantics,
+            "degraded_mode_flags" to value.degraded_mode_flags,
+            "snapshot_semantics" to value.snapshot_semantics,
+            "analysis_engine_capabilities" to value.analysis_engine_capabilities,
+            "build_context_bundle_supported" to value.build_context_bundle_supported,
+            "analysis_engine_first_backend" to value.analysis_engine_first_backend,
+            "snapshot_id" to value.snapshot_id,
+            "generated_at" to value.generated_at,
+        )
+        is ContextBundleResult -> jObject(
+            "task" to value.task,
+            "node_id" to value.node_id,
+            "chosen_node_id" to value.chosen_node_id,
+            "token_budget" to value.token_budget,
+            "summary_mode" to value.summary_mode,
+            "clusters" to value.clusters,
+            "entrypoints" to value.entrypoints,
+            "focus_nodes" to value.focus_nodes,
+            "relationships" to value.relationships,
+            "impact_files" to value.impact_files,
+            "source_slices" to value.source_slices,
+            "notes" to value.notes,
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
