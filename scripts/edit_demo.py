@@ -194,12 +194,17 @@ def run_apply_smoke(server: str, source_root: Path, env: dict[str, str]) -> dict
                 },
             },
         )
+        validation = session.tool_call("validate_edit", {"edit_id": plan["edit_id"], "mode": "auto"})
         apply_result = session.tool_call("apply_edit", {"edit_id": plan["edit_id"]})
         source = session.tool_call("get_source", {"node_id": target["id"], "include_context": 0})
     finally:
         session.close()
 
     return {
+        "validation_success": validation["success"],
+        "validation_scope": validation["validation_scope"],
+        "validator": validation["validator"],
+        "validation_errors": validation["validation_errors"],
         "apply_success": apply_result["success"],
         "snapshot_id": apply_result["snapshot_id"],
         "updated_nodes": apply_result["updated_nodes"][:5],

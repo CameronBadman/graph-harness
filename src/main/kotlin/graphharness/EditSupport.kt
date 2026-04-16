@@ -33,6 +33,25 @@ data class EditApplyResult(
     val generated_at: String,
 )
 
+data class EditValidationResult(
+    val success: Boolean,
+    val edit_id: String,
+    val validation_mode: String,
+    val validation_scope: String,
+    val validator: String,
+    val command: List<String>,
+    val exit_code: Int,
+    val duration_ms: Long,
+    val affected_files: List<String>,
+    val output_excerpt: String,
+    val validation_errors: List<String>,
+    val analysis_engine: String,
+    val engine_version: String? = null,
+    val build_duration_ms: Long,
+    val snapshot_id: String,
+    val generated_at: String,
+)
+
 data class PendingEdit(
     val id: String,
     val operation: String,
@@ -41,6 +60,7 @@ data class PendingEdit(
     val fileEdits: List<PendingFileEdit>,
     val affectedNodeIds: List<String>,
     val affectedFiles: List<String>,
+    val applied: Boolean = false,
 )
 
 data class PendingFileEdit(

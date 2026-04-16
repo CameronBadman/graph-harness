@@ -284,6 +284,10 @@ data class ResolveEditTargetResult(
     val generated_at: String,
 )
 
+data class ValidationRequestPayload(
+    val mode: String? = null,
+)
+
 data class ToolDefinition(
     val name: String,
     val description: String,

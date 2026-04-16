@@ -1,8 +1,10 @@
 package graphharness
 
+import java.io.ByteArrayOutputStream
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import java.nio.file.StandardWatchEventKinds
 import java.security.MessageDigest
 import java.time.Instant
@@ -10,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.io.path.createDirectories
 import kotlin.io.path.extension
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.math.min
@@ -57,6 +60,18 @@ data class FileParseResult(
 private data class MethodImplementationMatch(
     val node: NodeSummary,
     val relationship: String,
+)
+
+private data class ValidationCommand(
+    val validator: String,
+    val command: List<String>,
+    val environment: Map<String, String> = emptyMap(),
+)
+
+private data class ProcessRunResult(
+    val exitCode: Int,
+    val output: String,
+    val timedOut: Boolean,
 )
 
 data class Snapshot(
@@ -1342,12 +1357,25 @@ class SnapshotManager(private val projectRoot: Path) {
                 snapshot_id = snapshot.id,
                 generated_at = snapshot.generatedAt,
             )
+        if (pending.applied) {
+            return EditApplyResult(
+                success = false,
+                edit_id = editId,
+                updated_nodes = pending.affectedNodeIds.filter { it in snapshot.nodeSummaries },
+                affected_files = pending.affectedFiles,
+                validation_errors = listOf("Edit already applied: $editId"),
+                analysis_engine = snapshot.analysisEngine,
+                engine_version = snapshot.engineVersion,
+                build_duration_ms = snapshot.buildDurationMs,
+                snapshot_id = snapshot.id,
+                generated_at = snapshot.generatedAt,
+            )
+        }
 
         pending.fileEdits.forEach { fileEdit ->
             val path = snapshot.sourceIndex[fileEdit.file] ?: projectRoot.resolve(fileEdit.file).normalize()
             val currentContent = readPathText(path)
             if (sha256(currentContent) != fileEdit.fileHash) {
-                pendingEdits.remove(editId)
                 return EditApplyResult(
                     success = false,
                     edit_id = editId,
@@ -1369,7 +1397,7 @@ class SnapshotManager(private val projectRoot: Path) {
         }
         val refreshed = buildSnapshot()
         activeSnapshot.set(refreshed)
-        pendingEdits.remove(editId)
+        pendingEdits[editId] = pending.copy(applied = true)
 
         return EditApplyResult(
             success = true,
@@ -1383,6 +1411,250 @@ class SnapshotManager(private val projectRoot: Path) {
             snapshot_id = refreshed.id,
             generated_at = refreshed.generatedAt,
         )
+    }
+
+    fun validateEdit(
+        editId: String,
+        mode: String = "auto",
+        snapshot: Snapshot = current(),
+    ): EditValidationResult {
+        val pending = pendingEdits[editId]
+            ?: return EditValidationResult(
+                success = false,
+                edit_id = editId,
+                validation_mode = mode,
+                validation_scope = "unknown",
+                validator = "none",
+                command = emptyList(),
+                exit_code = -1,
+                duration_ms = 0,
+                affected_files = emptyList(),
+                output_excerpt = "",
+                validation_errors = listOf("Unknown edit_id: $editId"),
+                analysis_engine = snapshot.analysisEngine,
+                engine_version = snapshot.engineVersion,
+                build_duration_ms = snapshot.buildDurationMs,
+                snapshot_id = snapshot.id,
+                generated_at = snapshot.generatedAt,
+            )
+
+        val validationRoot = createValidationScratchRoot()
+        val validationScope = if (pending.applied) "applied_workspace" else "planned_edit"
+        return try {
+            copyProjectTree(projectRoot, validationRoot)
+            if (!pending.applied) {
+                pending.fileEdits.forEach { fileEdit ->
+                    val target = validationRoot.resolve(fileEdit.file).normalize()
+                    target.parent?.createDirectories()
+                    Files.writeString(target, fileEdit.newFileContent)
+                }
+            }
+
+            val selected = selectValidationCommand(validationRoot, mode)
+            val start = System.nanoTime()
+            val result = runValidationCommand(validationRoot, selected)
+            val durationMs = elapsedMs(start)
+            EditValidationResult(
+                success = !result.timedOut && result.exitCode == 0,
+                edit_id = editId,
+                validation_mode = mode,
+                validation_scope = validationScope,
+                validator = selected.validator,
+                command = selected.command,
+                exit_code = if (result.timedOut) -1 else result.exitCode,
+                duration_ms = durationMs,
+                affected_files = pending.affectedFiles,
+                output_excerpt = summarizeProcessOutput(result.output),
+                validation_errors = buildValidationErrors(result, selected),
+                analysis_engine = snapshot.analysisEngine,
+                engine_version = snapshot.engineVersion,
+                build_duration_ms = snapshot.buildDurationMs,
+                snapshot_id = snapshot.id,
+                generated_at = snapshot.generatedAt,
+            )
+        } finally {
+            deleteRecursively(validationRoot)
+        }
+    }
+
+    private fun createValidationScratchRoot(): Path =
+        Files.createTempDirectory("graphharness-validate-")
+
+    private fun copyProjectTree(sourceRoot: Path, targetRoot: Path) {
+        val excludedNames = setOf(".git", ".gradle", "build", "target", ".idea")
+        Files.walk(sourceRoot).use { paths ->
+            paths.forEach { source ->
+                val relative = sourceRoot.relativize(source)
+                if (relative.nameCount > 0 && relative.any { it.toString() in excludedNames }) {
+                    return@forEach
+                }
+                val target = if (relative.nameCount == 0) targetRoot else targetRoot.resolve(relative.toString())
+                if (Files.isDirectory(source)) {
+                    target.createDirectories()
+                } else {
+                    target.parent?.createDirectories()
+                    Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES)
+                }
+            }
+        }
+    }
+
+    private fun selectValidationCommand(root: Path, mode: String): ValidationCommand {
+        require(mode in setOf("auto", "compile", "test")) { "Unsupported validation mode: $mode" }
+        val mavenRepo = root.resolve(".graphharness-m2").toString()
+        val gradleUserHome = root.resolve(".graphharness-gradle").toString()
+        val mavenEnv = mapOf(
+            "HOME" to root.toString(),
+            "MAVEN_USER_HOME" to mavenRepo,
+        )
+        val mvnw = root.resolve("mvnw")
+        val gradlew = root.resolve("gradlew")
+        val pom = root.resolve("pom.xml")
+        val gradleKts = root.resolve("build.gradle.kts")
+        val gradleGroovy = root.resolve("build.gradle")
+
+        if (Files.exists(mvnw) && mode != "compile") {
+            return ValidationCommand(
+                validator = "maven-wrapper-test",
+                command = listOf("bash", "./mvnw", "-q", "-Dmaven.repo.local=$mavenRepo", "test"),
+                environment = mavenEnv,
+            )
+        }
+        if (Files.exists(mvnw)) {
+            return ValidationCommand(
+                validator = "maven-wrapper-compile",
+                command = listOf("bash", "./mvnw", "-q", "-Dmaven.repo.local=$mavenRepo", "-DskipTests", "compile"),
+                environment = mavenEnv,
+            )
+        }
+        if (Files.exists(gradlew) && mode != "compile") {
+            return ValidationCommand(
+                validator = "gradle-wrapper-test",
+                command = listOf("bash", "./gradlew", "--no-daemon", "test"),
+                environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
+            )
+        }
+        if (Files.exists(gradlew)) {
+            return ValidationCommand(
+                validator = "gradle-wrapper-compile",
+                command = listOf("bash", "./gradlew", "--no-daemon", "compileJava"),
+                environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
+            )
+        }
+        if (Files.exists(pom) && hasExecutable("mvn") && mode != "compile") {
+            return ValidationCommand(
+                validator = "maven-test",
+                command = listOf("mvn", "-q", "-Dmaven.repo.local=$mavenRepo", "test"),
+                environment = mavenEnv,
+            )
+        }
+        if (Files.exists(pom) && hasExecutable("mvn")) {
+            return ValidationCommand(
+                validator = "maven-compile",
+                command = listOf("mvn", "-q", "-Dmaven.repo.local=$mavenRepo", "-DskipTests", "compile"),
+                environment = mavenEnv,
+            )
+        }
+        if ((Files.exists(gradleKts) || Files.exists(gradleGroovy)) && hasExecutable("gradle") && mode != "compile") {
+            return ValidationCommand(
+                validator = "gradle-test",
+                command = listOf("gradle", "--no-daemon", "test"),
+                environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
+            )
+        }
+        if ((Files.exists(gradleKts) || Files.exists(gradleGroovy)) && hasExecutable("gradle")) {
+            return ValidationCommand(
+                validator = "gradle-compile",
+                command = listOf("gradle", "--no-daemon", "compileJava"),
+                environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
+            )
+        }
+        return ValidationCommand(
+            validator = "javac-syntax",
+            command = javacCommand(root),
+        )
+    }
+
+    private fun hasExecutable(command: String): Boolean =
+        runCatching {
+            val process = ProcessBuilder(command, "--version")
+                .redirectErrorStream(true)
+                .start()
+            try {
+                process.waitFor(5, TimeUnit.SECONDS)
+            } finally {
+                process.destroy()
+            }
+        }.getOrDefault(false)
+
+    private fun javacCommand(root: Path): List<String> {
+        val javaFiles = Files.walk(root).use { paths ->
+            paths.filter { Files.isRegularFile(it) && it.extension == "java" }
+                .map { root.relativize(it).toString() }
+                .sorted()
+                .toList()
+        }
+        require(javaFiles.isNotEmpty()) { "No Java files found for validation" }
+        return listOf("javac", "-proc:none") + javaFiles
+    }
+
+    private fun runValidationCommand(root: Path, validation: ValidationCommand): ProcessRunResult {
+        val builder = ProcessBuilder(validation.command)
+            .directory(root.toFile())
+            .redirectErrorStream(true)
+        builder.environment().putAll(validation.environment)
+        val process = builder.start()
+        val outputBuffer = ByteArrayOutputStream()
+        val reader = Thread {
+            process.inputStream.use { input ->
+                input.copyTo(outputBuffer)
+            }
+        }
+        reader.isDaemon = true
+        reader.start()
+        val completed = process.waitFor(120, TimeUnit.SECONDS)
+        if (!completed) {
+            process.destroyForcibly()
+        }
+        reader.join(1000)
+        return ProcessRunResult(
+            exitCode = if (completed) process.exitValue() else -1,
+            output = outputBuffer.toString(Charsets.UTF_8.name()),
+            timedOut = !completed,
+        )
+    }
+
+    private fun summarizeProcessOutput(output: String): String {
+        val lines = output.lines()
+            .filter { it.isNotBlank() }
+            .takeLast(40)
+        return lines.joinToString("\n").take(4000)
+    }
+
+    private fun buildValidationErrors(result: ProcessRunResult, selected: ValidationCommand): List<String> {
+        if (result.timedOut) {
+            return listOf("Validation command timed out: ${selected.command.joinToString(" ")}")
+        }
+        if (result.exitCode == 0) {
+            return emptyList()
+        }
+        val summary = summarizeProcessOutput(result.output)
+        return listOf(
+            buildString {
+                append("Validation failed via ${selected.validator}")
+                append(" (exit_code=").append(result.exitCode).append(')')
+                if (summary.isNotBlank()) {
+                    append(": ").append(summary.lineSequence().first())
+                }
+            },
+        )
+    }
+
+    private fun deleteRecursively(root: Path) {
+        if (!Files.exists(root)) return
+        Files.walk(root).use { paths ->
+            paths.sorted(Comparator.reverseOrder()).forEach { Files.deleteIfExists(it) }
+        }
     }
 
     private fun parseJavaFile(path: Path, root: Path): FileParseResult {

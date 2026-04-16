@@ -80,6 +80,17 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
                 required = listOf("edit_id"),
             ),
         ),
+        tool(
+            "validate_edit",
+            "Validate a planned or already-applied edit on a scratch copy using repo-aware Java build/test checks.",
+            objectSchema(
+                properties = mapOf(
+                    "edit_id" to stringSchema("Edit id returned by plan_edit."),
+                    "mode" to enumSchema("Validation depth.", listOf("auto", "compile", "test")),
+                ),
+                required = listOf("edit_id"),
+            ),
+        ),
         tool("get_summary_map", "Return the compact topology-oriented summary for the project.", objectSchema()),
         tool(
             "get_cluster_detail",
@@ -330,6 +341,13 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
 
             "apply_edit" -> graphHarnessJson.encode(
                 snapshotManager.applyEdit(arguments.requiredString("edit_id")),
+            )
+
+            "validate_edit" -> graphHarnessJson.encode(
+                snapshotManager.validateEdit(
+                    editId = arguments.requiredString("edit_id"),
+                    mode = arguments.optionalString("mode") ?: "auto",
+                ),
             )
 
             "get_summary_map" -> graphHarnessJson.encode(snapshotManager.summaryMap())
@@ -595,6 +613,24 @@ internal class JsonCodec {
             "edit_id" to value.edit_id,
             "updated_nodes" to value.updated_nodes,
             "affected_files" to value.affected_files,
+            "validation_errors" to value.validation_errors,
+            "analysis_engine" to value.analysis_engine,
+            "engine_version" to value.engine_version,
+            "build_duration_ms" to value.build_duration_ms,
+            "snapshot_id" to value.snapshot_id,
+            "generated_at" to value.generated_at,
+        )
+        is EditValidationResult -> jObject(
+            "success" to value.success,
+            "edit_id" to value.edit_id,
+            "validation_mode" to value.validation_mode,
+            "validation_scope" to value.validation_scope,
+            "validator" to value.validator,
+            "command" to value.command,
+            "exit_code" to value.exit_code,
+            "duration_ms" to value.duration_ms,
+            "affected_files" to value.affected_files,
+            "output_excerpt" to value.output_excerpt,
             "validation_errors" to value.validation_errors,
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,

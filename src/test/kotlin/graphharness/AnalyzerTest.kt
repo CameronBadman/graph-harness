@@ -141,6 +141,54 @@ class AnalyzerTest {
     }
 
     @Test
+    fun validatesPlannedAndAppliedEditsOnScratchCopies() {
+        val root = createTempDirectory("graphharness-validate-test")
+        val file = root.resolve("PaymentService.java")
+        file.writeText(
+            """
+            package com.app.payment;
+
+            public class PaymentService {
+                public PaymentResult processPayment(Order order) {
+                    return charge(order);
+                }
+
+                private PaymentResult charge(Order order) {
+                    return new PaymentResult();
+                }
+            }
+            """.trimIndent(),
+        )
+        root.resolve("PaymentResult.java").writeText("package com.app.payment;\npublic class PaymentResult {}\n")
+        root.resolve("Order.java").writeText("package com.app.payment;\npublic class Order {}\n")
+
+        val manager = SnapshotManager(root)
+        val processNode = manager.search("processPayment", "method", null, null).results.first()
+        val plan = manager.planEdit(
+            operation = "modify_method_body",
+            targetNodeId = processNode.id,
+            payload = EditRequestPayload(
+                patch_mode = "insert_before",
+                anchor = "return charge(order);",
+                snippet = "order.toString();",
+            ),
+        )
+
+        val pendingValidation = manager.validateEdit(plan.edit_id!!, "compile")
+        assertTrue(pendingValidation.success)
+        assertEquals("planned_edit", pendingValidation.validation_scope)
+        assertEquals("javac-syntax", pendingValidation.validator)
+
+        val apply = manager.applyEdit(plan.edit_id)
+        assertTrue(apply.success)
+
+        val appliedValidation = manager.validateEdit(plan.edit_id, "compile")
+        assertTrue(appliedValidation.success)
+        assertEquals("applied_workspace", appliedValidation.validation_scope)
+        assertEquals("javac-syntax", appliedValidation.validator)
+    }
+
+    @Test
     fun plansSmallerAnchorBasedMethodBodyEdits() {
         val root = createTempDirectory("graphharness-patch-test")
         val file = root.resolve("PaymentService.java")

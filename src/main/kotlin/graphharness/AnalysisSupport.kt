@@ -406,8 +406,8 @@ fun inferRenamePayload(task: String, method: MethodInfo): Map<String, String> {
 fun inferMethodPatchPayload(task: String): Map<String, String> {
     val payload = linkedMapOf<String, String>()
     when {
-        "insert before" in task -> payload["patch_mode"] = "insert_before"
-        "insert after" in task -> payload["patch_mode"] = "insert_after"
+        Regex("""insert\b[\s\S]*\bbefore\b""", RegexOption.IGNORE_CASE).containsMatchIn(task) -> payload["patch_mode"] = "insert_before"
+        Regex("""insert\b[\s\S]*\bafter\b""", RegexOption.IGNORE_CASE).containsMatchIn(task) -> payload["patch_mode"] = "insert_after"
         "replace line" in task || "replace statement" in task -> payload["patch_mode"] = "replace_line"
     }
     payloadAnchor(task)?.let { payload["anchor"] = it }
