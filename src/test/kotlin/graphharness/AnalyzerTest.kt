@@ -95,6 +95,11 @@ class AnalyzerTest {
         val submitNode = manager.search("submit", "method", null, null).results.first()
         val paths = manager.callPaths(submitNode.id, 3)
         assertTrue(paths.paths.none { path -> path.nodes.any { it.name.contains(".<init>") } })
+
+        val fitness = manager.agentFitness()
+        assertTrue(fitness.overall_score in 0..100)
+        assertTrue(fitness.subscores.any { it.name == "navigability" })
+        assertTrue(fitness.metrics["agent_relevant_method_count"] ?: 0.0 >= 1.0)
     }
 
     @Test
@@ -541,5 +546,82 @@ class AnalyzerTest {
         assertEquals("module:payments", validation.validation_target)
         assertEquals("javac-syntax", validation.validator)
         assertEquals(listOf("javac-syntax"), validation.attempted_validators)
+    }
+
+    @Test
+    fun reportsAgentFitnessIssuesForTangledCode() {
+        val root = createTempDirectory("graphharness-fitness-test")
+        root.resolve("BigService.java").writeText(
+            """
+            package com.app.payment;
+
+            public class BigService {
+                public PaymentResult processPayment(Order order) {
+                    validateOrder(order);
+                    audit(order);
+                    enrich(order);
+                    reserve(order);
+                    authorize(order);
+                    capture(order);
+                    notifyOps(order);
+                    publish(order);
+                    archive(order);
+                    return charge(order);
+                }
+
+                public PaymentResult charge(Order order) {
+                    return new PaymentResult();
+                }
+
+                public void processRefund(Order order) {
+                    validateOrder(order);
+                    audit(order);
+                    archive(order);
+                }
+
+                private void validateOrder(Order order) {}
+                private void audit(Order order) {}
+                private void enrich(Order order) {}
+                private void reserve(Order order) {}
+                private void authorize(Order order) {}
+                private void capture(Order order) {}
+                private void notifyOps(Order order) {}
+                private void publish(Order order) {}
+                private void archive(Order order) {}
+            }
+            """.trimIndent(),
+        )
+        root.resolve("CheckoutController.java").writeText(
+            """
+            package com.app.payment;
+
+            public class CheckoutController {
+                public PaymentResult submit(Order order) {
+                    return new BigService().processPayment(order);
+                }
+            }
+            """.trimIndent(),
+        )
+        root.resolve("RefundController.java").writeText(
+            """
+            package com.app.payment;
+
+            public class RefundController {
+                public void processRefund(Order order) {
+                    new BigService().processRefund(order);
+                }
+            }
+            """.trimIndent(),
+        )
+        root.resolve("PaymentResult.java").writeText("package com.app.payment;\npublic class PaymentResult {}\n")
+        root.resolve("Order.java").writeText("package com.app.payment;\npublic class Order {}\n")
+
+        val manager = SnapshotManager(root)
+        val fitness = manager.agentFitness()
+
+        assertTrue(fitness.issues.isNotEmpty())
+        assertTrue(fitness.recommended_actions.isNotEmpty())
+        assertTrue(fitness.issues.any { it.title.contains("Ambiguous") || it.title.contains("Oversized") })
+        assertTrue(fitness.subscores.any { it.name == "editability" && it.score < 100 })
     }
 }

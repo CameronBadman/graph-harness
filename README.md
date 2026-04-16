@@ -69,6 +69,7 @@ That demo now exercises the intended edit loop:
 - `verify_candidate`
 - `plan_edit`
 - `validate_edit`
+- `get_agent_fitness`
 - `apply_edit` smoke test on a scratch copy
 
 The available tools are:
@@ -78,6 +79,7 @@ The available tools are:
 - `verify_candidate`
 - `plan_edit`
 - `validate_edit`
+- `get_agent_fitness`
 - `apply_edit`
 - `get_cluster_detail`
 - `get_node_detail`
@@ -106,4 +108,5 @@ The available tools are:
 - `validate_edit` replays a planned edit, or validates an already-applied edit, on a scratch copy of the repo. It prefers Maven/Gradle test or compile commands and falls back to a local `javac -proc:none` syntax check when no project build tool is detected.
 - When repo-aware validation is blocked by wrapper/bootstrap failures or environment constraints, `validate_edit` reports `attempted_validators`, marks the result as `degraded`, and falls back to syntax validation when possible.
 - `validate_edit` scopes repo-aware validation to the nearest touched Maven/Gradle module when possible, and reports that choice as `validation_target`.
+- `get_agent_fitness` reports a repo-wide structural fitness score, subscores, issues, and recommended actions for how well the codebase supports graph-guided agent workflows.
 # code-agent

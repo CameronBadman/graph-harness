@@ -288,6 +288,41 @@ data class ValidationRequestPayload(
     val mode: String? = null,
 )
 
+data class FitnessSubscore(
+    val name: String,
+    val score: Int,
+    val rationale: String,
+)
+
+data class FitnessIssue(
+    val severity: String,
+    val title: String,
+    val details: String,
+    val node_id: String? = null,
+    val file: String? = null,
+)
+
+data class FitnessAction(
+    val priority: String,
+    val title: String,
+    val rationale: String,
+    val target_node_id: String? = null,
+    val file: String? = null,
+)
+
+data class AgentFitnessResult(
+    val overall_score: Int,
+    val subscores: List<FitnessSubscore>,
+    val metrics: Map<String, Double>,
+    val issues: List<FitnessIssue>,
+    val recommended_actions: List<FitnessAction>,
+    val analysis_engine: String,
+    val engine_version: String? = null,
+    val build_duration_ms: Long,
+    val snapshot_id: String,
+    val generated_at: String,
+)
+
 data class ToolDefinition(
     val name: String,
     val description: String,

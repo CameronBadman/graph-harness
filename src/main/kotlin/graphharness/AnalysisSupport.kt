@@ -113,7 +113,7 @@ fun entrypointPriority(method: MethodInfo): Int {
 }
 
 fun isSyntheticLikeMethod(method: MethodInfo): Boolean =
-    method.simpleName.startsWith("<") && method.simpleName.endsWith(">")
+    (method.simpleName.startsWith("<") && method.simpleName.contains(">")) || "<lambda>" in method.simpleName
 
 fun methodMatchesContract(candidate: MethodInfo, target: MethodInfo): Boolean {
     if (candidate.id == target.id) return false

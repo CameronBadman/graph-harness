@@ -91,6 +91,11 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
                 required = listOf("edit_id"),
             ),
         ),
+        tool(
+            "get_agent_fitness",
+            "Return a structural fitness report for how well this repo supports graph-guided agent workflows.",
+            objectSchema(),
+        ),
         tool("get_summary_map", "Return the compact topology-oriented summary for the project.", objectSchema()),
         tool(
             "get_cluster_detail",
@@ -348,6 +353,10 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
                     editId = arguments.requiredString("edit_id"),
                     mode = arguments.optionalString("mode") ?: "auto",
                 ),
+            )
+
+            "get_agent_fitness" -> graphHarnessJson.encode(
+                snapshotManager.agentFitness(),
             )
 
             "get_summary_map" -> graphHarnessJson.encode(snapshotManager.summaryMap())
@@ -635,6 +644,37 @@ internal class JsonCodec {
             "affected_files" to value.affected_files,
             "output_excerpt" to value.output_excerpt,
             "validation_errors" to value.validation_errors,
+            "analysis_engine" to value.analysis_engine,
+            "engine_version" to value.engine_version,
+            "build_duration_ms" to value.build_duration_ms,
+            "snapshot_id" to value.snapshot_id,
+            "generated_at" to value.generated_at,
+        )
+        is FitnessSubscore -> jObject(
+            "name" to value.name,
+            "score" to value.score,
+            "rationale" to value.rationale,
+        )
+        is FitnessIssue -> jObject(
+            "severity" to value.severity,
+            "title" to value.title,
+            "details" to value.details,
+            "node_id" to value.node_id,
+            "file" to value.file,
+        )
+        is FitnessAction -> jObject(
+            "priority" to value.priority,
+            "title" to value.title,
+            "rationale" to value.rationale,
+            "target_node_id" to value.target_node_id,
+            "file" to value.file,
+        )
+        is AgentFitnessResult -> jObject(
+            "overall_score" to value.overall_score,
+            "subscores" to value.subscores,
+            "metrics" to value.metrics,
+            "issues" to value.issues,
+            "recommended_actions" to value.recommended_actions,
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,

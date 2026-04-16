@@ -494,6 +494,157 @@ class SnapshotManager(private val projectRoot: Path) {
         )
     }
 
+    fun agentFitness(snapshot: Snapshot = current()): AgentFitnessResult {
+        val relevantMethods = snapshot.methodInfos.values.filter(::isAgentRelevantMethod)
+        val callEdges = snapshot.edges.filter { it.relationship == "calls" }
+        val outboundCounts = callEdges.groupingBy { it.from }.eachCount()
+        val inboundCounts = callEdges.groupingBy { it.to }.eachCount()
+        val avgFanOut = if (relevantMethods.isEmpty()) 0.0 else relevantMethods.map { outboundCounts.getOrDefault(it.id, 0) }.average()
+        val avgInbound = if (relevantMethods.isEmpty()) 0.0 else relevantMethods.map { inboundCounts.getOrDefault(it.id, 0) }.average()
+        val oversizedMethods = relevantMethods.filter { (it.loc >= 25) || (it.complexity >= 8) }
+        val ambiguityIgnore = setOf("toString", "hashCode", "equals")
+        val ambiguityGroups = relevantMethods
+            .filter { it.visibility == "public" && it.simpleName !in ambiguityIgnore }
+            .groupBy { it.simpleName }
+            .filterValues { it.size > 1 }
+        val ambiguousMethodCount = ambiguityGroups.values.sumOf { it.size }
+        val externalEdgeRatio = snapshot.clusters
+            .takeIf { it.isNotEmpty() }
+            ?.let { clusters -> clusters.sumOf { it.external_edges }.toDouble() / clusters.sumOf { it.node_count }.coerceAtLeast(1) }
+            ?: 0.0
+        val sampleForImpact = relevantMethods
+            .sortedWith(compareByDescending<MethodInfo> { inboundCounts.getOrDefault(it.id, 0) }.thenByDescending { entrypointPriority(it) })
+            .take(8)
+        val avgImpactRadius = if (sampleForImpact.isEmpty()) {
+            0.0
+        } else {
+            sampleForImpact.map { impact(it.id, 2, snapshot).affected_files.size }.average()
+        }
+        val buildRootRatios = sourceFileBuildRootStats(snapshot)
+        val moduleScopedRatio = buildRootRatios["module_scoped_file_ratio"] ?: 0.0
+
+        val navigability = scoreFitness(
+            100.0
+                - avgFanOut * 7.0
+                - ambiguousMethodCount * 4.0
+                - externalEdgeRatio * 12.0,
+        )
+        val editability = scoreFitness(
+            100.0
+                - oversizedMethods.size * 6.0
+                - avgImpactRadius * 9.0
+                - avgFanOut * 4.0,
+        )
+        val validationLocality = scoreFitness(
+            45.0
+                + moduleScopedRatio * 55.0
+                - externalEdgeRatio * 10.0,
+        )
+        val couplingRisk = scoreFitness(
+            100.0
+                - externalEdgeRatio * 18.0
+                - avgFanOut * 6.0
+                - avgInbound * 3.0,
+        )
+
+        val issues = mutableListOf<FitnessIssue>()
+        val actions = mutableListOf<FitnessAction>()
+
+        oversizedMethods.sortedByDescending { it.loc + it.complexity * 3 }.take(3).forEach { method ->
+            issues += FitnessIssue(
+                severity = if ((method.loc >= 40) || (method.complexity >= 12)) "high" else "medium",
+                title = "Oversized method",
+                details = "${method.qualifiedName} has loc=${method.loc} and complexity=${method.complexity}, which makes targeted edits and impact reasoning less local.",
+                node_id = method.id,
+                file = method.file,
+            )
+            actions += FitnessAction(
+                priority = "high",
+                title = "Extract and localize ${method.simpleName}",
+                rationale = "Splitting this method into smaller steps should improve edit targeting and reduce validation blast radius.",
+                target_node_id = method.id,
+                file = method.file,
+            )
+        }
+
+        ambiguityGroups.entries.sortedByDescending { it.value.size }.take(3).forEach { (simpleName, methods) ->
+            issues += FitnessIssue(
+                severity = "medium",
+                title = "Ambiguous method naming",
+                details = "$simpleName appears in ${methods.size} agent-relevant methods across the repo, which raises edit-target ambiguity.",
+                node_id = methods.first().id,
+                file = methods.first().file,
+            )
+            actions += FitnessAction(
+                priority = "medium",
+                title = "Differentiate $simpleName variants",
+                rationale = "More domain-specific method names reduce candidate ambiguity for graph-guided edits.",
+                target_node_id = methods.first().id,
+                file = methods.first().file,
+            )
+        }
+
+        if (externalEdgeRatio > 0.75 && snapshot.clusters.isNotEmpty()) {
+            val worstCluster = snapshot.clusters.maxByOrNull { it.external_edges.toDouble() / it.node_count.coerceAtLeast(1) }
+            issues += FitnessIssue(
+                severity = "medium",
+                title = "High cross-cluster coupling",
+                details = "External cluster edges per node are ${"%.2f".format(externalEdgeRatio)}, which weakens graph locality for agents.",
+                file = worstCluster?.label,
+            )
+            actions += FitnessAction(
+                priority = "medium",
+                title = "Reduce cluster boundary crossings",
+                rationale = "Moving shared logic behind clearer interfaces should shrink impact radii and improve module-scoped validation.",
+                file = worstCluster?.label,
+            )
+        }
+
+        if (moduleScopedRatio < 0.25 && snapshot.sourceIndex.size >= 20) {
+            issues += FitnessIssue(
+                severity = "low",
+                title = "Low module-scoped validation coverage",
+                details = "Only ${"%.0f".format(moduleScopedRatio * 100)}% of source files sit under a deeper build root than the project root.",
+            )
+            actions += FitnessAction(
+                priority = "low",
+                title = "Strengthen build-root locality",
+                rationale = "Clearer submodule boundaries would let agent validation stay local more often.",
+            )
+        }
+
+        val subscores = listOf(
+            FitnessSubscore("navigability", navigability, "Lower fan-out and fewer ambiguous method names improve traversal confidence."),
+            FitnessSubscore("editability", editability, "Smaller methods and narrower impact radii make graph-guided edits cheaper and safer."),
+            FitnessSubscore("validation_locality", validationLocality, "Deeper build roots and lower coupling improve the odds of module-scoped validation."),
+            FitnessSubscore("coupling_risk", couplingRisk, "Cross-cluster edges and high fan-in/fan-out widen the agent's blast radius."),
+        )
+        val overall = scoreFitness(subscores.map { it.score }.average())
+        val metrics = linkedMapOf(
+            "agent_relevant_method_count" to relevantMethods.size.toDouble(),
+            "average_fan_out" to avgFanOut,
+            "average_inbound_calls" to avgInbound,
+            "average_impact_radius_files" to avgImpactRadius,
+            "oversized_method_count" to oversizedMethods.size.toDouble(),
+            "ambiguous_method_count" to ambiguousMethodCount.toDouble(),
+            "external_edge_ratio" to externalEdgeRatio,
+            "module_scoped_file_ratio" to moduleScopedRatio,
+        )
+
+        return AgentFitnessResult(
+            overall_score = overall,
+            subscores = subscores,
+            metrics = metrics,
+            issues = issues.take(6),
+            recommended_actions = actions.distinctBy { it.title to it.target_node_id to it.file }.take(6),
+            analysis_engine = snapshot.analysisEngine,
+            engine_version = snapshot.engineVersion,
+            build_duration_ms = snapshot.buildDurationMs,
+            snapshot_id = snapshot.id,
+            generated_at = snapshot.generatedAt,
+        )
+    }
+
     fun clusterDetail(clusterId: String, snapshot: Snapshot = current()): ClusterDetailResult {
         val cluster = snapshot.clusters.firstOrNull { it.cluster_id == clusterId }
             ?: error("Unknown cluster_id: $clusterId")
@@ -1574,6 +1725,33 @@ class SnapshotManager(private val projectRoot: Path) {
             current = current.parent ?: return null
         }
     }
+
+    private fun sourceFileBuildRootStats(snapshot: Snapshot): Map<String, Double> {
+        if (snapshot.sourceIndex.isEmpty()) {
+            return mapOf("module_scoped_file_ratio" to 0.0, "build_root_count" to 0.0)
+        }
+        val buildFiles = setOf("pom.xml", "build.gradle", "build.gradle.kts")
+        val roots = snapshot.sourceIndex.keys.map { file ->
+            var current: Path? = projectRoot.resolve(file).normalize().parent
+            var best: Path = projectRoot
+            while (current != null && current.startsWith(projectRoot)) {
+                if (best == projectRoot && buildFiles.any { Files.exists(current.resolve(it)) }) {
+                    best = current
+                }
+                if (current == projectRoot) break
+                current = current.parent
+            }
+            best
+        }
+        val moduleScoped = roots.count { it != projectRoot }
+        return mapOf(
+            "module_scoped_file_ratio" to (moduleScoped.toDouble() / roots.size.coerceAtLeast(1)),
+            "build_root_count" to roots.distinct().size.toDouble(),
+        )
+    }
+
+    private fun scoreFitness(raw: Double): Int =
+        raw.toInt().coerceIn(0, 100)
 
     private fun copyProjectTree(sourceRoot: Path, targetRoot: Path) {
         val excludedNames = setOf(".git", ".gradle", "build", "target", ".idea")
