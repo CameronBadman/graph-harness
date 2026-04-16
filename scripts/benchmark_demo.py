@@ -3,6 +3,7 @@
 import argparse
 import json
 import math
+import time
 import shutil
 import subprocess
 import sys
@@ -80,6 +81,8 @@ class BenchmarkResult:
     tokens: int
     artifacts: list[str]
     notes: list[str]
+    total_latency_ms: int
+    tool_latencies_ms: dict[str, int]
 
 
 @dataclass
@@ -253,16 +256,31 @@ def choose_entrypoint(summary: dict[str, Any]) -> dict[str, Any]:
     return sorted(entrypoints, key=score, reverse=True)[0]
 
 
+def timed_tool_call(
+    session: JsonRpcSession,
+    tool_name: str,
+    arguments: dict[str, Any] | None,
+    latencies: dict[str, int],
+) -> dict[str, Any]:
+    started = time.perf_counter()
+    result = session.tool_call(tool_name, arguments)
+    elapsed_ms = round((time.perf_counter() - started) * 1000)
+    latencies[tool_name] = latencies.get(tool_name, 0) + elapsed_ms
+    return result
+
+
 def harness_run(server: str, project_root: str) -> BenchmarkResult:
     session = JsonRpcSession([server, project_root])
+    started = time.perf_counter()
     tokens = 0
     notes: list[str] = []
     artifacts: list[str] = []
+    tool_latencies: dict[str, int] = {}
 
     try:
         session.request("initialize", {})
 
-        summary = session.tool_call("get_summary_map")
+        summary = timed_tool_call(session, "get_summary_map", {}, tool_latencies)
         tokens += estimate_tokens(json.dumps(summary, separators=(",", ":")))
         notes.append(f"summary_map={summary['snapshot_id']}")
         notes.append(f"summary_mode={summary.get('summary_mode', 'unknown')}")
@@ -270,36 +288,36 @@ def harness_run(server: str, project_root: str) -> BenchmarkResult:
         notes.append(f"chosen_entrypoint={chosen_entrypoint['name']}")
 
         search_query = chosen_entrypoint["name"].split(".")[-1]
-        entry_search = session.tool_call("search_graph", {"query": search_query, "kind": "method"})
+        entry_search = timed_tool_call(session, "search_graph", {"query": search_query, "kind": "method"}, tool_latencies)
         tokens += estimate_tokens(json.dumps(entry_search, separators=(",", ":")))
         entry = next((item for item in entry_search["results"] if item["name"] == chosen_entrypoint["name"]), entry_search["results"][0])
         artifacts.append(entry["name"])
 
-        source = session.tool_call("get_source", {"node_id": entry["id"], "include_context": 1})
+        source = timed_tool_call(session, "get_source", {"node_id": entry["id"], "include_context": 1}, tool_latencies)
         tokens += estimate_tokens(json.dumps(source, separators=(",", ":")))
 
         summary_mode = summary.get("summary_mode", "standard")
         used_tools = ["get_summary_map", "search_graph", "get_source"]
 
         if summary_mode in ("standard", "expanded"):
-            node_detail = session.tool_call("get_node_detail", {"node_id": entry["id"]})
+            node_detail = timed_tool_call(session, "get_node_detail", {"node_id": entry["id"]}, tool_latencies)
             tokens += estimate_tokens(json.dumps(node_detail, separators=(",", ":")))
             used_tools.append("get_node_detail")
 
-            call_paths = session.tool_call("get_call_paths", {"node_id": entry["id"], "max_depth": 3})
+            call_paths = timed_tool_call(session, "get_call_paths", {"node_id": entry["id"], "max_depth": 3}, tool_latencies)
             tokens += estimate_tokens(json.dumps(call_paths, separators=(",", ":")))
             for path in call_paths["paths"]:
                 artifacts.extend(node["name"] for node in path["nodes"])
             used_tools.append("get_call_paths")
 
-            impact = session.tool_call("get_impact", {"node_id": entry["id"], "max_depth": 2})
+            impact = timed_tool_call(session, "get_impact", {"node_id": entry["id"], "max_depth": 2}, tool_latencies)
             tokens += estimate_tokens(json.dumps(impact, separators=(",", ":")))
             artifacts.extend(node["name"] for node in impact["affected_nodes"])
             used_tools.append("get_impact")
 
         if summary_mode == "expanded" and summary.get("clusters"):
             cluster = summary["clusters"][0]
-            cluster_detail = session.tool_call("get_cluster_detail", {"cluster_id": cluster["cluster_id"]})
+            cluster_detail = timed_tool_call(session, "get_cluster_detail", {"cluster_id": cluster["cluster_id"]}, tool_latencies)
             tokens += estimate_tokens(json.dumps(cluster_detail, separators=(",", ":")))
             used_tools.append("get_cluster_detail")
 
@@ -312,33 +330,39 @@ def harness_run(server: str, project_root: str) -> BenchmarkResult:
         tokens=tokens,
         artifacts=sorted(set(artifacts)),
         notes=notes,
+        total_latency_ms=round((time.perf_counter() - started) * 1000),
+        tool_latencies_ms=tool_latencies,
     )
 
 
 def harness_bundle_run(server: str, project_root: str) -> BenchmarkResult:
     session = JsonRpcSession([server, project_root])
+    started = time.perf_counter()
     tokens = 0
     notes: list[str] = []
     artifacts: list[str] = []
+    tool_latencies: dict[str, int] = {}
 
     try:
         session.request("initialize", {})
 
-        capabilities = session.tool_call("get_capabilities")
+        capabilities = timed_tool_call(session, "get_capabilities", {}, tool_latencies)
         tokens += estimate_tokens(json.dumps(capabilities, separators=(",", ":")))
         notes.append(f"analysis_engine={capabilities.get('analysis_engine', 'unknown')}")
 
-        summary = session.tool_call("get_summary_map")
+        summary = timed_tool_call(session, "get_summary_map", {}, tool_latencies)
         tokens += estimate_tokens(json.dumps(summary, separators=(",", ":")))
         chosen_entrypoint = choose_entrypoint(summary)
         notes.append(f"chosen_entrypoint={chosen_entrypoint['name']}")
 
-        bundle = session.tool_call(
+        bundle = timed_tool_call(
+            session,
             "build_context_bundle",
             {
                 "node_id": chosen_entrypoint["id"],
                 "token_budget": 2200,
             },
+            tool_latencies,
         )
         tokens += estimate_tokens(json.dumps(bundle, separators=(",", ":")))
         artifacts.extend(node["name"] for node in bundle.get("focus_nodes", []))
@@ -355,40 +379,44 @@ def harness_bundle_run(server: str, project_root: str) -> BenchmarkResult:
         tokens=tokens,
         artifacts=sorted(set(artifacts)),
         notes=notes,
+        total_latency_ms=round((time.perf_counter() - started) * 1000),
+        tool_latencies_ms=tool_latencies,
     )
 
 
 def harness_contract_run(server: str, project_root: str) -> BenchmarkResult:
     session = JsonRpcSession([server, project_root])
+    started = time.perf_counter()
     tokens = 0
     notes: list[str] = []
     artifacts: list[str] = []
+    tool_latencies: dict[str, int] = {}
 
     try:
         session.request("initialize", {})
 
-        summary = session.tool_call("get_summary_map")
+        summary = timed_tool_call(session, "get_summary_map", {}, tool_latencies)
         tokens += estimate_tokens(json.dumps(summary, separators=(",", ":")))
         notes.append(f"summary_map={summary['snapshot_id']}")
         notes.append(f"summary_mode={summary.get('summary_mode', 'unknown')}")
 
-        repo_search = session.tool_call("search_graph", {"query": "find", "kind": "method"})
+        repo_search = timed_tool_call(session, "search_graph", {"query": "find", "kind": "method"}, tool_latencies)
         tokens += estimate_tokens(json.dumps(repo_search, separators=(",", ":")))
         candidates = repo_search.get("results", [])
         target = next((item for item in candidates if "Repository." in item["name"]), candidates[0])
         artifacts.append(target["name"])
         notes.append(f"contract_target={target['name']}")
 
-        implementations = session.tool_call("get_implementations", {"node_id": target["id"]})
+        implementations = timed_tool_call(session, "get_implementations", {"node_id": target["id"]}, tool_latencies)
         tokens += estimate_tokens(json.dumps(implementations, separators=(",", ":")))
         for item in implementations["items"]:
             artifacts.append(f"{item['node']['name']}[{item.get('relationship', 'unknown')}]")
 
-        callers = session.tool_call("get_callers", {"node_id": target["id"], "depth": 2})
+        callers = timed_tool_call(session, "get_callers", {"node_id": target["id"], "depth": 2}, tool_latencies)
         tokens += estimate_tokens(json.dumps(callers, separators=(",", ":")))
         artifacts.extend(item["node"]["name"] for item in callers["items"])
 
-        impact = session.tool_call("get_impact", {"node_id": target["id"], "max_depth": 2})
+        impact = timed_tool_call(session, "get_impact", {"node_id": target["id"], "max_depth": 2}, tool_latencies)
         tokens += estimate_tokens(json.dumps(impact, separators=(",", ":")))
         artifacts.extend(node["name"] for node in impact["affected_nodes"])
 
@@ -402,10 +430,13 @@ def harness_contract_run(server: str, project_root: str) -> BenchmarkResult:
         tokens=tokens,
         artifacts=sorted(set(artifacts)),
         notes=notes,
+        total_latency_ms=round((time.perf_counter() - started) * 1000),
+        tool_latencies_ms=tool_latencies,
     )
 
 
 def naive_run(project_root: str) -> BenchmarkResult:
+    started = time.perf_counter()
     root = Path(project_root)
     files = sorted(root.rglob("*Controller.java"))[:3]
     files += sorted(root.rglob("*Service.java"))[:3]
@@ -425,10 +456,13 @@ def naive_run(project_root: str) -> BenchmarkResult:
         tokens=sum(estimate_tokens(text) for text in loaded_text),
         artifacts=sorted(set(artifacts)),
         notes=[f"loaded_files={','.join(path.name for path in files)}"],
+        total_latency_ms=round((time.perf_counter() - started) * 1000),
+        tool_latencies_ms={},
     )
 
 
 def naive_contract_run(project_root: str) -> BenchmarkResult:
+    started = time.perf_counter()
     root = Path(project_root)
     files = sorted(root.rglob("*Repository.java"))[:3]
     files += sorted(root.rglob("*Controller.java"))[:4]
@@ -448,18 +482,23 @@ def naive_contract_run(project_root: str) -> BenchmarkResult:
         tokens=sum(estimate_tokens(text) for text in loaded_text),
         artifacts=sorted(set(artifacts)),
         notes=[f"loaded_files={','.join(path.name for path in files)}"],
+        total_latency_ms=round((time.perf_counter() - started) * 1000),
+        tool_latencies_ms={},
     )
 
 
 def harness_edit_run(server: str, project_root: str) -> tuple[BenchmarkResult, BenchmarkResult]:
     session = JsonRpcSession([server, project_root])
+    started = time.perf_counter()
+    tool_latencies: dict[str, int] = {}
     try:
         session.request("initialize", {})
 
-        search = session.tool_call("search_graph", {"query": "processCreationForm", "kind": "method"})
+        search = timed_tool_call(session, "search_graph", {"query": "processCreationForm", "kind": "method"}, tool_latencies)
         target = next(item for item in search["results"] if item["name"].endswith("PetController.processCreationForm"))
 
-        replace_plan = session.tool_call(
+        replace_plan = timed_tool_call(
+            session,
             "plan_edit",
             {
                 "operation": "modify_method_body",
@@ -468,8 +507,10 @@ def harness_edit_run(server: str, project_root: str) -> tuple[BenchmarkResult, B
                     "new_body": 'pet.setOwner(owner);\nowner.addPet(pet);\nthis.owners.save(owner);\nredirectAttributes.addFlashAttribute("message", "New Pet has been Added");\nreturn "redirect:/owners/{ownerId}";',
                 },
             },
+            tool_latencies,
         )
-        patch_plan = session.tool_call(
+        patch_plan = timed_tool_call(
+            session,
             "plan_edit",
             {
                 "operation": "modify_method_body",
@@ -480,36 +521,44 @@ def harness_edit_run(server: str, project_root: str) -> tuple[BenchmarkResult, B
                     "snippet": "pet.setOwner(owner);",
                 },
             },
+            tool_latencies,
         )
     finally:
         session.close()
 
+    total_latency = round((time.perf_counter() - started) * 1000)
     return (
         BenchmarkResult(
             label="graphharness-edit-replace",
             tokens=estimate_tokens(json.dumps(search, separators=(",", ":"))) + estimate_tokens(json.dumps(replace_plan, separators=(",", ":"))),
             artifacts=[target["name"], *replace_plan["affected_files"]],
             notes=[f"plan_edit_tokens={estimate_tokens(json.dumps(replace_plan, separators=(',', ':')))}"],
+            total_latency_ms=total_latency,
+            tool_latencies_ms=dict(tool_latencies),
         ),
         BenchmarkResult(
             label="graphharness-edit-patch",
             tokens=estimate_tokens(json.dumps(search, separators=(",", ":"))) + estimate_tokens(json.dumps(patch_plan, separators=(",", ":"))),
             artifacts=[target["name"], *patch_plan["affected_files"]],
             notes=[f"plan_edit_tokens={estimate_tokens(json.dumps(patch_plan, separators=(',', ':')))}"],
+            total_latency_ms=total_latency,
+            tool_latencies_ms=dict(tool_latencies),
         ),
     )
 
 
 def harness_feature_run(server: str, project_root: str) -> BenchmarkResult:
     session = JsonRpcSession([server, project_root])
+    started = time.perf_counter()
     tokens = 0
     artifacts: list[str] = []
     notes: list[str] = []
+    tool_latencies: dict[str, int] = {}
     try:
         session.request("initialize", {})
-        creation_search = session.tool_call("search_graph", {"query": "processCreationForm", "kind": "method"})
-        update_search = session.tool_call("search_graph", {"query": "updatePetDetails", "kind": "method"})
-        init_search = session.tool_call("search_graph", {"query": "initCreationForm", "kind": "method"})
+        creation_search = timed_tool_call(session, "search_graph", {"query": "processCreationForm", "kind": "method"}, tool_latencies)
+        update_search = timed_tool_call(session, "search_graph", {"query": "updatePetDetails", "kind": "method"}, tool_latencies)
+        init_search = timed_tool_call(session, "search_graph", {"query": "initCreationForm", "kind": "method"}, tool_latencies)
         tokens += estimate_tokens(json.dumps(creation_search, separators=(",", ":")))
         tokens += estimate_tokens(json.dumps(update_search, separators=(",", ":")))
         tokens += estimate_tokens(json.dumps(init_search, separators=(",", ":")))
@@ -521,22 +570,24 @@ def harness_feature_run(server: str, project_root: str) -> BenchmarkResult:
         node_ids = [item["id"] for item in relevant]
         artifacts.extend(item["name"] for item in relevant)
 
-        bundle = session.tool_call(
+        bundle = timed_tool_call(
+            session,
             "build_context_bundle",
             {
                 "node_id": relevant[0]["id"],
                 "token_budget": 1800,
             },
+            tool_latencies,
         )
         tokens += estimate_tokens(json.dumps(bundle, separators=(",", ":")))
         artifacts.extend(node["name"] for node in bundle.get("focus_nodes", []))
         notes.append(f"bundle_target={bundle.get('chosen_node_id', 'none')}")
 
-        source_batch = session.tool_call("get_source_batch", {"node_ids": node_ids})
+        source_batch = timed_tool_call(session, "get_source_batch", {"node_ids": node_ids}, tool_latencies)
         tokens += estimate_tokens(json.dumps(source_batch, separators=(",", ":")))
         artifacts.extend(item["node_id"] for item in source_batch["sources"])
 
-        validation_targets = session.tool_call("get_validation_targets", {"node_id": relevant[1]["id"]})
+        validation_targets = timed_tool_call(session, "get_validation_targets", {"node_id": relevant[1]["id"]}, tool_latencies)
         tokens += estimate_tokens(json.dumps(validation_targets, separators=(",", ":")))
         artifacts.extend(target["identifier"] for target in validation_targets["validation_targets"])
         notes.append(f"used_tools=search_graph,build_context_bundle,get_source_batch,get_validation_targets")
@@ -548,6 +599,8 @@ def harness_feature_run(server: str, project_root: str) -> BenchmarkResult:
         tokens=tokens,
         artifacts=sorted(set(artifacts)),
         notes=notes,
+        total_latency_ms=round((time.perf_counter() - started) * 1000),
+        tool_latencies_ms=tool_latencies,
     )
 
 
@@ -599,6 +652,7 @@ def harness_edit_execution_run(server: str, project_root: str) -> dict[str, Any]
 
 
 def naive_edit_run(project_root: str) -> BenchmarkResult:
+    started = time.perf_counter()
     root = Path(project_root)
     pet_controller = next(root.rglob("PetController.java"))
     controller_text = pet_controller.read_text()
@@ -614,10 +668,13 @@ def naive_edit_run(project_root: str) -> BenchmarkResult:
         tokens=estimate_tokens(json.dumps(patch_payload, separators=(",", ":"))),
         artifacts=[pet_controller.name],
         notes=[f"file_lines={len(controller_text.splitlines())}"],
+        total_latency_ms=round((time.perf_counter() - started) * 1000),
+        tool_latencies_ms={},
     )
 
 
 def naive_feature_run(project_root: str) -> BenchmarkResult:
+    started = time.perf_counter()
     root = Path(project_root)
     pet_controller = next(root.rglob("PetController.java"))
     pet_controller_tests = next(root.rglob("PetControllerTests.java"))
@@ -643,6 +700,8 @@ def naive_feature_run(project_root: str) -> BenchmarkResult:
         tokens=estimate_tokens(json.dumps(payload, separators=(",", ":"))),
         artifacts=artifacts,
         notes=[f"loaded_files={','.join(path.name for path in loaded_files)}"],
+        total_latency_ms=round((time.perf_counter() - started) * 1000),
+        tool_latencies_ms={},
     )
 
 
@@ -653,6 +712,8 @@ def print_result(result: BenchmarkResult) -> None:
             "approx_tokens": result.tokens,
             "artifacts": result.artifacts,
             "normalized_artifacts": sorted({normalize_artifact(item) for item in result.artifacts}),
+            "total_latency_ms": result.total_latency_ms,
+            "tool_latencies_ms": result.tool_latencies_ms,
             "notes": result.notes,
         },
         indent=2,
