@@ -3,6 +3,7 @@
 import argparse
 import json
 import math
+import shutil
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -112,6 +113,21 @@ class TaskScore:
     task_success: bool
 
 
+@dataclass
+class EditExecutionScore:
+    task: str
+    validation_success: bool
+    apply_success: bool
+    degraded_validation: bool
+    validator: str
+    validation_target: str
+    changed_node_recall: float
+    changed_file_recall: float
+    missing_changed_nodes: list[str]
+    missing_changed_files: list[str]
+    task_success: bool
+
+
 def normalize_artifact(value: str) -> str:
     base = value.split("[", 1)[0]
     if ":" in base and ".java:" in base:
@@ -144,6 +160,14 @@ def ratio(found: set[str], expected: set[str]) -> float:
     return len(found & expected) / len(expected)
 
 
+def normalized_node_name(value: str) -> str:
+    if value.startswith("method:") or value.startswith("type:"):
+        parts = value.split(":")
+        if len(parts) > 1:
+            return normalize_artifact(parts[1])
+    return normalize_artifact(value)
+
+
 def score_task(spec: TaskSpec, result: BenchmarkResult) -> TaskScore:
     typed = typed_artifacts(result)
     missing_nodes = sorted(spec.expected_nodes - typed.nodes)
@@ -170,6 +194,40 @@ def score_task(spec: TaskSpec, result: BenchmarkResult) -> TaskScore:
         missing_files=missing_files,
         missing_tests=missing_tests,
         missing_validation_targets=missing_targets,
+        task_success=task_success,
+    )
+
+
+def score_edit_execution(
+    task: str,
+    execution: dict[str, Any],
+    expected_changed_nodes: set[str],
+    expected_changed_files: set[str],
+) -> EditExecutionScore:
+    changed_nodes = {
+        normalized_node_name(item.get("new_name") or item.get("old_name") or item.get("new_node_id") or item.get("old_node_id") or "")
+        for item in execution.get("changed_nodes", [])
+    }
+    changed_files = {normalize_artifact(item) for item in execution.get("changed_files", [])}
+    node_recall = ratio(changed_nodes, expected_changed_nodes)
+    file_recall = ratio(changed_files, expected_changed_files)
+    missing_nodes = sorted(expected_changed_nodes - changed_nodes)
+    missing_files = sorted(expected_changed_files - changed_files)
+    validation_success = execution.get("validation_success", False)
+    apply_success = execution.get("apply_success", False)
+    degraded = execution.get("degraded_validation", False)
+    task_success = validation_success and apply_success and node_recall >= 1.0 and file_recall >= 1.0
+    return EditExecutionScore(
+        task=task,
+        validation_success=validation_success,
+        apply_success=apply_success,
+        degraded_validation=degraded,
+        validator=execution.get("validator", ""),
+        validation_target=execution.get("validation_target", ""),
+        changed_node_recall=node_recall,
+        changed_file_recall=file_recall,
+        missing_changed_nodes=missing_nodes,
+        missing_changed_files=missing_files,
         task_success=task_success,
     )
 
@@ -493,6 +551,53 @@ def harness_feature_run(server: str, project_root: str) -> BenchmarkResult:
     )
 
 
+def harness_edit_execution_run(server: str, project_root: str) -> dict[str, Any]:
+    scratch = Path("/tmp/graphharness-benchmark-edit")
+    if scratch.exists():
+        shutil.rmtree(scratch)
+    shutil.copytree(project_root, scratch)
+    session = JsonRpcSession([server, str(scratch)])
+    try:
+        session.request("initialize", {})
+        search = session.tool_call("search_graph", {"query": "processCreationForm", "kind": "method"})
+        target = next(item for item in search["results"] if item["name"].endswith("PetController.processCreationForm"))
+        before_summary = session.tool_call("get_summary_map")
+        plan = session.tool_call(
+            "plan_edit",
+            {
+                "operation": "modify_method_body",
+                "target_node_id": target["id"],
+                "payload": {
+                    "patch_mode": "insert_before",
+                    "anchor": "owner.addPet(pet);",
+                    "snippet": "pet.setOwner(owner);",
+                },
+            },
+        )
+        validation = session.tool_call("validate_edit", {"edit_id": plan["edit_id"], "mode": "auto"})
+        apply_result = session.tool_call("apply_edit", {"edit_id": plan["edit_id"]})
+        delta = session.tool_call(
+            "get_snapshot_delta",
+            {
+                "old_snapshot_id": before_summary["snapshot_id"],
+                "new_snapshot_id": apply_result["snapshot_id"],
+            },
+        )
+        return {
+            "validation_success": validation["success"],
+            "apply_success": apply_result["success"],
+            "degraded_validation": validation["degraded"],
+            "validator": validation["validator"],
+            "validation_target": validation["validation_target"],
+            "attempted_validators": validation["attempted_validators"],
+            "changed_nodes": delta["changed_nodes"],
+            "changed_files": delta["changed_files"],
+            "snapshot_delta": delta,
+        }
+    finally:
+        session.close()
+
+
 def naive_edit_run(project_root: str) -> BenchmarkResult:
     root = Path(project_root)
     pet_controller = next(root.rglob("PetController.java"))
@@ -573,6 +678,27 @@ def print_score(score: TaskScore, label: str) -> None:
     ))
 
 
+def print_edit_execution_score(score: EditExecutionScore, execution: dict[str, Any]) -> None:
+    print("\n## score(graphharness-edit-execution)")
+    print(json.dumps(
+        {
+            "task": score.task,
+            "task_success": score.task_success,
+            "validation_success": score.validation_success,
+            "apply_success": score.apply_success,
+            "degraded_validation": score.degraded_validation,
+            "validator": score.validator,
+            "validation_target": score.validation_target,
+            "attempted_validators": execution.get("attempted_validators", []),
+            "changed_node_recall": round(score.changed_node_recall, 2),
+            "changed_file_recall": round(score.changed_file_recall, 2),
+            "missing_changed_nodes": score.missing_changed_nodes,
+            "missing_changed_files": score.missing_changed_files,
+        },
+        indent=2,
+    ))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Compare GraphHarness context use against naive file loading.")
     parser.add_argument("server", help="Path to the GraphHarness server binary.")
@@ -585,6 +711,7 @@ def main() -> int:
     harness_contract = harness_contract_run(args.server, args.project_root)
     naive_contract = naive_contract_run(args.project_root)
     harness_edit_replace, harness_edit_patch = harness_edit_run(args.server, args.project_root)
+    harness_edit_execution = harness_edit_execution_run(args.server, args.project_root)
     naive_edit_patch = naive_edit_run(args.project_root)
     harness_feature = harness_feature_run(args.server, args.project_root)
     naive_feature = naive_feature_run(args.project_root)
@@ -629,6 +756,12 @@ def main() -> int:
         expected_tests=set(),
         expected_validation_targets=set(),
     )
+    edit_execution_score = score_edit_execution(
+        task="edit_patch_execution",
+        execution=harness_edit_execution,
+        expected_changed_nodes={"petcontroller:processcreationform"},
+        expected_changed_files={"src/main/java/org/springframework/samples/petclinic/owner/petcontroller:java"},
+    )
 
     print_result(harness)
     print_result(harness_bundle)
@@ -648,6 +781,7 @@ def main() -> int:
     print_score(score_task(contract_task, naive_contract), "naive-contract")
     print_score(score_task(edit_task, harness_edit_patch), "graphharness-edit-patch")
     print_score(score_task(edit_task, naive_edit_patch), "naive-edit-patch")
+    print_edit_execution_score(edit_execution_score, harness_edit_execution)
     print_score(score_task(feature_task, harness_feature), "graphharness-feature")
     print_score(score_task(feature_task, naive_feature), "naive-feature")
 
