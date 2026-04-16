@@ -569,6 +569,78 @@ class AnalyzerTest {
     }
 
     @Test
+    fun usesValidationTargetsForTargetedTestExecution() {
+        val root = createTempDirectory("graphharness-targeted-validate")
+        root.resolve("pom.xml").writeText("<project></project>\n")
+        val mvnw = root.resolve("mvnw")
+        mvnw.writeText(
+            """
+            #!/usr/bin/env bash
+            printf '%s\n' "$@" > .gh-mvnw-args
+            exit 0
+            """.trimIndent(),
+        )
+        runCatching {
+            mvnw.setPosixFilePermissions(
+                setOf(
+                    PosixFilePermission.OWNER_READ,
+                    PosixFilePermission.OWNER_WRITE,
+                    PosixFilePermission.OWNER_EXECUTE,
+                ),
+            )
+        }
+        val mainDir = root.resolve("src/main/java/com/app/payment")
+        val testDir = root.resolve("src/test/java/com/app/payment")
+        mainDir.createDirectories()
+        testDir.createDirectories()
+        mainDir.resolve("PaymentService.java").writeText(
+            """
+            package com.app.payment;
+
+            public class PaymentService {
+                public PaymentResult processPayment(Order order) {
+                    return charge(order);
+                }
+
+                private PaymentResult charge(Order order) {
+                    return new PaymentResult();
+                }
+            }
+            """.trimIndent(),
+        )
+        mainDir.resolve("PaymentResult.java").writeText("package com.app.payment;\npublic class PaymentResult {}\n")
+        mainDir.resolve("Order.java").writeText("package com.app.payment;\npublic class Order {}\n")
+        testDir.resolve("PaymentServiceTests.java").writeText(
+            """
+            package com.app.payment;
+
+            public class PaymentServiceTests {
+            }
+            """.trimIndent(),
+        )
+
+        val manager = SnapshotManager(root)
+        val processNode = manager.search("processPayment", "method", null, null).results.first()
+        val plan = manager.planEdit(
+            operation = "modify_method_body",
+            targetNodeId = processNode.id,
+            payload = EditRequestPayload(
+                patch_mode = "insert_before",
+                anchor = "return charge(order);",
+                snippet = "order.toString();",
+            ),
+        )
+
+        val targets = manager.validationTargets(editId = plan.edit_id)
+        assertTrue(targets.command_hints.any { it.label.startsWith("targeted-test") })
+
+        val validation = manager.validateEdit(plan.edit_id!!, "test")
+        assertTrue(validation.success)
+        assertEquals("maven-wrapper-targeted-test", validation.validator)
+        assertTrue(validation.command.any { it.contains("-Dtest=PaymentServiceTests") })
+    }
+
+    @Test
     fun reportsAgentFitnessIssuesForTangledCode() {
         val root = createTempDirectory("graphharness-fitness-test")
         root.resolve("BigService.java").writeText(

@@ -1,6 +1,7 @@
 package graphharness
 
 import java.io.ByteArrayOutputStream
+import java.io.IOException
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
@@ -1951,8 +1952,20 @@ class SnapshotManager(private val projectRoot: Path) {
                 }
             }
 
-            val validationTarget = determineValidationTarget(validationRoot, pending.fileEdits.map { it.file })
-            val selected = selectValidationCommand(validationRoot, validationTarget, mode)
+            val plannedTargets = validationTargets(editId = editId, snapshot = snapshot)
+            val validationTarget = plannedTargets.validation_targets
+                .firstOrNull { it.kind == "module" }
+                ?.let { item -> validationTargetFromItem(validationRoot, item) }
+                ?: determineValidationTarget(validationRoot, pending.fileEdits.map { it.file })
+            val relatedTests = plannedTargets.validation_targets
+                .filter { it.kind == "test_file" }
+                .mapNotNull { it.file }
+                .distinct()
+            val selected = plannedTargets.command_hints
+                .asSequence()
+                .mapNotNull { commandHintToValidationCommand(validationRoot, it, mode) }
+                .firstOrNull()
+                ?: selectValidationCommand(validationRoot, validationTarget, mode, relatedTests)
             val start = System.nanoTime()
             val attempted = mutableListOf(selected.validator)
             val primaryResult = runValidationCommand(validationRoot, selected)
@@ -2018,6 +2031,19 @@ class SnapshotManager(private val projectRoot: Path) {
 
     private fun createValidationScratchRoot(): Path =
         Files.createTempDirectory("graphharness-validate-")
+
+    private fun validationTargetFromItem(root: Path, item: ValidationTargetItem): ValidationTarget {
+        val label = when {
+            item.kind == "module" && item.identifier != "project_root" && !item.identifier.startsWith("module:") -> "module:${item.identifier}"
+            else -> item.identifier
+        }
+        val targetRoot = when {
+            label == "project_root" -> root
+            label.startsWith("module:") -> root.resolve(label.removePrefix("module:")).normalize()
+            else -> root.resolve(label).normalize()
+        }
+        return ValidationTarget(targetRoot, label)
+    }
 
     private fun determineValidationTarget(root: Path, touchedFiles: List<String>): ValidationTarget {
         val buildFiles = setOf("pom.xml", "build.gradle", "build.gradle.kts")
@@ -2122,7 +2148,21 @@ class SnapshotManager(private val projectRoot: Path) {
         buildRoots.distinct().forEach { root ->
             val relative = projectRoot.relativize(root).toString().replace('\\', '/')
             val workingDirectory = root.toString()
-            if (Files.exists(root.resolve("mvnw"))) {
+            val scopedTests = relatedTests.filter { projectRoot.resolve(it).normalize().startsWith(root) }
+            val testSelectors = scopedTests.map { Path.of(it).fileName.toString().removeSuffix(".java") }.distinct()
+            if (testSelectors.isNotEmpty() && Files.exists(root.resolve("mvnw"))) {
+                hints += ValidationCommandHint(
+                    label = if (relative.isBlank()) "targeted-test" else "targeted-test:$relative",
+                    command = listOf("bash", "./mvnw", "-q", "-Dtest=${testSelectors.joinToString(",")}", "test"),
+                    working_directory = workingDirectory,
+                )
+            } else if (testSelectors.isNotEmpty() && Files.exists(root.resolve("gradlew"))) {
+                hints += ValidationCommandHint(
+                    label = if (relative.isBlank()) "targeted-test" else "targeted-test:$relative",
+                    command = listOf("bash", "./gradlew", "--no-daemon", "test") + testSelectors.flatMap { listOf("--tests", it) },
+                    working_directory = workingDirectory,
+                )
+            } else if (Files.exists(root.resolve("mvnw"))) {
                 hints += ValidationCommandHint(
                     label = if (relative.isBlank()) "module-test" else "module-test:$relative",
                     command = listOf("bash", "./mvnw", "-q", "test"),
@@ -2183,7 +2223,64 @@ class SnapshotManager(private val projectRoot: Path) {
         }
     }
 
-    private fun selectValidationCommand(root: Path, target: ValidationTarget, mode: String): ValidationCommand {
+    private fun commandHintToValidationCommand(
+        validationRoot: Path,
+        hint: ValidationCommandHint,
+        mode: String,
+    ): ValidationCommand? {
+        val label = hint.label
+        if (mode == "compile" && !label.contains("compile") && !label.contains("syntax")) return null
+        if (mode == "test" && !label.contains("test")) return null
+        if (mode == "auto" && !(label.contains("test") || label.contains("compile") || label.contains("syntax"))) return null
+        if (label.startsWith("likely-test:")) return null
+        if (label.startsWith("module-syntax")) return null
+        val firstCommand = hint.command.firstOrNull()
+        if (firstCommand == "mvn" && !hasExecutable("mvn")) return null
+        if (firstCommand == "gradle" && !hasExecutable("gradle")) return null
+        val workingDirectory = Path.of(hint.working_directory)
+        val scratchWorkingDirectory = if (workingDirectory.startsWith(projectRoot)) {
+            validationRoot.resolve(projectRoot.relativize(workingDirectory).toString()).normalize()
+        } else {
+            workingDirectory
+        }
+        val mavenRepo = validationRoot.resolve(".graphharness-m2").toString()
+        val gradleUserHome = validationRoot.resolve(".graphharness-gradle").toString()
+        val environment = when {
+            hint.command.any { it.contains("mvnw") } || hint.command.firstOrNull() == "mvn" -> mapOf(
+                "HOME" to validationRoot.toString(),
+                "MAVEN_USER_HOME" to mavenRepo,
+            )
+            hint.command.any { it.contains("gradlew") } || hint.command.firstOrNull() == "gradle" -> mapOf(
+                "GRADLE_USER_HOME" to gradleUserHome,
+            )
+            else -> emptyMap()
+        }
+        val validator = when {
+            label.startsWith("targeted-test") && hint.command.any { it.contains("mvnw") } -> "maven-wrapper-targeted-test"
+            label.startsWith("targeted-test") && hint.command.any { it.contains("gradlew") } -> "gradle-wrapper-targeted-test"
+            label.startsWith("module-test") && hint.command.any { it.contains("mvnw") } -> "maven-wrapper-test"
+            label.startsWith("module-test") && hint.command.any { it.contains("gradlew") } -> "gradle-wrapper-test"
+            label.startsWith("module-compile") && hint.command.firstOrNull() == "mvn" -> "maven-compile"
+            label.startsWith("module-compile") && hint.command.any { it.contains("mvnw") } -> "maven-wrapper-compile"
+            label.startsWith("module-compile") && hint.command.firstOrNull() == "gradle" -> "gradle-compile"
+            label.startsWith("module-compile") && hint.command.any { it.contains("gradlew") } -> "gradle-wrapper-compile"
+            label.startsWith("module-syntax") -> "javac-syntax"
+            else -> label
+        }
+        val command = if (validator == "javac-syntax") {
+            javacCommand(scratchWorkingDirectory)
+        } else {
+            hint.command
+        }
+        return ValidationCommand(
+            validator = validator,
+            command = command,
+            environment = environment,
+            workingDirectory = scratchWorkingDirectory,
+        )
+    }
+
+    private fun selectValidationCommand(root: Path, target: ValidationTarget, mode: String, relatedTests: List<String> = emptyList()): ValidationCommand {
         require(mode in setOf("auto", "compile", "test")) { "Unsupported validation mode: $mode" }
         val mavenRepo = root.resolve(".graphharness-m2").toString()
         val gradleUserHome = root.resolve(".graphharness-gradle").toString()
@@ -2203,7 +2300,19 @@ class SnapshotManager(private val projectRoot: Path) {
         val gradleProjectPath = root.relativize(target.root).joinToString(":") { it.toString() }.let {
             if (it.isBlank()) "" else ":$it"
         }
+        val targetedTests = relatedTests
+            .filter { root.resolve(it).normalize().startsWith(target.root) }
+            .map { Path.of(it).fileName.toString().removeSuffix(".java") }
+            .distinct()
 
+        if (Files.exists(mvnw) && mode != "compile" && targetedTests.isNotEmpty()) {
+            return ValidationCommand(
+                validator = "maven-wrapper-targeted-test",
+                command = listOf("bash", "./mvnw", "-q", "-Dmaven.repo.local=$mavenRepo", "-Dtest=${targetedTests.joinToString(",")}", "test"),
+                environment = mavenEnv,
+                workingDirectory = target.root,
+            )
+        }
         if (Files.exists(mvnw) && mode != "compile") {
             return ValidationCommand(
                 validator = "maven-wrapper-test",
@@ -2218,6 +2327,14 @@ class SnapshotManager(private val projectRoot: Path) {
                 command = listOf("bash", "./mvnw", "-q", "-Dmaven.repo.local=$mavenRepo", "-DskipTests", "compile"),
                 environment = mavenEnv,
                 workingDirectory = target.root,
+            )
+        }
+        if (target.root != root && Files.exists(pom) && Files.exists(rootMvnw) && mode != "compile" && targetedTests.isNotEmpty()) {
+            return ValidationCommand(
+                validator = "maven-wrapper-targeted-test",
+                command = listOf("bash", "./mvnw", "-q", "-Dmaven.repo.local=$mavenRepo", "-f", relativePom, "-Dtest=${targetedTests.joinToString(",")}", "test"),
+                environment = mavenEnv,
+                workingDirectory = root,
             )
         }
         if (target.root != root && Files.exists(pom) && Files.exists(rootMvnw) && mode != "compile") {
@@ -2236,6 +2353,14 @@ class SnapshotManager(private val projectRoot: Path) {
                 workingDirectory = root,
             )
         }
+        if (Files.exists(gradlew) && mode != "compile" && targetedTests.isNotEmpty()) {
+            return ValidationCommand(
+                validator = "gradle-wrapper-targeted-test",
+                command = listOf("bash", "./gradlew", "--no-daemon", "test") + targetedTests.flatMap { listOf("--tests", it) },
+                environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
+                workingDirectory = target.root,
+            )
+        }
         if (Files.exists(gradlew) && mode != "compile") {
             return ValidationCommand(
                 validator = "gradle-wrapper-test",
@@ -2250,6 +2375,14 @@ class SnapshotManager(private val projectRoot: Path) {
                 command = listOf("bash", "./gradlew", "--no-daemon", "compileJava"),
                 environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
                 workingDirectory = target.root,
+            )
+        }
+        if (target.root != root && rootSettings && Files.exists(rootGradlew) && gradleProjectPath.isNotBlank() && mode != "compile" && targetedTests.isNotEmpty()) {
+            return ValidationCommand(
+                validator = "gradle-wrapper-targeted-test",
+                command = listOf("bash", "./gradlew", "--no-daemon", "${gradleProjectPath}:test") + targetedTests.flatMap { listOf("--tests", it) },
+                environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
+                workingDirectory = root,
             )
         }
         if (target.root != root && rootSettings && Files.exists(rootGradlew) && gradleProjectPath.isNotBlank() && mode != "compile") {
@@ -2268,6 +2401,14 @@ class SnapshotManager(private val projectRoot: Path) {
                 workingDirectory = root,
             )
         }
+        if (Files.exists(pom) && hasExecutable("mvn") && mode != "compile" && targetedTests.isNotEmpty()) {
+            return ValidationCommand(
+                validator = "maven-targeted-test",
+                command = listOf("mvn", "-q", "-Dmaven.repo.local=$mavenRepo", "-Dtest=${targetedTests.joinToString(",")}", "test"),
+                environment = mavenEnv,
+                workingDirectory = target.root,
+            )
+        }
         if (Files.exists(pom) && hasExecutable("mvn") && mode != "compile") {
             return ValidationCommand(
                 validator = "maven-test",
@@ -2281,6 +2422,14 @@ class SnapshotManager(private val projectRoot: Path) {
                 validator = "maven-compile",
                 command = listOf("mvn", "-q", "-Dmaven.repo.local=$mavenRepo", "-DskipTests", "compile"),
                 environment = mavenEnv,
+                workingDirectory = target.root,
+            )
+        }
+        if ((Files.exists(gradleKts) || Files.exists(gradleGroovy)) && hasExecutable("gradle") && mode != "compile" && targetedTests.isNotEmpty()) {
+            return ValidationCommand(
+                validator = "gradle-targeted-test",
+                command = listOf("gradle", "--no-daemon", "test") + targetedTests.flatMap { listOf("--tests", it) },
+                environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
                 workingDirectory = target.root,
             )
         }
@@ -2335,7 +2484,15 @@ class SnapshotManager(private val projectRoot: Path) {
             .directory((validation.workingDirectory ?: root).toFile())
             .redirectErrorStream(true)
         builder.environment().putAll(validation.environment)
-        val process = builder.start()
+        val process = try {
+            builder.start()
+        } catch (error: IOException) {
+            return ProcessRunResult(
+                exitCode = -1,
+                output = error.message ?: error::class.simpleName.orEmpty(),
+                timedOut = false,
+            )
+        }
         val outputBuffer = ByteArrayOutputStream()
         val reader = Thread {
             process.inputStream.use { input ->

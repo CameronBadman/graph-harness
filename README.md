@@ -119,6 +119,7 @@ For orchestration-heavy clients, the intended higher-level context flow is:
 - `get_edit_candidates` uses lightweight heuristics to suggest likely edit targets, operations, and starter payloads from a natural-language task description.
 - `verify_candidate` is the cheap confirmation step for targeted edits; use it before `plan_edit` when `get_edit_candidates` returns `needs_disambiguation: true` or when the task wording is vague.
 - `validate_edit` replays a planned edit, or validates an already-applied edit, on a scratch copy of the repo. It prefers Maven/Gradle test or compile commands and falls back to a local `javac -proc:none` syntax check when no project build tool is detected.
+- `validate_edit` now consumes the same planning logic as `get_validation_targets`, so module selection and test targeting stay consistent between “what should I run?” and “run validation now.”
 - When repo-aware validation is blocked by wrapper/bootstrap failures or environment constraints, `validate_edit` reports `attempted_validators`, marks the result as `degraded`, and falls back to syntax validation when possible.
 - `validate_edit` scopes repo-aware validation to the nearest touched Maven/Gradle module when possible, and reports that choice as `validation_target`.
 - `get_agent_fitness` reports a repo-wide structural fitness score, subscores, issues, and recommended actions for how well the codebase supports graph-guided agent workflows.
