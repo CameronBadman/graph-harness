@@ -20,6 +20,26 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
             ),
         ),
         tool(
+            "verify_candidate",
+            "Cheaply verify whether a candidate node actually matches the requested edit task before planning the edit.",
+            objectSchema(
+                properties = mapOf(
+                    "task" to stringSchema("Natural-language edit task."),
+                    "node_id" to stringSchema("Candidate node id to verify."),
+                    "payload" to objectSchema(
+                        properties = mapOf(
+                            "new_body" to stringSchema("Replacement Java statements for the method body."),
+                            "patch_mode" to enumSchema("Method-body patch mode.", listOf("replace_body", "insert_before", "insert_after", "replace_line")),
+                            "anchor" to stringSchema("Anchor line fragment for patch verification."),
+                            "snippet" to stringSchema("Snippet to insert or use as replacement."),
+                            "new_name" to stringSchema("New method name for rename verification."),
+                        ),
+                    ),
+                ),
+                required = listOf("task", "node_id"),
+            ),
+        ),
+        tool(
             "plan_edit",
             "Plan a targeted graph-guided edit and return a preview diff without writing to disk.",
             objectSchema(
@@ -253,6 +273,24 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
                     limit = arguments.optionalInt("limit") ?: 5,
                 ),
             )
+
+            "verify_candidate" -> {
+                val payload = arguments.optionalObject("payload") ?: emptyJsonObject()
+                graphHarnessJson.encode(
+                    snapshotManager.verifyCandidate(
+                        task = arguments.requiredString("task"),
+                        nodeId = arguments.requiredString("node_id"),
+                        payload = EditRequestPayload(
+                            new_body = payload.optionalString("new_body"),
+                            patch_mode = payload.optionalString("patch_mode"),
+                            anchor = payload.optionalString("anchor"),
+                            snippet = payload.optionalString("snippet"),
+                            placement = payload.optionalString("placement"),
+                            new_name = payload.optionalString("new_name"),
+                        ),
+                    ),
+                )
+            }
 
             "plan_edit" -> {
                 val payload = arguments.optionalObject("payload") ?: emptyJsonObject()
@@ -499,6 +537,23 @@ internal class JsonCodec {
         is EditCandidatesResult -> jObject(
             "task" to value.task,
             "candidates" to value.candidates,
+            "needs_disambiguation" to value.needs_disambiguation,
+            "analysis_engine" to value.analysis_engine,
+            "engine_version" to value.engine_version,
+            "build_duration_ms" to value.build_duration_ms,
+            "snapshot_id" to value.snapshot_id,
+            "generated_at" to value.generated_at,
+        )
+        is VerifyCandidateResult -> jObject(
+            "task" to value.task,
+            "node" to value.node,
+            "suggested_operation" to value.suggested_operation,
+            "suggested_payload" to value.suggested_payload,
+            "anchor_present" to value.anchor_present,
+            "snippet_present" to value.snippet_present,
+            "name_match" to value.name_match,
+            "confidence" to value.confidence,
+            "verification_notes" to value.verification_notes,
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,

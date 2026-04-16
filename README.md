@@ -66,6 +66,7 @@ python3 scripts/edit_demo.py ./result/bin/graphharness /path/to/java/repo
 That demo now exercises the intended edit loop:
 
 - `get_edit_candidates`
+- `verify_candidate`
 - `plan_edit`
 - `apply_edit` smoke test on a scratch copy
 
@@ -73,6 +74,7 @@ The available tools are:
 
 - `get_summary_map`
 - `get_edit_candidates`
+- `verify_candidate`
 - `plan_edit`
 - `apply_edit`
 - `get_cluster_detail`
@@ -98,4 +100,5 @@ The available tools are:
 - The current edit surface is intentionally narrow: `modify_method_body` and method-only `rename_node`, with preview diff generation and stale-file validation before apply.
 - `modify_method_body` supports both full-body replacement and smaller anchor-based patch modes (`insert_before`, `insert_after`, `replace_line`).
 - `get_edit_candidates` uses lightweight heuristics to suggest likely edit targets, operations, and starter payloads from a natural-language task description.
+- `verify_candidate` is the cheap confirmation step for targeted edits; use it before `plan_edit` when `get_edit_candidates` returns `needs_disambiguation: true` or when the task wording is vague.
 # code-agent

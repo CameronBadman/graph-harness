@@ -415,6 +415,18 @@ fun inferMethodPatchPayload(task: String): Map<String, String> {
     return payload
 }
 
+fun candidateConfidence(score: Int, rationaleParts: List<String>): Double {
+    val rationaleBoost = rationaleParts.size.coerceAtMost(3) * 0.08
+    return ((score.coerceAtMost(320) / 320.0) + rationaleBoost).coerceIn(0.15, 0.99)
+}
+
+fun needsDisambiguation(candidates: List<EditCandidate>): Boolean {
+    if (candidates.isEmpty()) return true
+    if (candidates.first().confidence < 0.65) return true
+    if (candidates.size > 1 && (candidates.first().score - candidates[1].score) < 35) return true
+    return false
+}
+
 fun payloadAnchor(task: String): String? =
     Regex("""before\s+["']([^"']+)["']""", RegexOption.IGNORE_CASE).find(task)?.groupValues?.get(1)
         ?: Regex("""after\s+["']([^"']+)["']""", RegexOption.IGNORE_CASE).find(task)?.groupValues?.get(1)

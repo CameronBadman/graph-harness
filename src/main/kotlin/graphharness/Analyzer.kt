@@ -576,6 +576,7 @@ class SnapshotManager(private val projectRoot: Path) {
                     rationale = rationaleParts.distinct().take(3).ifEmpty { listOf("name and subsystem heuristics matched the task") }.joinToString("; "),
                     suggested_payload = suggestedPayload,
                     score = score,
+                    confidence = candidateConfidence(score, rationaleParts),
                 )
             }
             .sortedWith(compareByDescending<EditCandidate> { it.score }.thenBy { it.node.name })
@@ -584,6 +585,62 @@ class SnapshotManager(private val projectRoot: Path) {
         return EditCandidatesResult(
             task = normalizedTask,
             candidates = candidates,
+            needs_disambiguation = needsDisambiguation(candidates),
+            analysis_engine = snapshot.analysisEngine,
+            engine_version = snapshot.engineVersion,
+            build_duration_ms = snapshot.buildDurationMs,
+            snapshot_id = snapshot.id,
+            generated_at = snapshot.generatedAt,
+        )
+    }
+
+    fun verifyCandidate(
+        task: String,
+        nodeId: String,
+        payload: EditRequestPayload,
+        snapshot: Snapshot = current(),
+    ): VerifyCandidateResult {
+        val node = snapshot.nodeSummaries[nodeId] ?: error("Unknown node_id: $nodeId")
+        val method = snapshot.methodInfos[nodeId] ?: error("verify_candidate currently supports method nodes only")
+        val suggestedOperation = if (!payload.new_name.isNullOrBlank() || "rename" in task.lowercase()) "rename_node" else "modify_method_body"
+        val sourceText = snapshot.sourceIndex[method.file]
+            ?.let(::readPathText)
+            ?.let { sourceSlice(it, method.lineRange) }
+            .orEmpty()
+        val anchor = payload.anchor
+        val snippet = payload.snippet ?: payload.new_body
+        val anchorPresent = anchor?.let { sourceText.contains(it) } ?: false
+        val snippetPresent = snippet?.let { sourceText.contains(it) } ?: false
+        val nameMatch = extractEditTaskTerms(task).any { term ->
+            method.simpleName.contains(term, ignoreCase = true) || method.qualifiedName.contains(term, ignoreCase = true)
+        }
+        val notes = mutableListOf<String>()
+        if (nameMatch) notes += "task terms match the method name"
+        if (anchorPresent) notes += "anchor text exists in the candidate source"
+        if (snippetPresent) notes += "snippet already exists in the candidate source"
+        if (!anchorPresent && anchor != null) notes += "anchor text was not found in the candidate source"
+        val confidence = when {
+            anchorPresent && !snippetPresent -> 0.92
+            anchorPresent -> 0.78
+            nameMatch -> 0.56
+            else -> 0.28
+        }
+        return VerifyCandidateResult(
+            task = task,
+            node = node,
+            suggested_operation = suggestedOperation,
+            suggested_payload = buildMap {
+                payload.patch_mode?.let { put("patch_mode", it) }
+                payload.anchor?.let { put("anchor", it) }
+                payload.snippet?.let { put("snippet", it) }
+                payload.new_name?.let { put("new_name", it) }
+                payload.new_body?.let { put("new_body", it) }
+            },
+            anchor_present = anchorPresent,
+            snippet_present = snippetPresent,
+            name_match = nameMatch,
+            confidence = confidence,
+            verification_notes = notes,
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,

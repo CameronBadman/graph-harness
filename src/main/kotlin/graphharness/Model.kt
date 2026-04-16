@@ -240,11 +240,30 @@ data class EditCandidate(
     val rationale: String,
     val suggested_payload: Map<String, String> = emptyMap(),
     val score: Int,
+    val confidence: Double,
 )
 
 data class EditCandidatesResult(
     val task: String,
     val candidates: List<EditCandidate>,
+    val needs_disambiguation: Boolean,
+    val analysis_engine: String,
+    val engine_version: String? = null,
+    val build_duration_ms: Long,
+    val snapshot_id: String,
+    val generated_at: String,
+)
+
+data class VerifyCandidateResult(
+    val task: String,
+    val node: NodeSummary,
+    val suggested_operation: String,
+    val suggested_payload: Map<String, String>,
+    val anchor_present: Boolean,
+    val snippet_present: Boolean,
+    val name_match: Boolean,
+    val confidence: Double,
+    val verification_notes: List<String>,
     val analysis_engine: String,
     val engine_version: String? = null,
     val build_duration_ms: Long,

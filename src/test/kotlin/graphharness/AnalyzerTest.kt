@@ -272,4 +272,65 @@ class AnalyzerTest {
         assertTrue(patchCandidates.candidates.first().node.name.endsWith("PetController.processCreationForm"))
         assertTrue(patchCandidates.candidates.first().suggested_payload["patch_mode"] == "insert_before")
     }
+
+    @Test
+    fun verifiesCandidatesAndFlagsDisambiguation() {
+        val root = createTempDirectory("graphharness-verify-test")
+        root.resolve("OwnerController.java").writeText(
+            """
+            package com.app.payment;
+
+            public class OwnerController {
+                public void processCreationForm(Owner owner) {
+                    save(owner);
+                }
+            }
+            """.trimIndent(),
+        )
+        root.resolve("PetController.java").writeText(
+            """
+            package com.app.payment;
+
+            public class PetController {
+                public void processCreationForm(Owner owner, Pet pet) {
+                    owner.addPet(pet);
+                }
+            }
+            """.trimIndent(),
+        )
+        root.resolve("Owner.java").writeText("package com.app.payment;\npublic class Owner { public void addPet(Pet pet) {} }\n")
+        root.resolve("Pet.java").writeText("package com.app.payment;\npublic class Pet {}\n")
+
+        val manager = SnapshotManager(root)
+        val candidates = manager.editCandidates("Insert \"pet.setOwner(owner);\" before \"owner.addPet(pet);\" in processCreationForm", 3)
+        assertTrue(!candidates.needs_disambiguation)
+        val top = candidates.candidates.first()
+        assertTrue(top.confidence >= 0.65)
+
+        val verified = manager.verifyCandidate(
+            task = "Insert \"pet.setOwner(owner);\" before \"owner.addPet(pet);\" in processCreationForm",
+            nodeId = top.node.id,
+            payload = EditRequestPayload(
+                patch_mode = "insert_before",
+                anchor = "owner.addPet(pet);",
+                snippet = "pet.setOwner(owner);",
+            ),
+        )
+        assertTrue(verified.anchor_present)
+        assertTrue(!verified.snippet_present)
+        assertTrue(verified.confidence >= 0.78)
+
+        val wrongNode = manager.search("OwnerController.processCreationForm", "method", null, null).results.first()
+        val rejected = manager.verifyCandidate(
+            task = "Insert \"pet.setOwner(owner);\" before \"owner.addPet(pet);\" in processCreationForm",
+            nodeId = wrongNode.id,
+            payload = EditRequestPayload(
+                patch_mode = "insert_before",
+                anchor = "owner.addPet(pet);",
+                snippet = "pet.setOwner(owner);",
+            ),
+        )
+        assertTrue(!rejected.anchor_present)
+        assertTrue(rejected.confidence < verified.confidence)
+    }
 }
