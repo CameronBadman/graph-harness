@@ -71,6 +71,7 @@ That demo now exercises the intended edit loop:
 - `validate_edit`
 - `get_agent_fitness`
 - `get_cluster_fitness`
+- `get_validation_targets`
 - `apply_edit` smoke test on a scratch copy
 
 The available tools are:
@@ -82,6 +83,7 @@ The available tools are:
 - `validate_edit`
 - `get_agent_fitness`
 - `get_cluster_fitness`
+- `get_validation_targets`
 - `apply_edit`
 - `get_cluster_detail`
 - `get_node_detail`
@@ -112,4 +114,5 @@ The available tools are:
 - `validate_edit` scopes repo-aware validation to the nearest touched Maven/Gradle module when possible, and reports that choice as `validation_target`.
 - `get_agent_fitness` reports a repo-wide structural fitness score, subscores, issues, and recommended actions for how well the codebase supports graph-guided agent workflows.
 - `get_cluster_fitness` drills the same fitness model down to a single cluster so you can identify which subsystem is actually dragging the repo-wide score down.
+- `get_validation_targets` uses impact plus build-root layout to suggest the most relevant modules, tests, and validation command shapes for a node or planned edit.
 # code-agent

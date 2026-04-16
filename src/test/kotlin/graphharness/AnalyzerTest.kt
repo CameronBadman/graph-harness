@@ -104,6 +104,9 @@ class AnalyzerTest {
         val clusterFitness = manager.clusterFitness(clusterId)
         assertEquals(clusterId, clusterFitness.cluster.cluster_id)
         assertTrue(clusterFitness.overall_score in 0..100)
+        val validationTargets = manager.validationTargets(nodeId = processNode.id)
+        assertEquals(processNode.id, validationTargets.target_node_id)
+        assertTrue(validationTargets.validation_targets.any { it.kind == "module" })
     }
 
     @Test
@@ -550,6 +553,9 @@ class AnalyzerTest {
         assertEquals("module:payments", validation.validation_target)
         assertEquals("javac-syntax", validation.validator)
         assertEquals(listOf("javac-syntax"), validation.attempted_validators)
+        val targets = manager.validationTargets(editId = plan.edit_id)
+        assertEquals(plan.edit_id, targets.edit_id)
+        assertTrue(targets.validation_targets.any { it.identifier == "payments" || it.identifier == "project_root" || it.identifier == "module:payments" })
     }
 
     @Test

@@ -337,6 +337,32 @@ data class ClusterFitnessResult(
     val generated_at: String,
 )
 
+data class ValidationTargetItem(
+    val kind: String,
+    val identifier: String,
+    val file: String? = null,
+    val confidence: Double,
+    val rationale: String,
+)
+
+data class ValidationCommandHint(
+    val label: String,
+    val command: List<String>,
+    val working_directory: String,
+)
+
+data class ValidationTargetsResult(
+    val target_node_id: String? = null,
+    val edit_id: String? = null,
+    val validation_targets: List<ValidationTargetItem>,
+    val command_hints: List<ValidationCommandHint>,
+    val analysis_engine: String,
+    val engine_version: String? = null,
+    val build_duration_ms: Long,
+    val snapshot_id: String,
+    val generated_at: String,
+)
+
 data class ToolDefinition(
     val name: String,
     val description: String,

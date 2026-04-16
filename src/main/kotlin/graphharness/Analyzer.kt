@@ -540,6 +540,58 @@ class SnapshotManager(private val projectRoot: Path) {
         )
     }
 
+    fun validationTargets(
+        nodeId: String? = null,
+        editId: String? = null,
+        snapshot: Snapshot = current(),
+    ): ValidationTargetsResult {
+        require(!nodeId.isNullOrBlank() || !editId.isNullOrBlank()) { "Provide node_id or edit_id" }
+        val pending = editId?.let { pendingEdits[it] ?: error("Unknown edit_id: $it") }
+        val resolvedNodeId = nodeId ?: pending?.targetNodeId
+        require(!resolvedNodeId.isNullOrBlank()) { "Unable to resolve validation target node" }
+        val targetNode = snapshot.nodeSummaries[resolvedNodeId]
+        val impact = impact(resolvedNodeId!!, 2, snapshot)
+        val affectedFiles = listOfNotNull(targetNode?.file) + (pending?.affectedFiles ?: emptyList()) + impact.affected_files
+        val distinctFiles = affectedFiles.distinct()
+        val buildRoots = groupedBuildRoots(distinctFiles)
+        val relatedTests = inferRelatedTests(resolvedNodeId, distinctFiles, snapshot)
+        val validationItems = mutableListOf<ValidationTargetItem>()
+
+        buildRoots.forEach { (root, files) ->
+            val relative = projectRoot.relativize(root).toString().replace('\\', '/').ifBlank { "project_root" }
+            validationItems += ValidationTargetItem(
+                kind = "module",
+                identifier = relative,
+                file = null,
+                confidence = if (root == projectRoot) 0.62 else 0.84,
+                rationale = "Affected files map to this build root (${files.size} files).",
+            )
+        }
+        relatedTests.forEach { test ->
+            validationItems += ValidationTargetItem(
+                kind = "test_file",
+                identifier = test,
+                file = test,
+                confidence = 0.78,
+                rationale = "Test name/layout matches affected production files or impacted classes.",
+            )
+        }
+
+        val commandHints = buildValidationCommandHints(buildRoots.keys.toList(), relatedTests)
+
+        return ValidationTargetsResult(
+            target_node_id = resolvedNodeId,
+            edit_id = editId,
+            validation_targets = validationItems,
+            command_hints = commandHints,
+            analysis_engine = snapshot.analysisEngine,
+            engine_version = snapshot.engineVersion,
+            build_duration_ms = snapshot.buildDurationMs,
+            snapshot_id = snapshot.id,
+            generated_at = snapshot.generatedAt,
+        )
+    }
+
     private fun buildFitnessReport(
         relevantMethods: List<MethodInfo>,
         snapshot: Snapshot,
@@ -1816,6 +1868,90 @@ class SnapshotManager(private val projectRoot: Path) {
 
     private fun scoreFitness(raw: Double): Int =
         raw.toInt().coerceIn(0, 100)
+
+    private fun groupedBuildRoots(files: List<String>): Map<Path, List<String>> =
+        files.groupBy { file ->
+            var current: Path? = projectRoot.resolve(file).normalize().parent
+            var best: Path = projectRoot
+            val buildFiles = setOf("pom.xml", "build.gradle", "build.gradle.kts")
+            while (current != null && current.startsWith(projectRoot)) {
+                if (best == projectRoot && buildFiles.any { Files.exists(current.resolve(it)) }) {
+                    best = current
+                }
+                if (current == projectRoot) break
+                current = current.parent
+            }
+            best
+        }
+
+    private fun inferRelatedTests(nodeId: String, affectedFiles: List<String>, snapshot: Snapshot): List<String> {
+        val node = snapshot.nodeSummaries[nodeId]
+        val candidateNames = buildSet {
+            node?.name?.substringAfterLast('.')?.let { add(it) }
+            affectedFiles.forEach { file ->
+                val stem = Path.of(file).fileName.toString().removeSuffix(".java")
+                add(stem)
+                add(stem.removeSuffix("Controller"))
+                add(stem.removeSuffix("Service"))
+                add(stem.removeSuffix("Repository"))
+            }
+        }.filter { it.isNotBlank() }
+        return snapshot.sourceIndex.keys
+            .filter { it.contains("/test/") || it.endsWith("Test.java") || it.endsWith("Tests.java") }
+            .filter { testFile ->
+                val testStem = Path.of(testFile).fileName.toString().removeSuffix(".java")
+                candidateNames.any { name -> testStem.contains(name, ignoreCase = true) }
+            }
+            .sorted()
+            .take(8)
+    }
+
+    private fun buildValidationCommandHints(buildRoots: List<Path>, relatedTests: List<String>): List<ValidationCommandHint> {
+        val hints = mutableListOf<ValidationCommandHint>()
+        buildRoots.distinct().forEach { root ->
+            val relative = projectRoot.relativize(root).toString().replace('\\', '/')
+            val workingDirectory = root.toString()
+            if (Files.exists(root.resolve("mvnw"))) {
+                hints += ValidationCommandHint(
+                    label = if (relative.isBlank()) "module-test" else "module-test:$relative",
+                    command = listOf("bash", "./mvnw", "-q", "test"),
+                    working_directory = workingDirectory,
+                )
+            } else if (Files.exists(root.resolve("gradlew"))) {
+                hints += ValidationCommandHint(
+                    label = if (relative.isBlank()) "module-test" else "module-test:$relative",
+                    command = listOf("bash", "./gradlew", "--no-daemon", "test"),
+                    working_directory = workingDirectory,
+                )
+            } else if (Files.exists(root.resolve("pom.xml"))) {
+                hints += ValidationCommandHint(
+                    label = if (relative.isBlank()) "module-compile" else "module-compile:$relative",
+                    command = listOf("mvn", "-q", "-DskipTests", "compile"),
+                    working_directory = workingDirectory,
+                )
+            } else if (Files.exists(root.resolve("build.gradle")) || Files.exists(root.resolve("build.gradle.kts"))) {
+                hints += ValidationCommandHint(
+                    label = if (relative.isBlank()) "module-compile" else "module-compile:$relative",
+                    command = listOf("gradle", "--no-daemon", "compileJava"),
+                    working_directory = workingDirectory,
+                )
+            } else {
+                hints += ValidationCommandHint(
+                    label = if (relative.isBlank()) "module-syntax" else "module-syntax:$relative",
+                    command = listOf("javac", "-proc:none", "<java-files>"),
+                    working_directory = workingDirectory,
+                )
+            }
+        }
+        relatedTests.take(5).forEach { testFile ->
+            hints += ValidationCommandHint(
+                label = "likely-test:${Path.of(testFile).fileName}",
+                command = listOf("run", testFile),
+                working_directory = projectRoot.toString(),
+            )
+        }
+        return hints.distinctBy { it.label to it.working_directory }
+    }
 
     private fun copyProjectTree(sourceRoot: Path, targetRoot: Path) {
         val excludedNames = setOf(".git", ".gradle", "build", "target", ".idea")
