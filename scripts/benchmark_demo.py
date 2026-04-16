@@ -81,6 +81,37 @@ class BenchmarkResult:
     notes: list[str]
 
 
+@dataclass
+class TypedArtifacts:
+    nodes: set[str]
+    files: set[str]
+    tests: set[str]
+    validation_targets: set[str]
+
+
+@dataclass
+class TaskSpec:
+    name: str
+    expected_nodes: set[str]
+    expected_files: set[str]
+    expected_tests: set[str]
+    expected_validation_targets: set[str]
+
+
+@dataclass
+class TaskScore:
+    task: str
+    node_recall: float
+    file_recall: float
+    test_recall: float
+    validation_target_recall: float
+    missing_nodes: list[str]
+    missing_files: list[str]
+    missing_tests: list[str]
+    missing_validation_targets: list[str]
+    task_success: bool
+
+
 def normalize_artifact(value: str) -> str:
     base = value.split("[", 1)[0]
     if ":" in base and ".java:" in base:
@@ -93,6 +124,54 @@ def normalize_artifact(value: str) -> str:
         if len(parts) >= 2:
             return f"{parts[-2].lower()}:{parts[-1].lower()}"
     return base.lower()
+
+
+def typed_artifacts(result: BenchmarkResult) -> TypedArtifacts:
+    normalized = {normalize_artifact(item) for item in result.artifacts}
+    nodes = {item for item in normalized if ":" in item and not item.endswith(":java") and not item.startswith("src/")}
+    files = {item for item in normalized if item.endswith(":java") and not item.startswith("src/test/")}
+    tests = {item for item in normalized if item.startswith("src/test/") or item.endswith("tests:java") or item.endswith("test:java")}
+    validation_targets = {
+        item for item in normalized
+        if item == "project_root" or item.startswith("module:")
+    }
+    return TypedArtifacts(nodes=nodes, files=files, tests=tests, validation_targets=validation_targets)
+
+
+def ratio(found: set[str], expected: set[str]) -> float:
+    if not expected:
+        return 1.0
+    return len(found & expected) / len(expected)
+
+
+def score_task(spec: TaskSpec, result: BenchmarkResult) -> TaskScore:
+    typed = typed_artifacts(result)
+    missing_nodes = sorted(spec.expected_nodes - typed.nodes)
+    missing_files = sorted(spec.expected_files - typed.files)
+    missing_tests = sorted(spec.expected_tests - typed.tests)
+    missing_targets = sorted(spec.expected_validation_targets - typed.validation_targets)
+    node_recall = ratio(typed.nodes, spec.expected_nodes)
+    file_recall = ratio(typed.files, spec.expected_files)
+    test_recall = ratio(typed.tests, spec.expected_tests)
+    validation_target_recall = ratio(typed.validation_targets, spec.expected_validation_targets)
+    task_success = (
+        node_recall >= 1.0
+        and file_recall >= 1.0
+        and test_recall >= 1.0
+        and validation_target_recall >= 1.0
+    )
+    return TaskScore(
+        task=spec.name,
+        node_recall=node_recall,
+        file_recall=file_recall,
+        test_recall=test_recall,
+        validation_target_recall=validation_target_recall,
+        missing_nodes=missing_nodes,
+        missing_files=missing_files,
+        missing_tests=missing_tests,
+        missing_validation_targets=missing_targets,
+        task_success=task_success,
+    )
 
 
 def choose_entrypoint(summary: dict[str, Any]) -> dict[str, Any]:
@@ -475,6 +554,25 @@ def print_result(result: BenchmarkResult) -> None:
     ))
 
 
+def print_score(score: TaskScore, label: str) -> None:
+    print(f"\n## score({label})")
+    print(json.dumps(
+        {
+            "task": score.task,
+            "task_success": score.task_success,
+            "node_recall": round(score.node_recall, 2),
+            "file_recall": round(score.file_recall, 2),
+            "test_recall": round(score.test_recall, 2),
+            "validation_target_recall": round(score.validation_target_recall, 2),
+            "missing_nodes": score.missing_nodes,
+            "missing_files": score.missing_files,
+            "missing_tests": score.missing_tests,
+            "missing_validation_targets": score.missing_validation_targets,
+        },
+        indent=2,
+    ))
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Compare GraphHarness context use against naive file loading.")
     parser.add_argument("server", help="Path to the GraphHarness server binary.")
@@ -491,6 +589,47 @@ def main() -> int:
     harness_feature = harness_feature_run(args.server, args.project_root)
     naive_feature = naive_feature_run(args.project_root)
 
+    orientation_task = TaskSpec(
+        name="orientation_controller_flow",
+        expected_nodes={
+            "petcontroller:processcreationform",
+            "owner:addpet",
+        },
+        expected_files=set(),
+        expected_tests=set(),
+        expected_validation_targets=set(),
+    )
+    contract_task = TaskSpec(
+        name="contract_impact",
+        expected_nodes={
+            "ownerrepository:findbyid",
+            "ownercontroller:findowner",
+            "petcontroller:findowner",
+        },
+        expected_files=set(),
+        expected_tests=set(),
+        expected_validation_targets=set(),
+    )
+    feature_task = TaskSpec(
+        name="feature_owner_pet_consistency",
+        expected_nodes={
+            "petcontroller:initcreationform",
+            "petcontroller:processcreationform",
+            "petcontroller:updatepetdetails",
+            "owner:addpet",
+        },
+        expected_files=set(),
+        expected_tests={"src/test/java/org/springframework/samples/petclinic/owner/petcontrollertests:java"},
+        expected_validation_targets={"project_root"},
+    )
+    edit_task = TaskSpec(
+        name="edit_patch",
+        expected_nodes={"petcontroller:processcreationform"},
+        expected_files={"src/main/java/org/springframework/samples/petclinic/owner/petcontroller:java"},
+        expected_tests=set(),
+        expected_validation_targets=set(),
+    )
+
     print_result(harness)
     print_result(harness_bundle)
     print_result(naive)
@@ -501,6 +640,16 @@ def main() -> int:
     print_result(naive_edit_patch)
     print_result(harness_feature)
     print_result(naive_feature)
+
+    print_score(score_task(orientation_task, harness), "graphharness")
+    print_score(score_task(orientation_task, harness_bundle), "graphharness-bundle")
+    print_score(score_task(orientation_task, naive), "naive")
+    print_score(score_task(contract_task, harness_contract), "graphharness-contract")
+    print_score(score_task(contract_task, naive_contract), "naive-contract")
+    print_score(score_task(edit_task, harness_edit_patch), "graphharness-edit-patch")
+    print_score(score_task(edit_task, naive_edit_patch), "naive-edit-patch")
+    print_score(score_task(feature_task, harness_feature), "graphharness-feature")
+    print_score(score_task(feature_task, naive_feature), "naive-feature")
 
     reduction = 0.0
     if naive.tokens:
