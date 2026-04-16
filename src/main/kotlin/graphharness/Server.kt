@@ -13,13 +13,16 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
             "Plan a targeted graph-guided edit and return a preview diff without writing to disk.",
             objectSchema(
                 properties = mapOf(
-                    "operation" to enumSchema("Edit operation to preview.", listOf("modify_method_body")),
+                    "operation" to enumSchema("Edit operation to preview.", listOf("modify_method_body", "rename_node")),
                     "target_node_id" to stringSchema("Method node id to edit."),
                     "payload" to objectSchema(
                         properties = mapOf(
                             "new_body" to stringSchema("Replacement Java statements for the method body."),
+                            "patch_mode" to enumSchema("Method-body patch mode.", listOf("replace_body", "insert_before", "insert_after", "replace_line")),
+                            "anchor" to stringSchema("Anchor line fragment for patch modes that modify around an existing statement."),
+                            "snippet" to stringSchema("Snippet to insert or use as replacement in patch modes."),
+                            "new_name" to stringSchema("New method name for rename_node."),
                         ),
-                        required = listOf("new_body"),
                     ),
                 ),
                 required = listOf("operation", "target_node_id", "payload"),
@@ -240,7 +243,12 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
                         operation = arguments.requiredString("operation"),
                         targetNodeId = arguments.requiredString("target_node_id"),
                         payload = EditRequestPayload(
-                            new_body = payload.requiredString("new_body"),
+                            new_body = payload.optionalString("new_body"),
+                            patch_mode = payload.optionalString("patch_mode"),
+                            anchor = payload.optionalString("anchor"),
+                            snippet = payload.optionalString("snippet"),
+                            placement = payload.optionalString("placement"),
+                            new_name = payload.optionalString("new_name"),
                         ),
                     ),
                 )

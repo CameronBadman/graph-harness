@@ -226,7 +226,12 @@ data class CallPathsResult(
 )
 
 data class EditRequestPayload(
-    val new_body: String,
+    val new_body: String? = null,
+    val patch_mode: String? = null,
+    val anchor: String? = null,
+    val snippet: String? = null,
+    val placement: String? = null,
+    val new_name: String? = null,
 )
 
 data class ToolDefinition(

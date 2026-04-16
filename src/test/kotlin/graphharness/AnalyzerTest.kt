@@ -139,4 +139,97 @@ class AnalyzerTest {
         val refreshedSource = manager.source(processNode.id, 0)
         assertTrue(refreshedSource.source.contains("validateOrder(order);"))
     }
+
+    @Test
+    fun plansSmallerAnchorBasedMethodBodyEdits() {
+        val root = createTempDirectory("graphharness-patch-test")
+        val file = root.resolve("PaymentService.java")
+        file.writeText(
+            """
+            package com.app.payment;
+
+            public class PaymentService {
+                public PaymentResult processPayment(Order order) {
+                    owner.addPet(pet);
+                    return charge(order);
+                }
+
+                private PaymentResult charge(Order order) {
+                    return new PaymentResult();
+                }
+            }
+            """.trimIndent(),
+        )
+        root.resolve("PaymentResult.java").writeText("package com.app.payment;\npublic class PaymentResult {}\n")
+        root.resolve("Order.java").writeText("package com.app.payment;\npublic class Order {}\n")
+
+        val manager = SnapshotManager(root)
+        val processNode = manager.search("processPayment", "method", null, null).results.first()
+        val plan = manager.planEdit(
+            operation = "modify_method_body",
+            targetNodeId = processNode.id,
+            payload = EditRequestPayload(
+                patch_mode = "insert_before",
+                anchor = "owner.addPet(pet);",
+                snippet = "pet.setOwner(owner);",
+            ),
+        )
+
+        assertTrue(plan.validation_errors.isEmpty())
+        assertTrue(plan.diff.contains("+        pet.setOwner(owner);"))
+        assertTrue(!plan.diff.contains("-    public PaymentResult processPayment"))
+    }
+
+    @Test
+    fun plansAndAppliesMethodRenames() {
+        val root = createTempDirectory("graphharness-rename-test")
+        val service = root.resolve("PaymentService.java")
+        service.writeText(
+            """
+            package com.app.payment;
+
+            public class PaymentService {
+                public PaymentResult processPayment(Order order) {
+                    return charge(order);
+                }
+
+                public PaymentResult charge(Order order) {
+                    return new PaymentResult();
+                }
+            }
+            """.trimIndent(),
+        )
+        val controller = root.resolve("CheckoutController.java")
+        controller.writeText(
+            """
+            package com.app.payment;
+
+            public class CheckoutController {
+                public PaymentResult submit(Order order) {
+                    PaymentService service = new PaymentService();
+                    return service.charge(order);
+                }
+            }
+            """.trimIndent(),
+        )
+        root.resolve("PaymentResult.java").writeText("package com.app.payment;\npublic class PaymentResult {}\n")
+        root.resolve("Order.java").writeText("package com.app.payment;\npublic class Order {}\n")
+
+        val manager = SnapshotManager(root)
+        val chargeNode = manager.search("PaymentService.charge", "method", null, null).results.first()
+        val plan = manager.planEdit(
+            operation = "rename_node",
+            targetNodeId = chargeNode.id,
+            payload = EditRequestPayload(new_name = "chargePayment"),
+        )
+
+        assertTrue(plan.validation_errors.isEmpty())
+        assertTrue(plan.affected_files.size >= 2)
+        assertTrue(plan.diff.contains("chargePayment"))
+
+        val apply = manager.applyEdit(plan.edit_id!!)
+        assertTrue(apply.success)
+        assertTrue(service.readText().contains("chargePayment(Order order)"))
+        assertTrue(controller.readText().contains("service.chargePayment(order)"))
+    }
 }
