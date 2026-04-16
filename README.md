@@ -57,6 +57,12 @@ For a simple benchmark that compares GraphHarness context use against a naive fi
 python3 scripts/benchmark_demo.py ./result/bin/graphharness /path/to/java/repo
 ```
 
+For an edit-focused demo that benchmarks full-body replacement, anchor patching, and method rename planning:
+
+```bash
+python3 scripts/edit_demo.py ./result/bin/graphharness /path/to/java/repo
+```
+
 The available tools are:
 
 - `get_summary_map`

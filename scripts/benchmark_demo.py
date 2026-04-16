@@ -271,6 +271,106 @@ def naive_contract_run(project_root: str) -> BenchmarkResult:
     )
 
 
+def harness_edit_run(server: str, project_root: str) -> tuple[BenchmarkResult, BenchmarkResult, BenchmarkResult]:
+    session = JsonRpcSession([server, project_root])
+    try:
+        session.request("initialize", {})
+
+        search = session.tool_call("search_graph", {"query": "processCreationForm", "kind": "method"})
+        target = next(item for item in search["results"] if item["name"].endswith("PetController.processCreationForm"))
+
+        replace_plan = session.tool_call(
+            "plan_edit",
+            {
+                "operation": "modify_method_body",
+                "target_node_id": target["id"],
+                "payload": {
+                    "new_body": 'pet.setOwner(owner);\nowner.addPet(pet);\nthis.owners.save(owner);\nredirectAttributes.addFlashAttribute("message", "New Pet has been Added");\nreturn "redirect:/owners/{ownerId}";',
+                },
+            },
+        )
+        patch_plan = session.tool_call(
+            "plan_edit",
+            {
+                "operation": "modify_method_body",
+                "target_node_id": target["id"],
+                "payload": {
+                    "patch_mode": "insert_before",
+                    "anchor": "owner.addPet(pet);",
+                    "snippet": "pet.setOwner(owner);",
+                },
+            },
+        )
+
+        rename_search = session.tool_call("search_graph", {"query": "findById", "kind": "method"})
+        rename_target = next(item for item in rename_search["results"] if item["name"].endswith("OwnerRepository.findById"))
+        rename_plan = session.tool_call(
+            "plan_edit",
+            {
+                "operation": "rename_node",
+                "target_node_id": rename_target["id"],
+                "payload": {"new_name": "findOwnerById"},
+            },
+        )
+    finally:
+        session.close()
+
+    return (
+        BenchmarkResult(
+            label="graphharness-edit-replace",
+            tokens=estimate_tokens(json.dumps(search, separators=(",", ":"))) + estimate_tokens(json.dumps(replace_plan, separators=(",", ":"))),
+            artifacts=[target["name"], *replace_plan["affected_files"]],
+            notes=[f"plan_edit_tokens={estimate_tokens(json.dumps(replace_plan, separators=(',', ':')))}"],
+        ),
+        BenchmarkResult(
+            label="graphharness-edit-patch",
+            tokens=estimate_tokens(json.dumps(search, separators=(",", ":"))) + estimate_tokens(json.dumps(patch_plan, separators=(",", ":"))),
+            artifacts=[target["name"], *patch_plan["affected_files"]],
+            notes=[f"plan_edit_tokens={estimate_tokens(json.dumps(patch_plan, separators=(',', ':')))}"],
+        ),
+        BenchmarkResult(
+            label="graphharness-edit-rename",
+            tokens=estimate_tokens(json.dumps(rename_search, separators=(",", ":"))) + estimate_tokens(json.dumps(rename_plan, separators=(",", ":"))),
+            artifacts=[rename_target["name"], *rename_plan["affected_files"]],
+            notes=[f"plan_edit_tokens={estimate_tokens(json.dumps(rename_plan, separators=(',', ':')))}"],
+        ),
+    )
+
+
+def naive_edit_run(project_root: str) -> tuple[BenchmarkResult, BenchmarkResult]:
+    root = Path(project_root)
+    pet_controller = next(root.rglob("PetController.java"))
+    owner_repository = next(root.rglob("OwnerRepository.java"))
+    controller_text = pet_controller.read_text()
+    repository_text = owner_repository.read_text()
+
+    patch_payload = {
+        "file": pet_controller.name,
+        "source": controller_text,
+        "requested_change": "Insert pet.setOwner(owner); before owner.addPet(pet); in processCreationForm and keep behavior unchanged.",
+    }
+    rename_payload = {
+        "file": owner_repository.name,
+        "source": repository_text,
+        "requested_change": "Rename method findById to findOwnerById and update all callers.",
+    }
+
+    return (
+        BenchmarkResult(
+            label="naive-edit-patch",
+            tokens=estimate_tokens(json.dumps(patch_payload, separators=(",", ":"))),
+            artifacts=[pet_controller.name],
+            notes=[f"file_lines={len(controller_text.splitlines())}"],
+        ),
+        BenchmarkResult(
+            label="naive-edit-rename",
+            tokens=estimate_tokens(json.dumps(rename_payload, separators=(",", ":"))),
+            artifacts=[owner_repository.name],
+            notes=[f"file_lines={len(repository_text.splitlines())}"],
+        ),
+    )
+
+
 def print_result(result: BenchmarkResult) -> None:
     print(f"\n## {result.label}")
     print(json.dumps(
@@ -294,11 +394,18 @@ def main() -> int:
     naive = naive_run(args.project_root)
     harness_contract = harness_contract_run(args.server, args.project_root)
     naive_contract = naive_contract_run(args.project_root)
+    harness_edit_replace, harness_edit_patch, harness_edit_rename = harness_edit_run(args.server, args.project_root)
+    naive_edit_patch, naive_edit_rename = naive_edit_run(args.project_root)
 
     print_result(harness)
     print_result(naive)
     print_result(harness_contract)
     print_result(naive_contract)
+    print_result(harness_edit_replace)
+    print_result(harness_edit_patch)
+    print_result(harness_edit_rename)
+    print_result(naive_edit_patch)
+    print_result(naive_edit_rename)
 
     reduction = 0.0
     if naive.tokens:
@@ -328,6 +435,26 @@ def main() -> int:
             "artifact_overlap": contract_overlap,
             "graphharness_tokens": harness_contract.tokens,
             "naive_tokens": naive_contract.tokens,
+        },
+        indent=2,
+    ))
+    print("\n## comparison(edit-patch)")
+    print(json.dumps(
+        {
+            "replace_plan_tokens": harness_edit_replace.tokens,
+            "patch_plan_tokens": harness_edit_patch.tokens,
+            "naive_file_tokens": naive_edit_patch.tokens,
+            "patch_vs_replace_reduction_percent": round(100.0 * (1.0 - (harness_edit_patch.tokens / harness_edit_replace.tokens)), 2),
+            "patch_vs_naive_reduction_percent": round(100.0 * (1.0 - (harness_edit_patch.tokens / naive_edit_patch.tokens)), 2),
+        },
+        indent=2,
+    ))
+    print("\n## comparison(edit-rename)")
+    print(json.dumps(
+        {
+            "rename_plan_tokens": harness_edit_rename.tokens,
+            "naive_file_tokens": naive_edit_rename.tokens,
+            "rename_vs_naive_reduction_percent": round(100.0 * (1.0 - (harness_edit_rename.tokens / naive_edit_rename.tokens)), 2),
         },
         indent=2,
     ))
