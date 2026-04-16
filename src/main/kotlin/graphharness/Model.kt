@@ -234,6 +234,24 @@ data class EditRequestPayload(
     val new_name: String? = null,
 )
 
+data class EditCandidate(
+    val node: NodeSummary,
+    val suggested_operation: String,
+    val rationale: String,
+    val suggested_payload: Map<String, String> = emptyMap(),
+    val score: Int,
+)
+
+data class EditCandidatesResult(
+    val task: String,
+    val candidates: List<EditCandidate>,
+    val analysis_engine: String,
+    val engine_version: String? = null,
+    val build_duration_ms: Long,
+    val snapshot_id: String,
+    val generated_at: String,
+)
+
 data class ToolDefinition(
     val name: String,
     val description: String,

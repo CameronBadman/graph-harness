@@ -383,3 +383,42 @@ fun sourceSlice(fileSource: String, lineRange: SourceRange): String {
     val end = lineRange.end.coerceAtMost(lines.size)
     return lines.subList(start - 1, end).joinToString("\n")
 }
+
+fun extractEditTaskTerms(task: String): List<String> {
+    val quoted = Regex("""["']([A-Za-z_]\w*)["']""").findAll(task).map { it.groupValues[1].lowercase() }.toList()
+    val camel = Regex("""\b[A-Za-z_]\w*\b""").findAll(task)
+        .map { it.value }
+        .filter { token ->
+            token.any(Char::isUpperCase) ||
+                token in setOf("rename", "insert", "replace", "save", "find", "process", "validate", "charge")
+        }
+        .map { it.lowercase() }
+        .toList()
+    return (quoted + camel).distinct().filter { it.length >= 3 }
+}
+
+fun inferRenamePayload(task: String, method: MethodInfo): Map<String, String> {
+    val explicit = Regex("""rename(?:\s+method)?\s+\w+\s+to\s+([A-Za-z_]\w*)""").find(task)?.groupValues?.get(1)
+        ?: Regex("""to\s+["']?([A-Za-z_]\w*)["']?""").find(task)?.groupValues?.get(1)
+    return listOfNotNull(explicit?.let { "new_name" to it }).toMap()
+}
+
+fun inferMethodPatchPayload(task: String): Map<String, String> {
+    val payload = linkedMapOf<String, String>()
+    when {
+        "insert before" in task -> payload["patch_mode"] = "insert_before"
+        "insert after" in task -> payload["patch_mode"] = "insert_after"
+        "replace line" in task || "replace statement" in task -> payload["patch_mode"] = "replace_line"
+    }
+    payloadAnchor(task)?.let { payload["anchor"] = it }
+    payloadSnippet(task)?.let { payload["snippet"] = it }
+    return payload
+}
+
+fun payloadAnchor(task: String): String? =
+    Regex("""before\s+["']([^"']+)["']""", RegexOption.IGNORE_CASE).find(task)?.groupValues?.get(1)
+        ?: Regex("""after\s+["']([^"']+)["']""", RegexOption.IGNORE_CASE).find(task)?.groupValues?.get(1)
+
+fun payloadSnippet(task: String): String? =
+    Regex("""insert\s+["']([^"']+)["']""", RegexOption.IGNORE_CASE).find(task)?.groupValues?.get(1)
+        ?: Regex("""replace(?:\s+line|\s+statement)?\s+["']([^"']+)["']""", RegexOption.IGNORE_CASE).find(task)?.groupValues?.get(1)

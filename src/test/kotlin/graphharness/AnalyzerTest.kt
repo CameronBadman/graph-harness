@@ -232,4 +232,44 @@ class AnalyzerTest {
         assertTrue(service.readText().contains("chargePayment(Order order)"))
         assertTrue(controller.readText().contains("service.chargePayment(order)"))
     }
+
+    @Test
+    fun suggestsEditCandidatesFromNaturalLanguageTasks() {
+        val root = createTempDirectory("graphharness-candidate-test")
+        root.resolve("OwnerRepository.java").writeText(
+            """
+            package com.app.payment;
+
+            public interface OwnerRepository {
+                Owner findById(int id);
+            }
+            """.trimIndent(),
+        )
+        root.resolve("PetController.java").writeText(
+            """
+            package com.app.payment;
+
+            public class PetController {
+                public void processCreationForm(Owner owner, Pet pet) {
+                    owner.addPet(pet);
+                }
+            }
+            """.trimIndent(),
+        )
+        root.resolve("Owner.java").writeText("package com.app.payment;\npublic class Owner { public void addPet(Pet pet) {} }\n")
+        root.resolve("Pet.java").writeText("package com.app.payment;\npublic class Pet {}\n")
+
+        val manager = SnapshotManager(root)
+        val renameCandidates = manager.editCandidates("Rename method findById to findOwnerById in the repository", 3)
+        assertTrue(renameCandidates.candidates.isNotEmpty())
+        assertTrue(renameCandidates.candidates.first().suggested_operation == "rename_node")
+        assertTrue(renameCandidates.candidates.first().node.name.endsWith("OwnerRepository.findById"))
+        assertTrue(renameCandidates.candidates.first().suggested_payload["new_name"] == "findOwnerById")
+
+        val patchCandidates = manager.editCandidates("Insert \"pet.setOwner(owner);\" before \"owner.addPet(pet);\" in processCreationForm", 3)
+        assertTrue(patchCandidates.candidates.isNotEmpty())
+        assertTrue(patchCandidates.candidates.first().suggested_operation == "modify_method_body")
+        assertTrue(patchCandidates.candidates.first().node.name.endsWith("PetController.processCreationForm"))
+        assertTrue(patchCandidates.candidates.first().suggested_payload["patch_mode"] == "insert_before")
+    }
 }

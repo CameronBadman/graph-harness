@@ -495,6 +495,103 @@ class SnapshotManager(private val projectRoot: Path) {
         return SearchResult(results, snapshot.analysisEngine, snapshot.engineVersion, snapshot.buildDurationMs, snapshot.id, snapshot.generatedAt)
     }
 
+    fun editCandidates(task: String, limit: Int, snapshot: Snapshot = current()): EditCandidatesResult {
+        val normalizedTask = task.trim()
+        val lowerTask = normalizedTask.lowercase()
+        val requestedLimit = limit.coerceIn(1, 10)
+        val methods = snapshot.methodInfos.values.filter { isAgentRelevantMethod(it) }
+        val taskTerms = extractEditTaskTerms(normalizedTask)
+        val preferredKinds = when {
+            "repository" in lowerTask -> listOf("Repository")
+            "controller" in lowerTask -> listOf("Controller")
+            "service" in lowerTask -> listOf("Service")
+            else -> emptyList()
+        }
+        val suggestedOperation = when {
+            "rename" in lowerTask -> "rename_node"
+            else -> "modify_method_body"
+        }
+
+        val candidates = methods
+            .mapNotNull { method ->
+                val node = snapshot.nodeSummaries[method.id] ?: return@mapNotNull null
+                val nameLower = method.qualifiedName.lowercase()
+                val simpleLower = method.simpleName.lowercase()
+                val methodText = snapshot.sourceIndex[method.file]
+                    ?.let(::readPathText)
+                    ?.let { sourceSlice(it, method.lineRange) }
+                    ?.lowercase()
+                    .orEmpty()
+                var score = 0
+                val rationaleParts = mutableListOf<String>()
+
+                taskTerms.forEach { term ->
+                    when {
+                        simpleLower == term -> {
+                            score += 80
+                            rationaleParts += "exact method-name match for '$term'"
+                        }
+                        simpleLower.contains(term) -> {
+                            score += 45
+                            rationaleParts += "method name contains '$term'"
+                        }
+                        nameLower.contains(term) -> {
+                            score += 25
+                            rationaleParts += "qualified name contains '$term'"
+                        }
+                    }
+                }
+
+                if (preferredKinds.any { it in method.parentQualifiedName }) {
+                    score += 30
+                    rationaleParts += "owner type matches requested subsystem"
+                }
+                payloadAnchor(lowerTask)?.let { anchor ->
+                    if (methodText.contains(anchor.lowercase())) {
+                        score += 120
+                        rationaleParts += "method body contains requested anchor"
+                    }
+                }
+                payloadSnippet(lowerTask)?.let { snippet ->
+                    if (methodText.contains(snippet.lowercase())) {
+                        score -= 20
+                    }
+                }
+                if (suggestedOperation == "modify_method_body") {
+                    score += entrypointPriority(method).coerceAtLeast(0)
+                }
+                if ("before" in lowerTask || "after" in lowerTask || "insert" in lowerTask || "replace" in lowerTask) {
+                    score += 10
+                }
+                if (score <= 0) return@mapNotNull null
+
+                val suggestedPayload = when (suggestedOperation) {
+                    "rename_node" -> inferRenamePayload(normalizedTask, method)
+                    else -> inferMethodPatchPayload(normalizedTask)
+                }
+
+                EditCandidate(
+                    node = node,
+                    suggested_operation = suggestedOperation,
+                    rationale = rationaleParts.distinct().take(3).ifEmpty { listOf("name and subsystem heuristics matched the task") }.joinToString("; "),
+                    suggested_payload = suggestedPayload,
+                    score = score,
+                )
+            }
+            .sortedWith(compareByDescending<EditCandidate> { it.score }.thenBy { it.node.name })
+            .take(requestedLimit)
+
+        return EditCandidatesResult(
+            task = normalizedTask,
+            candidates = candidates,
+            analysis_engine = snapshot.analysisEngine,
+            engine_version = snapshot.engineVersion,
+            build_duration_ms = snapshot.buildDurationMs,
+            snapshot_id = snapshot.id,
+            generated_at = snapshot.generatedAt,
+        )
+    }
+
     fun nodeDetail(nodeId: String, snapshot: Snapshot = current()): NodeDetailResult {
         val start = System.nanoTime()
         val node = snapshot.nodeSummaries[nodeId] ?: error("Unknown node_id: $nodeId")

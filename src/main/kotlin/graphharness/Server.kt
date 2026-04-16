@@ -9,6 +9,17 @@ import java.time.Instant
 class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
     private val tools = listOf(
         tool(
+            "get_edit_candidates",
+            "Suggest likely edit targets and operations from a natural-language task description.",
+            objectSchema(
+                properties = mapOf(
+                    "task" to stringSchema("Natural-language edit task."),
+                    "limit" to intSchema("Maximum candidates to return.", minimum = 1, maximum = 10),
+                ),
+                required = listOf("task"),
+            ),
+        ),
+        tool(
             "plan_edit",
             "Plan a targeted graph-guided edit and return a preview diff without writing to disk.",
             objectSchema(
@@ -236,6 +247,13 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
 
     private fun invokeTool(toolName: String, arguments: JObject): JsonValue {
         return when (toolName) {
+            "get_edit_candidates" -> graphHarnessJson.encode(
+                snapshotManager.editCandidates(
+                    task = arguments.requiredString("task"),
+                    limit = arguments.optionalInt("limit") ?: 5,
+                ),
+            )
+
             "plan_edit" -> {
                 val payload = arguments.optionalObject("payload") ?: emptyJsonObject()
                 graphHarnessJson.encode(
@@ -465,6 +483,22 @@ internal class JsonCodec {
             "affected_nodes" to value.affected_nodes,
             "affected_files" to value.affected_files,
             "validation_errors" to value.validation_errors,
+            "analysis_engine" to value.analysis_engine,
+            "engine_version" to value.engine_version,
+            "build_duration_ms" to value.build_duration_ms,
+            "snapshot_id" to value.snapshot_id,
+            "generated_at" to value.generated_at,
+        )
+        is EditCandidate -> jObject(
+            "node" to value.node,
+            "suggested_operation" to value.suggested_operation,
+            "rationale" to value.rationale,
+            "suggested_payload" to value.suggested_payload,
+            "score" to value.score,
+        )
+        is EditCandidatesResult -> jObject(
+            "task" to value.task,
+            "candidates" to value.candidates,
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
