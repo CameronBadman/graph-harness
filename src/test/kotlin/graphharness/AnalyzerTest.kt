@@ -333,4 +333,45 @@ class AnalyzerTest {
         assertTrue(!rejected.anchor_present)
         assertTrue(rejected.confidence < verified.confidence)
     }
+
+    @Test
+    fun resolvesEditTargetUsingVerification() {
+        val root = createTempDirectory("graphharness-resolve-test")
+        root.resolve("OwnerController.java").writeText(
+            """
+            package com.app.payment;
+
+            public class OwnerController {
+                public void processCreationForm(Owner owner) {
+                    save(owner);
+                }
+            }
+            """.trimIndent(),
+        )
+        root.resolve("PetController.java").writeText(
+            """
+            package com.app.payment;
+
+            public class PetController {
+                public void processCreationForm(Owner owner, Pet pet) {
+                    owner.addPet(pet);
+                }
+            }
+            """.trimIndent(),
+        )
+        root.resolve("Owner.java").writeText("package com.app.payment;\npublic class Owner { public void addPet(Pet pet) {} }\n")
+        root.resolve("Pet.java").writeText("package com.app.payment;\npublic class Pet {}\n")
+
+        val manager = SnapshotManager(root)
+        val resolved = manager.resolveEditTarget(
+            task = "Insert \"pet.setOwner(owner);\" before \"owner.addPet(pet);\" in processCreationForm",
+            limit = 3,
+        )
+
+        assertTrue(!resolved.needs_disambiguation)
+        assertNotNull(resolved.resolved_candidate)
+        assertTrue(resolved.resolved_candidate.node.name.endsWith("PetController.processCreationForm"))
+        assertNotNull(resolved.verification)
+        assertTrue(resolved.verification.anchor_present)
+    }
 }

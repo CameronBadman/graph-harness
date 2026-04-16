@@ -20,6 +20,17 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
             ),
         ),
         tool(
+            "resolve_edit_target",
+            "Resolve a natural-language edit task into the best verified candidate and report rejected alternatives.",
+            objectSchema(
+                properties = mapOf(
+                    "task" to stringSchema("Natural-language edit task."),
+                    "limit" to intSchema("Maximum candidates to inspect before resolving.", minimum = 1, maximum = 10),
+                ),
+                required = listOf("task"),
+            ),
+        ),
+        tool(
             "verify_candidate",
             "Cheaply verify whether a candidate node actually matches the requested edit task before planning the edit.",
             objectSchema(
@@ -269,6 +280,13 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
         return when (toolName) {
             "get_edit_candidates" -> graphHarnessJson.encode(
                 snapshotManager.editCandidates(
+                    task = arguments.requiredString("task"),
+                    limit = arguments.optionalInt("limit") ?: 5,
+                ),
+            )
+
+            "resolve_edit_target" -> graphHarnessJson.encode(
+                snapshotManager.resolveEditTarget(
                     task = arguments.requiredString("task"),
                     limit = arguments.optionalInt("limit") ?: 5,
                 ),
@@ -537,6 +555,18 @@ internal class JsonCodec {
         is EditCandidatesResult -> jObject(
             "task" to value.task,
             "candidates" to value.candidates,
+            "needs_disambiguation" to value.needs_disambiguation,
+            "analysis_engine" to value.analysis_engine,
+            "engine_version" to value.engine_version,
+            "build_duration_ms" to value.build_duration_ms,
+            "snapshot_id" to value.snapshot_id,
+            "generated_at" to value.generated_at,
+        )
+        is ResolveEditTargetResult -> jObject(
+            "task" to value.task,
+            "resolved_candidate" to value.resolved_candidate,
+            "verification" to value.verification,
+            "rejected_candidates" to value.rejected_candidates,
             "needs_disambiguation" to value.needs_disambiguation,
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,

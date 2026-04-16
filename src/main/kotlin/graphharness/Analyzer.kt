@@ -649,6 +649,71 @@ class SnapshotManager(private val projectRoot: Path) {
         )
     }
 
+    fun resolveEditTarget(
+        task: String,
+        limit: Int,
+        snapshot: Snapshot = current(),
+    ): ResolveEditTargetResult {
+        val candidatesResult = editCandidates(task, limit, snapshot)
+        if (candidatesResult.candidates.isEmpty()) {
+            return ResolveEditTargetResult(
+                task = task,
+                needs_disambiguation = true,
+                analysis_engine = snapshot.analysisEngine,
+                engine_version = snapshot.engineVersion,
+                build_duration_ms = snapshot.buildDurationMs,
+                snapshot_id = snapshot.id,
+                generated_at = snapshot.generatedAt,
+            )
+        }
+
+        val verified = candidatesResult.candidates.map { candidate ->
+            verifyCandidate(
+                task = task,
+                nodeId = candidate.node.id,
+                payload = EditRequestPayload(
+                    patch_mode = candidate.suggested_payload["patch_mode"],
+                    anchor = candidate.suggested_payload["anchor"],
+                    snippet = candidate.suggested_payload["snippet"],
+                    new_name = candidate.suggested_payload["new_name"],
+                    new_body = candidate.suggested_payload["new_body"],
+                ),
+                snapshot = snapshot,
+            )
+        }
+
+        val ranked = candidatesResult.candidates.zip(verified)
+            .sortedWith(
+                compareByDescending<Pair<EditCandidate, VerifyCandidateResult>> { it.second.anchor_present }
+                    .thenByDescending { it.second.confidence }
+                    .thenByDescending { it.first.confidence }
+                    .thenByDescending { it.first.score },
+            )
+
+        val resolved = ranked.firstOrNull()
+        val resolvedCandidate = resolved?.first
+        val resolvedVerification = resolved?.second
+        val needsDisambiguation = when {
+            resolvedCandidate == null || resolvedVerification == null -> true
+            resolvedVerification.confidence < 0.65 -> true
+            ranked.size > 1 && ranked[0].second.confidence == ranked[1].second.confidence && ranked[0].second.anchor_present == ranked[1].second.anchor_present -> true
+            else -> candidatesResult.needs_disambiguation
+        }
+
+        return ResolveEditTargetResult(
+            task = task,
+            resolved_candidate = resolvedCandidate,
+            verification = resolvedVerification,
+            rejected_candidates = ranked.drop(1).map { it.second },
+            needs_disambiguation = needsDisambiguation,
+            analysis_engine = snapshot.analysisEngine,
+            engine_version = snapshot.engineVersion,
+            build_duration_ms = snapshot.buildDurationMs,
+            snapshot_id = snapshot.id,
+            generated_at = snapshot.generatedAt,
+        )
+    }
+
     fun nodeDetail(nodeId: String, snapshot: Snapshot = current()): NodeDetailResult {
         val start = System.nanoTime()
         val node = snapshot.nodeSummaries[nodeId] ?: error("Unknown node_id: $nodeId")

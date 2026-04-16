@@ -271,6 +271,19 @@ data class VerifyCandidateResult(
     val generated_at: String,
 )
 
+data class ResolveEditTargetResult(
+    val task: String,
+    val resolved_candidate: EditCandidate? = null,
+    val verification: VerifyCandidateResult? = null,
+    val rejected_candidates: List<VerifyCandidateResult> = emptyList(),
+    val needs_disambiguation: Boolean,
+    val analysis_engine: String,
+    val engine_version: String? = null,
+    val build_duration_ms: Long,
+    val snapshot_id: String,
+    val generated_at: String,
+)
+
 data class ToolDefinition(
     val name: String,
     val description: String,
