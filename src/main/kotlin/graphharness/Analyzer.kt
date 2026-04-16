@@ -103,11 +103,14 @@ data class Snapshot(
     val typeInfos: Map<String, TypeInfo>,
     val methodInfos: Map<String, MethodInfo>,
     val sourceIndex: Map<String, Path>,
+    val fileHashes: Map<String, String>,
     val packageCount: Int,
 )
 
 class SnapshotManager(private val projectRoot: Path) {
-    private val activeSnapshot = AtomicReference(buildSnapshot())
+    private val activeSnapshot = AtomicReference<Snapshot>()
+    private val snapshotHistory = ConcurrentHashMap<String, Snapshot>()
+    private val snapshotOrder = ArrayDeque<String>()
     private val pendingEdits = ConcurrentHashMap<String, PendingEdit>()
     private val rebuildThreadIds = AtomicInteger(1)
     private val rebuildExecutor = Executors.newSingleThreadScheduledExecutor { runnable ->
@@ -118,6 +121,9 @@ class SnapshotManager(private val projectRoot: Path) {
     }
 
     init {
+        val initial = buildSnapshot()
+        recordSnapshot(initial)
+        activeSnapshot.set(initial)
         startWatcher()
     }
 
@@ -157,7 +163,7 @@ class SnapshotManager(private val projectRoot: Path) {
                 key.reset()
                 if (touchedJava) {
                     rebuildExecutor.schedule({
-                        runCatching { activeSnapshot.set(buildSnapshot()) }
+                        runCatching { installSnapshot(buildSnapshot()) }
                     }, 800, TimeUnit.MILLISECONDS)
                 }
             }
@@ -166,6 +172,25 @@ class SnapshotManager(private val projectRoot: Path) {
         watcherThread.name = "graphharness-watcher"
         watcherThread.start()
     }
+
+    @Synchronized
+    private fun recordSnapshot(snapshot: Snapshot) {
+        snapshotHistory[snapshot.id] = snapshot
+        snapshotOrder.remove(snapshot.id)
+        snapshotOrder.addLast(snapshot.id)
+        while (snapshotOrder.size > 12) {
+            val expired = snapshotOrder.removeFirst()
+            snapshotHistory.remove(expired)
+        }
+    }
+
+    private fun installSnapshot(snapshot: Snapshot) {
+        recordSnapshot(snapshot)
+        activeSnapshot.set(snapshot)
+    }
+
+    private fun snapshotById(snapshotId: String): Snapshot =
+        snapshotHistory[snapshotId] ?: error("Unknown snapshot_id: $snapshotId")
 
     private fun buildSnapshot(): Snapshot {
         val buildStart = System.nanoTime()
@@ -201,6 +226,7 @@ class SnapshotManager(private val projectRoot: Path) {
         val edges = (callEdges + typeEdges + dependencyEdges).distinct()
         val clusters = buildClusters(typeInfos, methodInfos, edges, nodeSummaries)
         val sourceIndex = javaFiles.associateBy { normalize(projectRoot.relativize(it).invariantSeparatorsPathString) }
+        val fileHashes = sourceIndex.mapValues { (_, path) -> sha256(readPathText(path)) }
         val generatedAt = Instant.now().toString()
 
         val hash = MessageDigest.getInstance("SHA-256")
@@ -226,6 +252,7 @@ class SnapshotManager(private val projectRoot: Path) {
             typeInfos = typeInfos,
             methodInfos = methodInfos,
             sourceIndex = sourceIndex,
+            fileHashes = fileHashes,
             packageCount = typeInfos.values.map { it.packageName }.filter { it.isNotBlank() }.toSet().size,
         )
     }
@@ -238,6 +265,7 @@ class SnapshotManager(private val projectRoot: Path) {
         val graphEdges = (graph.callEdges + graph.typeEdges + graph.dependencyEdges).distinct()
         val clusters = buildClusters(typeInfos, methodInfos, graphEdges, nodeSummaries)
         val sourceIndex = javaFiles.associateBy { normalize(projectRoot.relativize(it).invariantSeparatorsPathString) }
+        val fileHashes = sourceIndex.mapValues { (_, path) -> sha256(readPathText(path)) }
         val generatedAt = Instant.now().toString()
         val hash = MessageDigest.getInstance("SHA-256")
             .digest(
@@ -263,6 +291,7 @@ class SnapshotManager(private val projectRoot: Path) {
             typeInfos = typeInfos,
             methodInfos = methodInfos,
             sourceIndex = sourceIndex,
+            fileHashes = fileHashes,
             packageCount = typeInfos.values.map { it.packageName }.filter { it.isNotBlank() }.toSet().size,
         )
     }
@@ -553,6 +582,11 @@ class SnapshotManager(private val projectRoot: Path) {
 
     private fun estimateTextTokens(text: String): Int = maxOf(1, (text.length / 4) + 1)
 
+    private fun snapshotNodeFingerprint(node: NodeSummary): String {
+        val simpleName = node.name.substringAfterLast('.')
+        return "${node.kind}|${node.file}|${node.line_range.start}|$simpleName"
+    }
+
     fun capabilities(snapshot: Snapshot = current()): CapabilitiesResult =
         CapabilitiesResult(
             languages = listOf("java"),
@@ -561,6 +595,7 @@ class SnapshotManager(private val projectRoot: Path) {
             available_tools = listOf(
                 "get_capabilities",
                 "build_context_bundle",
+                "get_snapshot_delta",
                 "get_summary_map",
                 "get_cluster_detail",
                 "search_graph",
@@ -592,7 +627,7 @@ class SnapshotManager(private val projectRoot: Path) {
                 "degraded validation means repo-aware validation failed or was blocked and a fallback path was attempted",
             ),
             degraded_mode_flags = listOf("degraded", "attempted_validators", "summary_mode"),
-            snapshot_semantics = "Node ids are snapshot-scoped and responses carry snapshot_id; delta/rebinding support is not implemented yet.",
+            snapshot_semantics = "Node ids are snapshot-scoped and responses carry snapshot_id; get_snapshot_delta compares retained snapshots and rebinding is heuristic rather than guaranteed.",
             analysis_engine_capabilities = listOf(
                 "joern-backed java analysis",
                 "snapshot-based traversal",
@@ -605,6 +640,80 @@ class SnapshotManager(private val projectRoot: Path) {
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
         )
+
+    fun snapshotDelta(oldSnapshotId: String, newSnapshotId: String): SnapshotDeltaResult {
+        val oldSnapshot = snapshotById(oldSnapshotId)
+        val newSnapshot = snapshotById(newSnapshotId)
+
+        val addedNodes = newSnapshot.nodeSummaries
+            .filterKeys { it !in oldSnapshot.nodeSummaries }
+            .values
+            .sortedBy { it.name }
+        val removedNodes = oldSnapshot.nodeSummaries
+            .filterKeys { it !in newSnapshot.nodeSummaries }
+            .values
+            .sortedBy { it.name }
+
+        val oldFingerprints = oldSnapshot.nodeSummaries.values.groupBy(::snapshotNodeFingerprint)
+        val newFingerprints = newSnapshot.nodeSummaries.values.groupBy(::snapshotNodeFingerprint)
+        val changedNodes = mutableListOf<SnapshotDeltaNode>()
+        oldFingerprints.keys.intersect(newFingerprints.keys).sorted().forEach { fingerprint ->
+            val oldNodes = oldFingerprints[fingerprint].orEmpty()
+            val newNodes = newFingerprints[fingerprint].orEmpty()
+            val pairCount = min(oldNodes.size, newNodes.size)
+            repeat(pairCount) { index ->
+                val oldNode = oldNodes[index]
+                val newNode = newNodes[index]
+                if (oldNode.id == newNode.id && oldNode == newNode) return@repeat
+                val changeTypes = buildList {
+                    if (oldNode.id != newNode.id) add("node_id")
+                    if (oldNode.name != newNode.name) add("name")
+                    if (oldNode.signature != newNode.signature) add("signature")
+                    if (oldNode.file != newNode.file) add("file")
+                    if (oldNode.line_range != newNode.line_range) add("line_range")
+                }
+                if (changeTypes.isNotEmpty()) {
+                    changedNodes += SnapshotDeltaNode(
+                        old_node_id = oldNode.id,
+                        new_node_id = newNode.id,
+                        kind = newNode.kind,
+                        old_name = oldNode.name,
+                        new_name = newNode.name,
+                        file = if (oldNode.file == newNode.file) newNode.file else "${oldNode.file} -> ${newNode.file}",
+                        change_types = changeTypes,
+                    )
+                }
+            }
+        }
+
+        val oldFiles = oldSnapshot.sourceIndex.keys.toSet()
+        val newFiles = newSnapshot.sourceIndex.keys.toSet()
+        val sharedFiles = oldFiles.intersect(newFiles)
+        val changedFiles = sharedFiles.filter { file ->
+            oldSnapshot.fileHashes[file] != newSnapshot.fileHashes[file]
+        }.sorted()
+
+        val oldEdges = oldSnapshot.edges.map { Triple(it.from, it.to, it.relationship) }.toSet()
+        val newEdges = newSnapshot.edges.map { Triple(it.from, it.to, it.relationship) }.toSet()
+
+        return SnapshotDeltaResult(
+            old_snapshot_id = oldSnapshotId,
+            new_snapshot_id = newSnapshotId,
+            added_nodes = addedNodes,
+            removed_nodes = removedNodes,
+            changed_nodes = changedNodes.sortedBy { it.new_name ?: it.old_name ?: it.new_node_id ?: it.old_node_id },
+            added_files = (newFiles - oldFiles).sorted(),
+            removed_files = (oldFiles - newFiles).sorted(),
+            changed_files = changedFiles,
+            added_edge_count = (newEdges - oldEdges).size,
+            removed_edge_count = (oldEdges - newEdges).size,
+            analysis_engine = newSnapshot.analysisEngine,
+            engine_version = newSnapshot.engineVersion,
+            build_duration_ms = newSnapshot.buildDurationMs,
+            snapshot_id = newSnapshot.id,
+            generated_at = newSnapshot.generatedAt,
+        )
+    }
 
     fun buildContextBundle(
         task: String? = null,
@@ -1895,7 +2004,7 @@ class SnapshotManager(private val projectRoot: Path) {
             Files.writeString(path, fileEdit.newFileContent)
         }
         val refreshed = buildSnapshot()
-        activeSnapshot.set(refreshed)
+        installSnapshot(refreshed)
         pendingEdits[editId] = pending.copy(applied = true)
 
         return EditApplyResult(

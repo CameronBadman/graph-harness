@@ -103,6 +103,7 @@ class AnalyzerTest {
         val capabilities = manager.capabilities()
         assertTrue(capabilities.languages.contains("java"))
         assertTrue(capabilities.available_tools.contains("get_capabilities"))
+        assertTrue(capabilities.available_tools.contains("get_snapshot_delta"))
         assertTrue(capabilities.build_context_bundle_supported)
         val clusterId = manager.clusterDetail("cluster:com.app.payment").cluster.cluster_id
         val clusterFitness = manager.clusterFitness(clusterId)
@@ -117,6 +118,21 @@ class AnalyzerTest {
         assertTrue(bundle.source_slices.any { it.node_id == processNode.id })
         val taskBundle = manager.buildContextBundle(task = "Insert validation in processPayment", tokenBudget = 1200)
         assertNotNull(taskBundle.chosen_node_id)
+        val beforeSnapshot = summary.snapshot_id
+        val editPlan = manager.planEdit(
+            operation = "modify_method_body",
+            targetNodeId = processNode.id,
+            payload = EditRequestPayload(
+                patch_mode = "insert_before",
+                anchor = "return charge(order);",
+                snippet = "audit(order);",
+            ),
+        )
+        val apply = manager.applyEdit(editPlan.edit_id!!)
+        assertTrue(apply.success)
+        val delta = manager.snapshotDelta(beforeSnapshot, apply.snapshot_id)
+        assertTrue(delta.changed_files.any { it.endsWith("PaymentService.java") })
+        assertTrue(delta.changed_nodes.any { it.old_node_id == processNode.id || it.new_node_id == processNode.id })
     }
 
     @Test

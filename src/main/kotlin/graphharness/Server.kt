@@ -25,6 +25,17 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
             ),
         ),
         tool(
+            "get_snapshot_delta",
+            "Compare two retained snapshots and report added, removed, and heuristically changed nodes and files.",
+            objectSchema(
+                properties = mapOf(
+                    "old_snapshot_id" to stringSchema("Earlier snapshot id."),
+                    "new_snapshot_id" to stringSchema("Later snapshot id."),
+                ),
+                required = listOf("old_snapshot_id", "new_snapshot_id"),
+            ),
+        ),
+        tool(
             "get_edit_candidates",
             "Suggest likely edit targets and operations from a natural-language task description.",
             objectSchema(
@@ -398,6 +409,12 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
                     task = arguments.optionalString("task"),
                     nodeId = arguments.optionalString("node_id"),
                     tokenBudget = arguments.optionalInt("token_budget") ?: 1800,
+                ),
+            )
+            "get_snapshot_delta" -> graphHarnessJson.encode(
+                snapshotManager.snapshotDelta(
+                    oldSnapshotId = arguments.requiredString("old_snapshot_id"),
+                    newSnapshotId = arguments.requiredString("new_snapshot_id"),
                 ),
             )
 
@@ -801,6 +818,32 @@ internal class JsonCodec {
             "impact_files" to value.impact_files,
             "source_slices" to value.source_slices,
             "notes" to value.notes,
+            "analysis_engine" to value.analysis_engine,
+            "engine_version" to value.engine_version,
+            "build_duration_ms" to value.build_duration_ms,
+            "snapshot_id" to value.snapshot_id,
+            "generated_at" to value.generated_at,
+        )
+        is SnapshotDeltaNode -> jObject(
+            "old_node_id" to value.old_node_id,
+            "new_node_id" to value.new_node_id,
+            "kind" to value.kind,
+            "old_name" to value.old_name,
+            "new_name" to value.new_name,
+            "file" to value.file,
+            "change_types" to value.change_types,
+        )
+        is SnapshotDeltaResult -> jObject(
+            "old_snapshot_id" to value.old_snapshot_id,
+            "new_snapshot_id" to value.new_snapshot_id,
+            "added_nodes" to value.added_nodes,
+            "removed_nodes" to value.removed_nodes,
+            "changed_nodes" to value.changed_nodes,
+            "added_files" to value.added_files,
+            "removed_files" to value.removed_files,
+            "changed_files" to value.changed_files,
+            "added_edge_count" to value.added_edge_count,
+            "removed_edge_count" to value.removed_edge_count,
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,

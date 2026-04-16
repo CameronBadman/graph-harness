@@ -78,6 +78,7 @@ The available tools are:
 
 - `get_capabilities`
 - `build_context_bundle`
+- `get_snapshot_delta`
 - `get_summary_map`
 - `get_edit_candidates`
 - `resolve_edit_target`
@@ -127,4 +128,5 @@ For orchestration-heavy clients, the intended higher-level context flow is:
 - `get_validation_targets` uses impact plus build-root layout to suggest the most relevant modules, tests, and validation command shapes for a node or planned edit.
 - `get_capabilities` is the explicit capability handshake for orchestration. It reports supported languages, engine/backend details, edit operations, validation modes, confidence semantics, and degraded-mode flags in one place.
 - `build_context_bundle` compresses the common orientation flow into one response: focus node resolution, key graph relationships, likely impact files, and a budget-limited set of source slices.
+- `get_snapshot_delta` compares two retained snapshots and reports added, removed, and heuristically changed nodes/files so clients can react to background rebuilds or post-edit refreshes.
 # code-agent

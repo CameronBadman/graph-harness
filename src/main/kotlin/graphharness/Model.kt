@@ -400,6 +400,34 @@ data class ContextBundleResult(
     val generated_at: String,
 )
 
+data class SnapshotDeltaNode(
+    val old_node_id: String? = null,
+    val new_node_id: String? = null,
+    val kind: String,
+    val old_name: String? = null,
+    val new_name: String? = null,
+    val file: String? = null,
+    val change_types: List<String> = emptyList(),
+)
+
+data class SnapshotDeltaResult(
+    val old_snapshot_id: String,
+    val new_snapshot_id: String,
+    val added_nodes: List<NodeSummary>,
+    val removed_nodes: List<NodeSummary>,
+    val changed_nodes: List<SnapshotDeltaNode>,
+    val added_files: List<String>,
+    val removed_files: List<String>,
+    val changed_files: List<String>,
+    val added_edge_count: Int,
+    val removed_edge_count: Int,
+    val analysis_engine: String,
+    val engine_version: String? = null,
+    val build_duration_ms: Long,
+    val snapshot_id: String,
+    val generated_at: String,
+)
+
 data class ToolDefinition(
     val name: String,
     val description: String,
