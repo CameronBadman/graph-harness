@@ -63,6 +63,12 @@ For an edit-focused demo that benchmarks full-body replacement, anchor patching,
 python3 scripts/edit_demo.py ./result/bin/graphharness /path/to/java/repo
 ```
 
+That demo now exercises the intended edit loop:
+
+- `get_edit_candidates`
+- `plan_edit`
+- `apply_edit` smoke test on a scratch copy
+
 The available tools are:
 
 - `get_summary_map`

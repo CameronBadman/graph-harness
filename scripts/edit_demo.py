@@ -101,8 +101,9 @@ def run_method_patch_demo(server: str, project_root: Path, env: dict[str, str]) 
     session = JsonRpcSession([server, str(project_root)], env=env)
     try:
         session.request("initialize", {})
-        search = session.tool_call("search_graph", {"query": "processCreationForm", "kind": "method"})
-        target = next(item for item in search["results"] if item["name"].endswith("PetController.processCreationForm"))
+        candidate_task = 'Insert "pet.setOwner(owner);" before "owner.addPet(pet);" in processCreationForm'
+        candidates = session.tool_call("get_edit_candidates", {"task": candidate_task, "limit": 3})
+        target = candidates["candidates"][0]["node"]
         replace_plan = session.tool_call(
             "plan_edit",
             {
@@ -126,6 +127,8 @@ def run_method_patch_demo(server: str, project_root: Path, env: dict[str, str]) 
             },
         )
         return {
+            "candidate_task": candidate_task,
+            "top_candidate": candidates["candidates"][0],
             "target": target["name"],
             "replace_plan_tokens": estimate_tokens(replace_plan),
             "patch_plan_tokens": estimate_tokens(patch_plan),
@@ -144,8 +147,9 @@ def run_rename_demo(server: str, project_root: Path, env: dict[str, str]) -> dic
     session = JsonRpcSession([server, str(project_root)], env=env)
     try:
         session.request("initialize", {})
-        search = session.tool_call("search_graph", {"query": "findById", "kind": "method"})
-        target = next(item for item in search["results"] if item["name"].endswith("OwnerRepository.findById"))
+        candidate_task = "Rename method findById to findOwnerById in the repository"
+        candidates = session.tool_call("get_edit_candidates", {"task": candidate_task, "limit": 3})
+        target = candidates["candidates"][0]["node"]
         plan = session.tool_call(
             "plan_edit",
             {
@@ -155,6 +159,8 @@ def run_rename_demo(server: str, project_root: Path, env: dict[str, str]) -> dic
             },
         )
         return {
+            "candidate_task": candidate_task,
+            "top_candidate": candidates["candidates"][0],
             "target": target["name"],
             "rename_plan_tokens": estimate_tokens(plan),
             "affected_files": plan["affected_files"][:10],
