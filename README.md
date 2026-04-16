@@ -50,6 +50,12 @@ For a persistent demo session that behaves more like a real MCP client:
 python3 scripts/session_demo.py ./result/bin/graphharness /path/to/java/repo
 ```
 
+For a simple benchmark that compares GraphHarness context use against a naive file-loading workflow:
+
+```bash
+python3 scripts/benchmark_demo.py ./result/bin/graphharness /path/to/java/repo
+```
+
 The available tools are:
 
 - `get_summary_map`
