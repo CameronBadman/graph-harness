@@ -8,6 +8,33 @@ import java.time.Instant
 
 class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
     private val tools = listOf(
+        tool(
+            "plan_edit",
+            "Plan a targeted graph-guided edit and return a preview diff without writing to disk.",
+            objectSchema(
+                properties = mapOf(
+                    "operation" to enumSchema("Edit operation to preview.", listOf("modify_method_body")),
+                    "target_node_id" to stringSchema("Method node id to edit."),
+                    "payload" to objectSchema(
+                        properties = mapOf(
+                            "new_body" to stringSchema("Replacement Java statements for the method body."),
+                        ),
+                        required = listOf("new_body"),
+                    ),
+                ),
+                required = listOf("operation", "target_node_id", "payload"),
+            ),
+        ),
+        tool(
+            "apply_edit",
+            "Apply a previously planned edit to disk and refresh the active snapshot.",
+            objectSchema(
+                properties = mapOf(
+                    "edit_id" to stringSchema("Edit id returned by plan_edit."),
+                ),
+                required = listOf("edit_id"),
+            ),
+        ),
         tool("get_summary_map", "Return the compact topology-oriented summary for the project.", objectSchema()),
         tool(
             "get_cluster_detail",
@@ -206,6 +233,23 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
 
     private fun invokeTool(toolName: String, arguments: JObject): JsonValue {
         return when (toolName) {
+            "plan_edit" -> {
+                val payload = arguments.optionalObject("payload") ?: emptyJsonObject()
+                graphHarnessJson.encode(
+                    snapshotManager.planEdit(
+                        operation = arguments.requiredString("operation"),
+                        targetNodeId = arguments.requiredString("target_node_id"),
+                        payload = EditRequestPayload(
+                            new_body = payload.requiredString("new_body"),
+                        ),
+                    ),
+                )
+            }
+
+            "apply_edit" -> graphHarnessJson.encode(
+                snapshotManager.applyEdit(arguments.requiredString("edit_id")),
+            )
+
             "get_summary_map" -> graphHarnessJson.encode(snapshotManager.summaryMap())
             "get_cluster_detail" -> graphHarnessJson.encode(snapshotManager.clusterDetail(arguments.requiredString("cluster_id")))
             "get_node_detail" -> graphHarnessJson.encode(snapshotManager.nodeDetail(arguments.requiredString("node_id")))
@@ -405,6 +449,32 @@ internal class JsonCodec {
         )
 
         is HotspotSummary -> jObject("node" to value.node, "score" to value.score)
+        is EditPlanResult -> jObject(
+            "edit_id" to value.edit_id,
+            "operation" to value.operation,
+            "target_node_id" to value.target_node_id,
+            "diff" to value.diff,
+            "affected_nodes" to value.affected_nodes,
+            "affected_files" to value.affected_files,
+            "validation_errors" to value.validation_errors,
+            "analysis_engine" to value.analysis_engine,
+            "engine_version" to value.engine_version,
+            "build_duration_ms" to value.build_duration_ms,
+            "snapshot_id" to value.snapshot_id,
+            "generated_at" to value.generated_at,
+        )
+        is EditApplyResult -> jObject(
+            "success" to value.success,
+            "edit_id" to value.edit_id,
+            "updated_nodes" to value.updated_nodes,
+            "affected_files" to value.affected_files,
+            "validation_errors" to value.validation_errors,
+            "analysis_engine" to value.analysis_engine,
+            "engine_version" to value.engine_version,
+            "build_duration_ms" to value.build_duration_ms,
+            "snapshot_id" to value.snapshot_id,
+            "generated_at" to value.generated_at,
+        )
         is SummaryMapResult -> jObject(
             "project" to value.project,
             "clusters" to value.clusters,

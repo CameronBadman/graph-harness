@@ -2,11 +2,12 @@
 
 GraphHarness is a local MCP-style stdio server that gives coding agents structural context for Java repositories before they open source files directly.
 
-This prototype is intentionally read-only:
+This prototype is mostly read-only, with one narrow graph-guided edit path:
 
 - snapshot-based Java project analysis
 - topology-oriented summary and cluster expansion
 - callers, callees, hierarchy, dependency, impact, and source retrieval tools
+- preview-and-apply method body edits via `plan_edit` and `apply_edit`
 - local stdio transport using JSON-RPC with MCP-compatible `tools/list` and `tools/call`
 
 ## Status
@@ -59,6 +60,8 @@ python3 scripts/benchmark_demo.py ./result/bin/graphharness /path/to/java/repo
 The available tools are:
 
 - `get_summary_map`
+- `plan_edit`
+- `apply_edit`
 - `get_cluster_detail`
 - `get_node_detail`
 - `get_call_paths`
@@ -79,4 +82,5 @@ The available tools are:
 - Clustering is package-oriented in this prototype.
 - The packaged launcher disables JVM shared perf data to avoid noisy `hsperfdata` warnings during CLI use.
 - When Joern is installed, GraphHarness builds the project snapshot from a Joern-generated CPG and derives the tool responses from that graph model.
+- The current edit surface is intentionally narrow: `modify_method_body` only, with preview diff generation and stale-file validation before apply.
 # code-agent

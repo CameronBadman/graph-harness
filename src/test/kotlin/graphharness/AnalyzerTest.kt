@@ -1,9 +1,11 @@
 package graphharness
 
 import kotlin.io.path.createTempDirectory
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class AnalyzerTest {
@@ -80,5 +82,61 @@ class AnalyzerTest {
         val submitNode = manager.search("submit", "method", null, null).results.first()
         val paths = manager.callPaths(submitNode.id, 3)
         assertTrue(paths.paths.none { path -> path.nodes.any { it.name.contains(".<init>") } })
+    }
+
+    @Test
+    fun plansAndAppliesMethodBodyEdits() {
+        val root = createTempDirectory("graphharness-edit-test")
+        val file = root.resolve("PaymentService.java")
+        file.writeText(
+            """
+            package com.app.payment;
+
+            public class PaymentService {
+                public PaymentResult processPayment(Order order) {
+                    return charge(order);
+                }
+
+                private PaymentResult charge(Order order) {
+                    return new PaymentResult();
+                }
+            }
+            """.trimIndent(),
+        )
+        root.resolve("PaymentResult.java").writeText(
+            """
+            package com.app.payment;
+            public class PaymentResult {}
+            """.trimIndent(),
+        )
+        root.resolve("Order.java").writeText(
+            """
+            package com.app.payment;
+            public class Order {}
+            """.trimIndent(),
+        )
+
+        val manager = SnapshotManager(root)
+        val processNode = manager.search("processPayment", "method", null, null).results.first()
+        val plan = manager.planEdit(
+            operation = "modify_method_body",
+            targetNodeId = processNode.id,
+            payload = EditRequestPayload(
+                new_body = """
+                validateOrder(order);
+                return charge(order);
+                """.trimIndent(),
+            ),
+        )
+
+        assertTrue(plan.validation_errors.isEmpty())
+        assertNotNull(plan.edit_id)
+        assertTrue(plan.diff.contains("validateOrder(order);"))
+
+        val apply = manager.applyEdit(plan.edit_id)
+        assertTrue(apply.success)
+        assertTrue(file.readText().contains("validateOrder(order);"))
+        val refreshedSource = manager.source(processNode.id, 0)
+        assertTrue(refreshedSource.source.contains("validateOrder(order);"))
     }
 }

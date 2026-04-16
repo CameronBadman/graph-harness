@@ -6,6 +6,7 @@ import java.nio.file.Path
 import java.nio.file.StandardWatchEventKinds
 import java.security.MessageDigest
 import java.time.Instant
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
@@ -77,6 +78,7 @@ data class Snapshot(
 
 class SnapshotManager(private val projectRoot: Path) {
     private val activeSnapshot = AtomicReference(buildSnapshot())
+    private val pendingEdits = ConcurrentHashMap<String, PendingEdit>()
     private val rebuildExecutor = Executors.newSingleThreadScheduledExecutor()
 
     init {
@@ -852,6 +854,152 @@ class SnapshotManager(private val projectRoot: Path) {
             SourceBatchItem(nodeId, item.source, item.file, item.line_range)
         }
         return SourceBatchResult(items, snapshot.analysisEngine, snapshot.engineVersion, snapshot.buildDurationMs, snapshot.id, snapshot.generatedAt)
+    }
+
+    fun planEdit(
+        operation: String,
+        targetNodeId: String,
+        payload: EditRequestPayload,
+        snapshot: Snapshot = current(),
+    ): EditPlanResult {
+        val validationErrors = mutableListOf<String>()
+        if (operation != "modify_method_body") {
+            validationErrors += "Unsupported operation: $operation"
+        }
+
+        val method = snapshot.methodInfos[targetNodeId]
+        if (method == null) {
+            validationErrors += "target_node_id must reference a method node"
+        }
+        if (payload.new_body.isBlank()) {
+            validationErrors += "payload.new_body must not be blank"
+        }
+        if (validationErrors.isNotEmpty()) {
+            return EditPlanResult(
+                operation = operation,
+                target_node_id = targetNodeId,
+                diff = "",
+                affected_nodes = emptyList(),
+                affected_files = emptyList(),
+                validation_errors = validationErrors,
+                analysis_engine = snapshot.analysisEngine,
+                engine_version = snapshot.engineVersion,
+                build_duration_ms = snapshot.buildDurationMs,
+                snapshot_id = snapshot.id,
+                generated_at = snapshot.generatedAt,
+            )
+        }
+
+        val targetMethod = method!!
+        val path = snapshot.sourceIndex[targetMethod.file] ?: error("Missing file for node_id: $targetNodeId")
+        val fileSource = readPathText(path)
+        val bodyRange = methodBodyRange(fileSource, targetMethod.lineRange.start, targetMethod.lineRange.end)
+        if (bodyRange == null) {
+            return EditPlanResult(
+                operation = operation,
+                target_node_id = targetNodeId,
+                diff = "",
+                affected_nodes = emptyList(),
+                affected_files = listOf(targetMethod.file),
+                validation_errors = listOf("Could not locate method body braces for target node"),
+                analysis_engine = snapshot.analysisEngine,
+                engine_version = snapshot.engineVersion,
+                build_duration_ms = snapshot.buildDurationMs,
+                snapshot_id = snapshot.id,
+                generated_at = snapshot.generatedAt,
+            )
+        }
+
+        val methodSource = source(targetNodeId, 0, snapshot)
+        val newFileSource = renderMethodBody(fileSource, bodyRange, payload.new_body)
+        val newMethodEnd = findBlockEndLine(newFileSource, targetMethod.lineRange.start) ?: targetMethod.lineRange.end
+        val newMethodRange = SourceRange(targetMethod.lineRange.start, newMethodEnd)
+        val newMethodSource = sourceSlice(newFileSource, newMethodRange)
+        val diff = buildMethodDiff(targetMethod.file, targetMethod.lineRange, methodSource.source, newMethodSource)
+        val impact = impact(targetNodeId, 2, snapshot)
+        val affectedNodeIds = (listOf(targetNodeId) + impact.affected_nodes.map { it.id }).distinct()
+        val affectedFiles = (listOf(targetMethod.file) + impact.affected_files).distinct()
+        val editId = makeEditId()
+
+        pendingEdits[editId] = PendingEdit(
+            id = editId,
+            operation = operation,
+            targetNodeId = targetNodeId,
+            snapshotId = snapshot.id,
+            file = targetMethod.file,
+            fileHash = sha256(fileSource),
+            newFileContent = newFileSource,
+            affectedNodeIds = affectedNodeIds,
+            affectedFiles = affectedFiles,
+        )
+
+        return EditPlanResult(
+            edit_id = editId,
+            operation = operation,
+            target_node_id = targetNodeId,
+            diff = diff,
+            affected_nodes = affectedNodeIds,
+            affected_files = affectedFiles,
+            validation_errors = emptyList(),
+            analysis_engine = snapshot.analysisEngine,
+            engine_version = snapshot.engineVersion,
+            build_duration_ms = snapshot.buildDurationMs,
+            snapshot_id = snapshot.id,
+            generated_at = snapshot.generatedAt,
+        )
+    }
+
+    fun applyEdit(editId: String): EditApplyResult {
+        val snapshot = current()
+        val pending = pendingEdits[editId]
+            ?: return EditApplyResult(
+                success = false,
+                edit_id = editId,
+                updated_nodes = emptyList(),
+                affected_files = emptyList(),
+                validation_errors = listOf("Unknown edit_id: $editId"),
+                analysis_engine = snapshot.analysisEngine,
+                engine_version = snapshot.engineVersion,
+                build_duration_ms = snapshot.buildDurationMs,
+                snapshot_id = snapshot.id,
+                generated_at = snapshot.generatedAt,
+            )
+
+        val path = snapshot.sourceIndex[pending.file] ?: projectRoot.resolve(pending.file).normalize()
+        val currentContent = readPathText(path)
+        if (sha256(currentContent) != pending.fileHash) {
+            pendingEdits.remove(editId)
+            return EditApplyResult(
+                success = false,
+                edit_id = editId,
+                updated_nodes = emptyList(),
+                affected_files = pending.affectedFiles,
+                validation_errors = listOf("Source file changed since plan_edit; regenerate the edit plan"),
+                analysis_engine = snapshot.analysisEngine,
+                engine_version = snapshot.engineVersion,
+                build_duration_ms = snapshot.buildDurationMs,
+                snapshot_id = snapshot.id,
+                generated_at = snapshot.generatedAt,
+            )
+        }
+
+        Files.writeString(path, pending.newFileContent)
+        val refreshed = buildSnapshot()
+        activeSnapshot.set(refreshed)
+        pendingEdits.remove(editId)
+
+        return EditApplyResult(
+            success = true,
+            edit_id = editId,
+            updated_nodes = pending.affectedNodeIds.filter { it in refreshed.nodeSummaries },
+            affected_files = pending.affectedFiles,
+            validation_errors = emptyList(),
+            analysis_engine = refreshed.analysisEngine,
+            engine_version = refreshed.engineVersion,
+            build_duration_ms = refreshed.buildDurationMs,
+            snapshot_id = refreshed.id,
+            generated_at = refreshed.generatedAt,
+        )
     }
 
     private fun parseJavaFile(path: Path, root: Path): FileParseResult {

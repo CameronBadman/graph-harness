@@ -225,6 +225,10 @@ data class CallPathsResult(
     val latency_ms: Long,
 )
 
+data class EditRequestPayload(
+    val new_body: String,
+)
+
 data class ToolDefinition(
     val name: String,
     val description: String,

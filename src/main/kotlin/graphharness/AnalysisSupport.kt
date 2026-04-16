@@ -376,3 +376,10 @@ fun closingLineForSource(source: String, openBraceIdx: Int): Int {
     }
     return source.count { it == '\n' } + 1
 }
+
+fun sourceSlice(fileSource: String, lineRange: SourceRange): String {
+    val lines = fileSource.lines()
+    val start = lineRange.start.coerceAtLeast(1)
+    val end = lineRange.end.coerceAtMost(lines.size)
+    return lines.subList(start - 1, end).joinToString("\n")
+}
