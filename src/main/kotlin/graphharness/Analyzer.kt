@@ -67,6 +67,7 @@ private data class ValidationCommand(
     val validator: String,
     val command: List<String>,
     val environment: Map<String, String> = emptyMap(),
+    val workingDirectory: Path? = null,
 )
 
 private data class ProcessRunResult(
@@ -80,6 +81,11 @@ private data class ValidationOutcome(
     val result: ProcessRunResult,
     val degraded: Boolean,
     val notes: List<String>,
+)
+
+private data class ValidationTarget(
+    val root: Path,
+    val label: String,
 )
 
 data class Snapshot(
@@ -1438,6 +1444,7 @@ class SnapshotManager(private val projectRoot: Path) {
                 edit_id = editId,
                 validation_mode = mode,
                 validation_scope = "unknown",
+                validation_target = "unknown",
                 validator = "none",
                 attempted_validators = emptyList(),
                 degraded = false,
@@ -1466,14 +1473,16 @@ class SnapshotManager(private val projectRoot: Path) {
                 }
             }
 
-            val selected = selectValidationCommand(validationRoot, mode)
+            val validationTarget = determineValidationTarget(validationRoot, pending.fileEdits.map { it.file })
+            val selected = selectValidationCommand(validationRoot, validationTarget, mode)
             val start = System.nanoTime()
             val attempted = mutableListOf(selected.validator)
             val primaryResult = runValidationCommand(validationRoot, selected)
-            val finalOutcome = if (shouldFallbackValidation(selected, primaryResult, mode, validationRoot)) {
+            val finalOutcome = if (shouldFallbackValidation(selected, primaryResult, mode, validationTarget.root)) {
                 val fallback = ValidationCommand(
                     validator = "javac-syntax",
-                    command = javacCommand(validationRoot),
+                    command = javacCommand(validationTarget.root),
+                    workingDirectory = validationTarget.root,
                 )
                 attempted += fallback.validator
                 val fallbackResult = runValidationCommand(validationRoot, fallback)
@@ -1508,6 +1517,7 @@ class SnapshotManager(private val projectRoot: Path) {
                 edit_id = editId,
                 validation_mode = mode,
                 validation_scope = validationScope,
+                validation_target = validationTarget.label,
                 validator = finalOutcome.validator.validator,
                 attempted_validators = attempted,
                 degraded = finalOutcome.degraded,
@@ -1531,6 +1541,40 @@ class SnapshotManager(private val projectRoot: Path) {
     private fun createValidationScratchRoot(): Path =
         Files.createTempDirectory("graphharness-validate-")
 
+    private fun determineValidationTarget(root: Path, touchedFiles: List<String>): ValidationTarget {
+        val buildFiles = setOf("pom.xml", "build.gradle", "build.gradle.kts")
+        val candidates = touchedFiles.mapNotNull { file ->
+            var current: Path? = root.resolve(file).normalize().parent
+            var best: Path? = null
+            while (current != null && current.startsWith(root)) {
+                if (best == null && buildFiles.any { Files.exists(current.resolve(it)) }) {
+                    best = current
+                }
+                if (current == root) break
+                current = current.parent
+            }
+            best
+        }
+        val chosen = when {
+            candidates.isEmpty() -> root
+            else -> deepestCommonPath(candidates) ?: candidates.minByOrNull { root.relativize(it).nameCount } ?: root
+        }
+        val relative = root.relativize(chosen).toString().replace('\\', '/')
+        val label = if (relative.isBlank()) "project_root" else "module:$relative"
+        return ValidationTarget(chosen, label)
+    }
+
+    private fun deepestCommonPath(paths: List<Path>): Path? {
+        if (paths.isEmpty()) return null
+        var current = paths.first()
+        while (true) {
+            if (paths.all { it.startsWith(current) }) {
+                return current
+            }
+            current = current.parent ?: return null
+        }
+    }
+
     private fun copyProjectTree(sourceRoot: Path, targetRoot: Path) {
         val excludedNames = setOf(".git", ".gradle", "build", "target", ".idea")
         Files.walk(sourceRoot).use { paths ->
@@ -1550,7 +1594,7 @@ class SnapshotManager(private val projectRoot: Path) {
         }
     }
 
-    private fun selectValidationCommand(root: Path, mode: String): ValidationCommand {
+    private fun selectValidationCommand(root: Path, target: ValidationTarget, mode: String): ValidationCommand {
         require(mode in setOf("auto", "compile", "test")) { "Unsupported validation mode: $mode" }
         val mavenRepo = root.resolve(".graphharness-m2").toString()
         val gradleUserHome = root.resolve(".graphharness-gradle").toString()
@@ -1558,17 +1602,25 @@ class SnapshotManager(private val projectRoot: Path) {
             "HOME" to root.toString(),
             "MAVEN_USER_HOME" to mavenRepo,
         )
-        val mvnw = root.resolve("mvnw")
-        val gradlew = root.resolve("gradlew")
-        val pom = root.resolve("pom.xml")
-        val gradleKts = root.resolve("build.gradle.kts")
-        val gradleGroovy = root.resolve("build.gradle")
+        val mvnw = target.root.resolve("mvnw")
+        val gradlew = target.root.resolve("gradlew")
+        val pom = target.root.resolve("pom.xml")
+        val gradleKts = target.root.resolve("build.gradle.kts")
+        val gradleGroovy = target.root.resolve("build.gradle")
+        val rootMvnw = root.resolve("mvnw")
+        val rootGradlew = root.resolve("gradlew")
+        val rootSettings = listOf("settings.gradle", "settings.gradle.kts").any { Files.exists(root.resolve(it)) }
+        val relativePom = root.relativize(target.root.resolve("pom.xml")).toString().replace('\\', '/')
+        val gradleProjectPath = root.relativize(target.root).joinToString(":") { it.toString() }.let {
+            if (it.isBlank()) "" else ":$it"
+        }
 
         if (Files.exists(mvnw) && mode != "compile") {
             return ValidationCommand(
                 validator = "maven-wrapper-test",
                 command = listOf("bash", "./mvnw", "-q", "-Dmaven.repo.local=$mavenRepo", "test"),
                 environment = mavenEnv,
+                workingDirectory = target.root,
             )
         }
         if (Files.exists(mvnw)) {
@@ -1576,6 +1628,23 @@ class SnapshotManager(private val projectRoot: Path) {
                 validator = "maven-wrapper-compile",
                 command = listOf("bash", "./mvnw", "-q", "-Dmaven.repo.local=$mavenRepo", "-DskipTests", "compile"),
                 environment = mavenEnv,
+                workingDirectory = target.root,
+            )
+        }
+        if (target.root != root && Files.exists(pom) && Files.exists(rootMvnw) && mode != "compile") {
+            return ValidationCommand(
+                validator = "maven-wrapper-test",
+                command = listOf("bash", "./mvnw", "-q", "-Dmaven.repo.local=$mavenRepo", "-f", relativePom, "test"),
+                environment = mavenEnv,
+                workingDirectory = root,
+            )
+        }
+        if (target.root != root && Files.exists(pom) && Files.exists(rootMvnw)) {
+            return ValidationCommand(
+                validator = "maven-wrapper-compile",
+                command = listOf("bash", "./mvnw", "-q", "-Dmaven.repo.local=$mavenRepo", "-f", relativePom, "-DskipTests", "compile"),
+                environment = mavenEnv,
+                workingDirectory = root,
             )
         }
         if (Files.exists(gradlew) && mode != "compile") {
@@ -1583,6 +1652,7 @@ class SnapshotManager(private val projectRoot: Path) {
                 validator = "gradle-wrapper-test",
                 command = listOf("bash", "./gradlew", "--no-daemon", "test"),
                 environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
+                workingDirectory = target.root,
             )
         }
         if (Files.exists(gradlew)) {
@@ -1590,6 +1660,23 @@ class SnapshotManager(private val projectRoot: Path) {
                 validator = "gradle-wrapper-compile",
                 command = listOf("bash", "./gradlew", "--no-daemon", "compileJava"),
                 environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
+                workingDirectory = target.root,
+            )
+        }
+        if (target.root != root && rootSettings && Files.exists(rootGradlew) && gradleProjectPath.isNotBlank() && mode != "compile") {
+            return ValidationCommand(
+                validator = "gradle-wrapper-test",
+                command = listOf("bash", "./gradlew", "--no-daemon", "${gradleProjectPath}:test"),
+                environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
+                workingDirectory = root,
+            )
+        }
+        if (target.root != root && rootSettings && Files.exists(rootGradlew) && gradleProjectPath.isNotBlank()) {
+            return ValidationCommand(
+                validator = "gradle-wrapper-compile",
+                command = listOf("bash", "./gradlew", "--no-daemon", "${gradleProjectPath}:compileJava"),
+                environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
+                workingDirectory = root,
             )
         }
         if (Files.exists(pom) && hasExecutable("mvn") && mode != "compile") {
@@ -1597,6 +1684,7 @@ class SnapshotManager(private val projectRoot: Path) {
                 validator = "maven-test",
                 command = listOf("mvn", "-q", "-Dmaven.repo.local=$mavenRepo", "test"),
                 environment = mavenEnv,
+                workingDirectory = target.root,
             )
         }
         if (Files.exists(pom) && hasExecutable("mvn")) {
@@ -1604,6 +1692,7 @@ class SnapshotManager(private val projectRoot: Path) {
                 validator = "maven-compile",
                 command = listOf("mvn", "-q", "-Dmaven.repo.local=$mavenRepo", "-DskipTests", "compile"),
                 environment = mavenEnv,
+                workingDirectory = target.root,
             )
         }
         if ((Files.exists(gradleKts) || Files.exists(gradleGroovy)) && hasExecutable("gradle") && mode != "compile") {
@@ -1611,6 +1700,7 @@ class SnapshotManager(private val projectRoot: Path) {
                 validator = "gradle-test",
                 command = listOf("gradle", "--no-daemon", "test"),
                 environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
+                workingDirectory = target.root,
             )
         }
         if ((Files.exists(gradleKts) || Files.exists(gradleGroovy)) && hasExecutable("gradle")) {
@@ -1618,11 +1708,13 @@ class SnapshotManager(private val projectRoot: Path) {
                 validator = "gradle-compile",
                 command = listOf("gradle", "--no-daemon", "compileJava"),
                 environment = mapOf("GRADLE_USER_HOME" to gradleUserHome),
+                workingDirectory = target.root,
             )
         }
         return ValidationCommand(
             validator = "javac-syntax",
-            command = javacCommand(root),
+            command = javacCommand(target.root),
+            workingDirectory = target.root,
         )
     }
 
@@ -1651,7 +1743,7 @@ class SnapshotManager(private val projectRoot: Path) {
 
     private fun runValidationCommand(root: Path, validation: ValidationCommand): ProcessRunResult {
         val builder = ProcessBuilder(validation.command)
-            .directory(root.toFile())
+            .directory((validation.workingDirectory ?: root).toFile())
             .redirectErrorStream(true)
         builder.environment().putAll(validation.environment)
         val process = builder.start()

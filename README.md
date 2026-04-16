@@ -105,4 +105,5 @@ The available tools are:
 - `verify_candidate` is the cheap confirmation step for targeted edits; use it before `plan_edit` when `get_edit_candidates` returns `needs_disambiguation: true` or when the task wording is vague.
 - `validate_edit` replays a planned edit, or validates an already-applied edit, on a scratch copy of the repo. It prefers Maven/Gradle test or compile commands and falls back to a local `javac -proc:none` syntax check when no project build tool is detected.
 - When repo-aware validation is blocked by wrapper/bootstrap failures or environment constraints, `validate_edit` reports `attempted_validators`, marks the result as `degraded`, and falls back to syntax validation when possible.
+- `validate_edit` scopes repo-aware validation to the nearest touched Maven/Gradle module when possible, and reports that choice as `validation_target`.
 # code-agent

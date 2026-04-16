@@ -38,6 +38,7 @@ data class EditValidationResult(
     val edit_id: String,
     val validation_mode: String,
     val validation_scope: String,
+    val validation_target: String,
     val validator: String,
     val attempted_validators: List<String>,
     val degraded: Boolean,

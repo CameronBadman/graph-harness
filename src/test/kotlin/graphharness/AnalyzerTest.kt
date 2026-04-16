@@ -1,6 +1,7 @@
 package graphharness
 
 import kotlin.io.path.createTempDirectory
+import kotlin.io.path.createDirectories
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.io.path.setPosixFilePermissions
@@ -189,6 +190,7 @@ class AnalyzerTest {
         val pendingValidation = manager.validateEdit(plan.edit_id!!, "compile")
         assertTrue(pendingValidation.success)
         assertEquals("planned_edit", pendingValidation.validation_scope)
+        assertEquals("project_root", pendingValidation.validation_target)
         assertEquals("javac-syntax", pendingValidation.validator)
 
         val apply = manager.applyEdit(plan.edit_id)
@@ -197,6 +199,7 @@ class AnalyzerTest {
         val appliedValidation = manager.validateEdit(plan.edit_id, "compile")
         assertTrue(appliedValidation.success)
         assertEquals("applied_workspace", appliedValidation.validation_scope)
+        assertEquals("project_root", appliedValidation.validation_target)
         assertEquals("javac-syntax", appliedValidation.validator)
     }
 
@@ -489,8 +492,54 @@ class AnalyzerTest {
 
         val validation = manager.validateEdit(plan.edit_id!!, "auto")
         assertTrue(validation.success)
+        assertEquals("project_root", validation.validation_target)
         assertEquals("javac-syntax", validation.validator)
         assertTrue(validation.degraded)
         assertEquals(listOf("maven-wrapper-test", "javac-syntax"), validation.attempted_validators)
+    }
+
+    @Test
+    fun scopesValidationToNearestModuleForTouchedFiles() {
+        val root = createTempDirectory("graphharness-module-validate")
+        root.resolve("pom.xml").writeText("<project></project>\n")
+        val moduleDir = root.resolve("payments")
+        moduleDir.resolve("pom.xml").parent?.createDirectories()
+        moduleDir.resolve("pom.xml").writeText("<project></project>\n")
+        val service = moduleDir.resolve("PaymentService.java")
+        service.writeText(
+            """
+            package com.app.payment;
+
+            public class PaymentService {
+                public PaymentResult processPayment(Order order) {
+                    return charge(order);
+                }
+
+                private PaymentResult charge(Order order) {
+                    return new PaymentResult();
+                }
+            }
+            """.trimIndent(),
+        )
+        moduleDir.resolve("PaymentResult.java").writeText("package com.app.payment;\npublic class PaymentResult {}\n")
+        moduleDir.resolve("Order.java").writeText("package com.app.payment;\npublic class Order {}\n")
+
+        val manager = SnapshotManager(root)
+        val processNode = manager.search("processPayment", "method", null, null).results.first()
+        val plan = manager.planEdit(
+            operation = "modify_method_body",
+            targetNodeId = processNode.id,
+            payload = EditRequestPayload(
+                patch_mode = "insert_before",
+                anchor = "return charge(order);",
+                snippet = "order.toString();",
+            ),
+        )
+
+        val validation = manager.validateEdit(plan.edit_id!!, "compile")
+        assertTrue(validation.success)
+        assertEquals("module:payments", validation.validation_target)
+        assertEquals("javac-syntax", validation.validator)
+        assertEquals(listOf("javac-syntax"), validation.attempted_validators)
     }
 }

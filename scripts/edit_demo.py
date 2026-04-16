@@ -203,6 +203,7 @@ def run_apply_smoke(server: str, source_root: Path, env: dict[str, str]) -> dict
     return {
         "validation_success": validation["success"],
         "validation_scope": validation["validation_scope"],
+        "validation_target": validation["validation_target"],
         "validator": validation["validator"],
         "attempted_validators": validation["attempted_validators"],
         "degraded_validation": validation["degraded"],
