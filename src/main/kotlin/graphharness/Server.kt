@@ -626,6 +626,8 @@ internal class JsonCodec {
             "validation_mode" to value.validation_mode,
             "validation_scope" to value.validation_scope,
             "validator" to value.validator,
+            "attempted_validators" to value.attempted_validators,
+            "degraded" to value.degraded,
             "command" to value.command,
             "exit_code" to value.exit_code,
             "duration_ms" to value.duration_ms,

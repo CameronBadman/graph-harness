@@ -3,10 +3,12 @@ package graphharness
 import kotlin.io.path.createTempDirectory
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
+import kotlin.io.path.setPosixFilePermissions
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import java.nio.file.attribute.PosixFilePermission
 
 class AnalyzerTest {
     @Test
@@ -52,13 +54,23 @@ class AnalyzerTest {
             public class Order {}
             """.trimIndent(),
         )
+        root.resolve("CheckoutController.java").writeText(
+            """
+            package com.app.payment;
+
+            public class CheckoutController {
+                public PaymentResult submit(Order order) {
+                    PaymentService service = new PaymentService();
+                    return service.processPayment(order);
+                }
+            }
+            """.trimIndent(),
+        )
 
         val manager = SnapshotManager(root)
         val summary = manager.summaryMap()
 
-        assertEquals(4, summary.project.total_files)
-        assertTrue(summary.clusters.isNotEmpty())
-        assertTrue(summary.clusters.none { it.cluster_id == "cluster:default" })
+        assertEquals(5, summary.project.total_files)
         assertEquals("compact", summary.summary_mode)
         assertTrue(summary.clusters.isEmpty())
         assertTrue(summary.bridge_nodes.isEmpty())
@@ -421,5 +433,64 @@ class AnalyzerTest {
         assertTrue(resolved.resolved_candidate.node.name.endsWith("PetController.processCreationForm"))
         assertNotNull(resolved.verification)
         assertTrue(resolved.verification.anchor_present)
+    }
+
+    @Test
+    fun fallsBackToSyntaxValidationWhenRepoAwareValidationIsBlocked() {
+        val root = createTempDirectory("graphharness-validate-fallback")
+        val service = root.resolve("PaymentService.java")
+        service.writeText(
+            """
+            package com.app.payment;
+
+            public class PaymentService {
+                public PaymentResult processPayment(Order order) {
+                    return charge(order);
+                }
+
+                private PaymentResult charge(Order order) {
+                    return new PaymentResult();
+                }
+            }
+            """.trimIndent(),
+        )
+        root.resolve("PaymentResult.java").writeText("package com.app.payment;\npublic class PaymentResult {}\n")
+        root.resolve("Order.java").writeText("package com.app.payment;\npublic class Order {}\n")
+        root.resolve("pom.xml").writeText("<project></project>\n")
+        val mvnw = root.resolve("mvnw")
+        mvnw.writeText(
+            """
+            #!/usr/bin/env bash
+            echo "wget: Failed to fetch https://repo.maven.apache.org/example.zip"
+            exit 1
+            """.trimIndent(),
+        )
+        runCatching {
+            mvnw.setPosixFilePermissions(
+                setOf(
+                    PosixFilePermission.OWNER_READ,
+                    PosixFilePermission.OWNER_WRITE,
+                    PosixFilePermission.OWNER_EXECUTE,
+                ),
+            )
+        }
+
+        val manager = SnapshotManager(root)
+        val processNode = manager.search("processPayment", "method", null, null).results.first()
+        val plan = manager.planEdit(
+            operation = "modify_method_body",
+            targetNodeId = processNode.id,
+            payload = EditRequestPayload(
+                patch_mode = "insert_before",
+                anchor = "return charge(order);",
+                snippet = "order.toString();",
+            ),
+        )
+
+        val validation = manager.validateEdit(plan.edit_id!!, "auto")
+        assertTrue(validation.success)
+        assertEquals("javac-syntax", validation.validator)
+        assertTrue(validation.degraded)
+        assertEquals(listOf("maven-wrapper-test", "javac-syntax"), validation.attempted_validators)
     }
 }

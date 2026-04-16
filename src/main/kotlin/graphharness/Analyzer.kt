@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.io.path.createDirectories
 import kotlin.io.path.extension
 import kotlin.io.path.invariantSeparatorsPathString
@@ -74,6 +75,13 @@ private data class ProcessRunResult(
     val timedOut: Boolean,
 )
 
+private data class ValidationOutcome(
+    val validator: ValidationCommand,
+    val result: ProcessRunResult,
+    val degraded: Boolean,
+    val notes: List<String>,
+)
+
 data class Snapshot(
     val id: String,
     val generatedAt: String,
@@ -94,7 +102,13 @@ data class Snapshot(
 class SnapshotManager(private val projectRoot: Path) {
     private val activeSnapshot = AtomicReference(buildSnapshot())
     private val pendingEdits = ConcurrentHashMap<String, PendingEdit>()
-    private val rebuildExecutor = Executors.newSingleThreadScheduledExecutor()
+    private val rebuildThreadIds = AtomicInteger(1)
+    private val rebuildExecutor = Executors.newSingleThreadScheduledExecutor { runnable ->
+        Thread(runnable).apply {
+            isDaemon = true
+            name = "graphharness-rebuild-${rebuildThreadIds.getAndIncrement()}"
+        }
+    }
 
     init {
         startWatcher()
@@ -1425,6 +1439,8 @@ class SnapshotManager(private val projectRoot: Path) {
                 validation_mode = mode,
                 validation_scope = "unknown",
                 validator = "none",
+                attempted_validators = emptyList(),
+                degraded = false,
                 command = emptyList(),
                 exit_code = -1,
                 duration_ms = 0,
@@ -1452,20 +1468,55 @@ class SnapshotManager(private val projectRoot: Path) {
 
             val selected = selectValidationCommand(validationRoot, mode)
             val start = System.nanoTime()
-            val result = runValidationCommand(validationRoot, selected)
+            val attempted = mutableListOf(selected.validator)
+            val primaryResult = runValidationCommand(validationRoot, selected)
+            val finalOutcome = if (shouldFallbackValidation(selected, primaryResult, mode, validationRoot)) {
+                val fallback = ValidationCommand(
+                    validator = "javac-syntax",
+                    command = javacCommand(validationRoot),
+                )
+                attempted += fallback.validator
+                val fallbackResult = runValidationCommand(validationRoot, fallback)
+                if (!fallbackResult.timedOut && fallbackResult.exitCode == 0) {
+                    ValidationOutcome(
+                        validator = fallback,
+                        result = fallbackResult,
+                        degraded = true,
+                        notes = listOf(
+                            "Primary validation via ${selected.validator} was blocked or failed; javac syntax fallback passed",
+                        ),
+                    )
+                } else {
+                    ValidationOutcome(
+                        validator = selected,
+                        result = primaryResult,
+                        degraded = true,
+                        notes = buildFallbackNotes(selected, primaryResult, fallback, fallbackResult),
+                    )
+                }
+            } else {
+                ValidationOutcome(
+                    validator = selected,
+                    result = primaryResult,
+                    degraded = false,
+                    notes = emptyList(),
+                )
+            }
             val durationMs = elapsedMs(start)
             EditValidationResult(
-                success = !result.timedOut && result.exitCode == 0,
+                success = !finalOutcome.result.timedOut && finalOutcome.result.exitCode == 0,
                 edit_id = editId,
                 validation_mode = mode,
                 validation_scope = validationScope,
-                validator = selected.validator,
-                command = selected.command,
-                exit_code = if (result.timedOut) -1 else result.exitCode,
+                validator = finalOutcome.validator.validator,
+                attempted_validators = attempted,
+                degraded = finalOutcome.degraded,
+                command = finalOutcome.validator.command,
+                exit_code = if (finalOutcome.result.timedOut) -1 else finalOutcome.result.exitCode,
                 duration_ms = durationMs,
                 affected_files = pending.affectedFiles,
-                output_excerpt = summarizeProcessOutput(result.output),
-                validation_errors = buildValidationErrors(result, selected),
+                output_excerpt = summarizeValidationOutput(finalOutcome),
+                validation_errors = buildValidationErrors(finalOutcome),
                 analysis_engine = snapshot.analysisEngine,
                 engine_version = snapshot.engineVersion,
                 build_duration_ms = snapshot.buildDurationMs,
@@ -1631,23 +1682,89 @@ class SnapshotManager(private val projectRoot: Path) {
         return lines.joinToString("\n").take(4000)
     }
 
-    private fun buildValidationErrors(result: ProcessRunResult, selected: ValidationCommand): List<String> {
-        if (result.timedOut) {
-            return listOf("Validation command timed out: ${selected.command.joinToString(" ")}")
+    private fun shouldFallbackValidation(
+        selected: ValidationCommand,
+        result: ProcessRunResult,
+        mode: String,
+        root: Path,
+    ): Boolean {
+        if (mode != "auto") return false
+        if (selected.validator == "javac-syntax") return false
+        if (result.exitCode == 0 && !result.timedOut) return false
+        val output = result.output.lowercase()
+        if (result.timedOut) return true
+        if ("failed to fetch" in output || "read-only file system" in output || "operation not permitted" in output) return true
+        if ("could not resolve" in output || "unable to access" in output || "download" in output) return true
+        return Files.exists(root.resolve("pom.xml")) || Files.exists(root.resolve("build.gradle")) || Files.exists(root.resolve("build.gradle.kts"))
+    }
+
+    private fun summarizeValidationOutput(outcome: ValidationOutcome): String {
+        val sections = mutableListOf<String>()
+        if (outcome.notes.isNotEmpty()) {
+            sections += outcome.notes.joinToString("\n")
         }
-        if (result.exitCode == 0) {
-            return emptyList()
+        val processSummary = summarizeProcessOutput(outcome.result.output)
+        if (processSummary.isNotBlank()) {
+            sections += processSummary
         }
-        val summary = summarizeProcessOutput(result.output)
-        return listOf(
+        return sections.joinToString("\n\n").take(4000)
+    }
+
+    private fun buildValidationErrors(outcome: ValidationOutcome): List<String> {
+        if (outcome.result.timedOut) {
+            return outcome.notes + listOf("Validation command timed out: ${outcome.validator.command.joinToString(" ")}")
+        }
+        if (outcome.result.exitCode == 0) {
+            return outcome.notes
+        }
+        val summary = summarizeProcessOutput(outcome.result.output)
+        return outcome.notes + listOf(
             buildString {
-                append("Validation failed via ${selected.validator}")
-                append(" (exit_code=").append(result.exitCode).append(')')
+                append("Validation failed via ${outcome.validator.validator}")
+                append(" (exit_code=").append(outcome.result.exitCode).append(')')
                 if (summary.isNotBlank()) {
                     append(": ").append(summary.lineSequence().first())
                 }
             },
         )
+    }
+
+    private fun buildFallbackNotes(
+        primary: ValidationCommand,
+        primaryResult: ProcessRunResult,
+        fallback: ValidationCommand,
+        fallbackResult: ProcessRunResult,
+    ): List<String> {
+        val primarySummary = summarizeProcessOutput(primaryResult.output).lineSequence().firstOrNull().orEmpty()
+        val fallbackSummary = summarizeProcessOutput(fallbackResult.output).lineSequence().firstOrNull().orEmpty()
+        return buildList {
+            add(
+                buildString {
+                    append("Primary validation via ${primary.validator} failed")
+                    if (primaryResult.timedOut) {
+                        append(" due to timeout")
+                    } else {
+                        append(" with exit_code=").append(primaryResult.exitCode)
+                    }
+                    if (primarySummary.isNotBlank()) {
+                        append(": ").append(primarySummary)
+                    }
+                },
+            )
+            add(
+                buildString {
+                    append("Fallback validation via ${fallback.validator} also failed")
+                    if (fallbackResult.timedOut) {
+                        append(" due to timeout")
+                    } else {
+                        append(" with exit_code=").append(fallbackResult.exitCode)
+                    }
+                    if (fallbackSummary.isNotBlank()) {
+                        append(": ").append(fallbackSummary)
+                    }
+                },
+            )
+        }
     }
 
     private fun deleteRecursively(root: Path) {

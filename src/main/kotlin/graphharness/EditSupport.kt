@@ -39,6 +39,8 @@ data class EditValidationResult(
     val validation_mode: String,
     val validation_scope: String,
     val validator: String,
+    val attempted_validators: List<String>,
+    val degraded: Boolean,
     val command: List<String>,
     val exit_code: Int,
     val duration_ms: Long,
