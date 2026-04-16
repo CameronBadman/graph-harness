@@ -495,8 +495,61 @@ class SnapshotManager(private val projectRoot: Path) {
     }
 
     fun agentFitness(snapshot: Snapshot = current()): AgentFitnessResult {
-        val relevantMethods = snapshot.methodInfos.values.filter(::isAgentRelevantMethod)
+        val report = buildFitnessReport(
+            relevantMethods = snapshot.methodInfos.values.filter(::isAgentRelevantMethod),
+            snapshot = snapshot,
+            scopeLabel = null,
+        )
+        return AgentFitnessResult(
+            overall_score = report.overall_score,
+            subscores = report.subscores,
+            metrics = report.metrics,
+            issues = report.issues,
+            recommended_actions = report.recommended_actions,
+            analysis_engine = snapshot.analysisEngine,
+            engine_version = snapshot.engineVersion,
+            build_duration_ms = snapshot.buildDurationMs,
+            snapshot_id = snapshot.id,
+            generated_at = snapshot.generatedAt,
+        )
+    }
+
+    fun clusterFitness(clusterId: String, snapshot: Snapshot = current()): ClusterFitnessResult {
+        val cluster = snapshot.clusters.firstOrNull { it.cluster_id == clusterId }
+            ?: error("Unknown cluster_id: $clusterId")
+        val nodeIds = snapshot.clusterNodes[clusterId].orEmpty().toSet()
+        val methods = snapshot.methodInfos.values.filter { it.id in nodeIds && isAgentRelevantMethod(it) }
+        val report = buildFitnessReport(
+            relevantMethods = methods,
+            snapshot = snapshot,
+            scopeLabel = cluster.label,
+            allowedNodeIds = nodeIds,
+        )
+        return ClusterFitnessResult(
+            cluster = cluster,
+            overall_score = report.overall_score,
+            subscores = report.subscores,
+            metrics = report.metrics,
+            issues = report.issues,
+            recommended_actions = report.recommended_actions,
+            analysis_engine = snapshot.analysisEngine,
+            engine_version = snapshot.engineVersion,
+            build_duration_ms = snapshot.buildDurationMs,
+            snapshot_id = snapshot.id,
+            generated_at = snapshot.generatedAt,
+        )
+    }
+
+    private fun buildFitnessReport(
+        relevantMethods: List<MethodInfo>,
+        snapshot: Snapshot,
+        scopeLabel: String?,
+        allowedNodeIds: Set<String>? = null,
+    ): AgentFitnessResult {
         val callEdges = snapshot.edges.filter { it.relationship == "calls" }
+            .filter { edge ->
+                allowedNodeIds == null || (edge.from in allowedNodeIds && edge.to in allowedNodeIds)
+            }
         val outboundCounts = callEdges.groupingBy { it.from }.eachCount()
         val inboundCounts = callEdges.groupingBy { it.to }.eachCount()
         val avgFanOut = if (relevantMethods.isEmpty()) 0.0 else relevantMethods.map { outboundCounts.getOrDefault(it.id, 0) }.average()
@@ -508,19 +561,27 @@ class SnapshotManager(private val projectRoot: Path) {
             .groupBy { it.simpleName }
             .filterValues { it.size > 1 }
         val ambiguousMethodCount = ambiguityGroups.values.sumOf { it.size }
-        val externalEdgeRatio = snapshot.clusters
-            .takeIf { it.isNotEmpty() }
-            ?.let { clusters -> clusters.sumOf { it.external_edges }.toDouble() / clusters.sumOf { it.node_count }.coerceAtLeast(1) }
-            ?: 0.0
+        val externalEdgeRatio = when {
+            scopeLabel != null -> {
+                val cluster = snapshot.clusters.firstOrNull { it.label == scopeLabel || it.cluster_id == scopeLabel }
+                cluster?.let { it.external_edges.toDouble() / it.node_count.coerceAtLeast(1) } ?: 0.0
+            }
+            else -> snapshot.clusters
+                .takeIf { it.isNotEmpty() }
+                ?.let { clusters -> clusters.sumOf { it.external_edges }.toDouble() / clusters.sumOf { it.node_count }.coerceAtLeast(1) }
+                ?: 0.0
+        }
         val sampleForImpact = relevantMethods
             .sortedWith(compareByDescending<MethodInfo> { inboundCounts.getOrDefault(it.id, 0) }.thenByDescending { entrypointPriority(it) })
             .take(8)
         val avgImpactRadius = if (sampleForImpact.isEmpty()) {
             0.0
         } else {
-            sampleForImpact.map { impact(it.id, 2, snapshot).affected_files.size }.average()
+            sampleForImpact.map { impact(it.id, 2, snapshot).affected_files.count { file ->
+                allowedNodeIds == null || snapshot.nodeSummaries.values.any { node -> node.id in allowedNodeIds && node.file == file }
+            } }.average()
         }
-        val buildRootRatios = sourceFileBuildRootStats(snapshot)
+        val buildRootRatios = sourceFileBuildRootStats(snapshot, relevantMethods.map { it.file }.distinct())
         val moduleScopedRatio = buildRootRatios["module_scoped_file_ratio"] ?: 0.0
 
         val navigability = scoreFitness(
@@ -585,22 +646,25 @@ class SnapshotManager(private val projectRoot: Path) {
         }
 
         if (externalEdgeRatio > 0.75 && snapshot.clusters.isNotEmpty()) {
-            val worstCluster = snapshot.clusters.maxByOrNull { it.external_edges.toDouble() / it.node_count.coerceAtLeast(1) }
+            val worstCluster = when {
+                scopeLabel != null -> snapshot.clusters.firstOrNull { it.label == scopeLabel || it.cluster_id == scopeLabel }
+                else -> snapshot.clusters.maxByOrNull { it.external_edges.toDouble() / it.node_count.coerceAtLeast(1) }
+            }
             issues += FitnessIssue(
                 severity = "medium",
-                title = "High cross-cluster coupling",
+                title = if (scopeLabel == null) "High cross-cluster coupling" else "Cluster boundary pressure",
                 details = "External cluster edges per node are ${"%.2f".format(externalEdgeRatio)}, which weakens graph locality for agents.",
                 file = worstCluster?.label,
             )
             actions += FitnessAction(
                 priority = "medium",
-                title = "Reduce cluster boundary crossings",
+                title = if (scopeLabel == null) "Reduce cluster boundary crossings" else "Reduce ${worstCluster?.label ?: "cluster"} boundary crossings",
                 rationale = "Moving shared logic behind clearer interfaces should shrink impact radii and improve module-scoped validation.",
                 file = worstCluster?.label,
             )
         }
 
-        if (moduleScopedRatio < 0.25 && snapshot.sourceIndex.size >= 20) {
+        if (moduleScopedRatio < 0.25 && relevantMethods.size >= 10) {
             issues += FitnessIssue(
                 severity = "low",
                 title = "Low module-scoped validation coverage",
@@ -1726,12 +1790,12 @@ class SnapshotManager(private val projectRoot: Path) {
         }
     }
 
-    private fun sourceFileBuildRootStats(snapshot: Snapshot): Map<String, Double> {
-        if (snapshot.sourceIndex.isEmpty()) {
+    private fun sourceFileBuildRootStats(snapshot: Snapshot, files: List<String> = snapshot.sourceIndex.keys.toList()): Map<String, Double> {
+        if (files.isEmpty()) {
             return mapOf("module_scoped_file_ratio" to 0.0, "build_root_count" to 0.0)
         }
         val buildFiles = setOf("pom.xml", "build.gradle", "build.gradle.kts")
-        val roots = snapshot.sourceIndex.keys.map { file ->
+        val roots = files.map { file ->
             var current: Path? = projectRoot.resolve(file).normalize().parent
             var best: Path = projectRoot
             while (current != null && current.startsWith(projectRoot)) {

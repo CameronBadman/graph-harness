@@ -100,6 +100,10 @@ class AnalyzerTest {
         assertTrue(fitness.overall_score in 0..100)
         assertTrue(fitness.subscores.any { it.name == "navigability" })
         assertTrue(fitness.metrics["agent_relevant_method_count"] ?: 0.0 >= 1.0)
+        val clusterId = manager.clusterDetail("cluster:com.app.payment").cluster.cluster_id
+        val clusterFitness = manager.clusterFitness(clusterId)
+        assertEquals(clusterId, clusterFitness.cluster.cluster_id)
+        assertTrue(clusterFitness.overall_score in 0..100)
     }
 
     @Test

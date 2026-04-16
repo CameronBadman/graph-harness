@@ -323,6 +323,20 @@ data class AgentFitnessResult(
     val generated_at: String,
 )
 
+data class ClusterFitnessResult(
+    val cluster: ClusterSummary,
+    val overall_score: Int,
+    val subscores: List<FitnessSubscore>,
+    val metrics: Map<String, Double>,
+    val issues: List<FitnessIssue>,
+    val recommended_actions: List<FitnessAction>,
+    val analysis_engine: String,
+    val engine_version: String? = null,
+    val build_duration_ms: Long,
+    val snapshot_id: String,
+    val generated_at: String,
+)
+
 data class ToolDefinition(
     val name: String,
     val description: String,
