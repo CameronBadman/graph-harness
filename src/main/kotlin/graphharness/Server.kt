@@ -630,6 +630,8 @@ internal class JsonCodec {
             "pending_rebuild" to value.pending_rebuild,
             "dirty_files" to value.dirty_files,
             "dirty_node_estimate" to value.dirty_node_estimate,
+            "recompute_mode" to value.recompute_mode,
+            "incremental_supported" to value.incremental_supported,
         )
 
         is ProjectSummary -> jObject(

@@ -41,6 +41,8 @@ data class SnapshotRuntimeState(
     val pending_rebuild: Boolean,
     val dirty_files: List<String>,
     val dirty_node_estimate: Int,
+    val recompute_mode: String,
+    val incremental_supported: Boolean,
 )
 
 data class ProjectSummary(

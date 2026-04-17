@@ -110,6 +110,7 @@ data class Snapshot(
     val packageCount: Int,
     val clusterStrategy: String = "package",
     val clusterProvenance: String = "package_name",
+    val recomputeMode: String = "full",
     val epoch: Long = 0,
 )
 
@@ -124,6 +125,7 @@ class SnapshotManager(private val projectRoot: Path) {
     private val dirtyFiles = ConcurrentHashMap.newKeySet<String>()
     private val requireJoern = readStrictJoernMode()
     private val clusterStrategy = readClusterStrategy()
+    private val incrementalFileThreshold = 40
     private val rebuildExecutor = Executors.newSingleThreadScheduledExecutor { runnable ->
         Thread(runnable).apply {
             isDaemon = true
@@ -184,7 +186,7 @@ class SnapshotManager(private val projectRoot: Path) {
                 if (touchedJava) {
                     pendingRebuild.set(true)
                     rebuildExecutor.schedule({
-                        runCatching { installSnapshot(buildSnapshot()) }
+                        rebuildFromDirty()
                     }, 800, TimeUnit.MILLISECONDS)
                 }
             }
@@ -216,8 +218,33 @@ class SnapshotManager(private val projectRoot: Path) {
     private fun snapshotById(snapshotId: String): Snapshot =
         snapshotHistory[snapshotId] ?: error("Unknown snapshot_id: $snapshotId")
 
-    private fun buildSnapshot(): Snapshot {
+    private fun rebuildFromDirty() {
+        val changed = dirtyFiles.toSet()
+        val snapshot = runCatching { buildSnapshot(changed) }
+            .recoverCatching { buildSnapshot(emptySet()) }
+            .getOrElse {
+                pendingRebuild.set(false)
+                return
+            }
+        installSnapshot(snapshot)
+    }
+
+    private fun buildSnapshot(changedFiles: Set<String> = emptySet()): Snapshot {
         val buildStart = System.nanoTime()
+        val active = activeSnapshot.get()
+        val changedJava = changedFiles
+            .map { normalize(it) }
+            .filter { it.endsWith(".java") }
+            .toSet()
+
+        if (active != null &&
+            active.analysisEngine == "fallback-parser" &&
+            changedJava.isNotEmpty() &&
+            changedJava.size <= incrementalFileThreshold
+        ) {
+            return buildSnapshotLegacyIncremental(active, changedJava, elapsedMs(buildStart))
+        }
+
         val javaFiles = Files.walk(projectRoot).use { paths ->
             paths.filter { Files.isRegularFile(it) && it.extension == "java" }
                 .asSequence()
@@ -291,6 +318,78 @@ class SnapshotManager(private val projectRoot: Path) {
             packageCount = typeInfos.values.map { it.packageName }.filter { it.isNotBlank() }.toSet().size,
             clusterStrategy = clusterStrategy,
             clusterProvenance = clusterProvenance,
+            recomputeMode = "full",
+        )
+    }
+
+    private fun buildSnapshotLegacyIncremental(
+        previous: Snapshot,
+        changedFiles: Set<String>,
+        buildDurationMs: Long,
+    ): Snapshot {
+        val typeInfos = previous.typeInfos.toMutableMap()
+        val methodInfos = previous.methodInfos.toMutableMap()
+        val sourceIndex = previous.sourceIndex.toMutableMap()
+        val fileHashes = previous.fileHashes.toMutableMap()
+
+        changedFiles.forEach { relative ->
+            val absPath = projectRoot.resolve(relative).normalize()
+            typeInfos.entries.removeIf { it.value.file == relative }
+            methodInfos.entries.removeIf { it.value.file == relative }
+
+            if (!Files.exists(absPath) || !Files.isRegularFile(absPath) || absPath.extension != "java") {
+                sourceIndex.remove(relative)
+                fileHashes.remove(relative)
+                return@forEach
+            }
+
+            val parsed = parseJavaFile(absPath, projectRoot)
+            parsed.types.forEach { typeInfos[it.id] = it }
+            parsed.methods.forEach { methodInfos[it.id] = it }
+            sourceIndex[relative] = absPath
+            fileHashes[relative] = sha256(readPathText(absPath))
+        }
+
+        val typesBySimpleName = typeInfos.values.groupBy { it.simpleName }
+        val methodsBySimpleName = methodInfos.values.groupBy { it.simpleName }
+        val typeByQualifiedName = typeInfos.values.associateBy { it.qualifiedName }
+        val nodeSummaries = buildNodeSummaries(typeInfos, methodInfos)
+        val callEdges = buildCallEdges(methodInfos, methodsBySimpleName)
+        val typeEdges = buildTypeEdges(typeInfos, typeByQualifiedName, typesBySimpleName)
+        val dependencyEdges = buildDependencyEdges(methodInfos, typeInfos, typesBySimpleName)
+        val edges = (callEdges + typeEdges + dependencyEdges).distinct()
+        val clusters = buildClusters(typeInfos, methodInfos, edges, nodeSummaries, clusterStrategy)
+        val clusterProvenance = clusterProvenanceForStrategy(clusterStrategy)
+        val generatedAt = Instant.now().toString()
+        val hash = MessageDigest.getInstance("SHA-256")
+            .digest(
+                buildString {
+                    append("fallback-incremental")
+                    append(generatedAt)
+                    changedFiles.sorted().forEach { append(it) }
+                }.toByteArray()
+            )
+            .joinToString("") { "%02x".format(it) }
+
+        return Snapshot(
+            id = hash.take(16),
+            generatedAt = generatedAt,
+            root = projectRoot,
+            analysisEngine = "fallback-parser",
+            engineVersion = null,
+            buildDurationMs = buildDurationMs,
+            nodeSummaries = nodeSummaries,
+            edges = edges,
+            clusters = clusters,
+            clusterNodes = buildClusterNodes(clusters, typeInfos, methodInfos, clusterStrategy),
+            typeInfos = typeInfos,
+            methodInfos = methodInfos,
+            sourceIndex = sourceIndex,
+            fileHashes = fileHashes,
+            packageCount = typeInfos.values.map { it.packageName }.filter { it.isNotBlank() }.toSet().size,
+            clusterStrategy = clusterStrategy,
+            clusterProvenance = clusterProvenance,
+            recomputeMode = "incremental",
         )
     }
 
@@ -333,6 +432,7 @@ class SnapshotManager(private val projectRoot: Path) {
             packageCount = typeInfos.values.map { it.packageName }.filter { it.isNotBlank() }.toSet().size,
             clusterStrategy = clusterStrategy,
             clusterProvenance = clusterProvenance,
+            recomputeMode = "full",
         )
     }
 
@@ -705,6 +805,8 @@ class SnapshotManager(private val projectRoot: Path) {
             pending_rebuild = pendingRebuild.get(),
             dirty_files = dirty,
             dirty_node_estimate = dirtyNodeEstimate,
+            recompute_mode = snapshot.recomputeMode,
+            incremental_supported = snapshot.analysisEngine == "fallback-parser",
         )
     }
 
@@ -790,6 +892,7 @@ class SnapshotManager(private val projectRoot: Path) {
                 "snapshot deltas perform heuristic node rebinding when identifiers shift",
                 "call/dependency edges may be incomplete for dynamic runtime behavior",
                 "validation targeting is heuristic unless explicit tests are provided",
+                "incremental recompute currently applies only to fallback backend and still rebuilds global edges",
             ),
             degraded_mode_flags = listOf("degraded", "attempted_validators", "summary_mode", "pending_rebuild"),
             failure_semantics = listOf(
@@ -807,6 +910,7 @@ class SnapshotManager(private val projectRoot: Path) {
                 "graph-guided edit planning",
                 "scratch-copy validation",
                 "repo and cluster fitness scoring",
+                "file-level invalidation with fallback incremental parser mode",
             ),
             build_context_bundle_supported = true,
             analysis_engine_first_backend = snapshot.analysisEngine == "joern",
