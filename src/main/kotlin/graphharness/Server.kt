@@ -108,6 +108,16 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
             ),
         ),
         tool(
+            "rebase_edit_plan",
+            "Re-plan a stale edit against the current snapshot and return a new diff preview.",
+            objectSchema(
+                properties = mapOf(
+                    "edit_id" to stringSchema("Original edit id returned by plan_edit."),
+                ),
+                required = listOf("edit_id"),
+            ),
+        ),
+        tool(
             "validate_edit",
             "Validate a planned or already-applied edit on a scratch copy using repo-aware Java build/test checks.",
             objectSchema(
@@ -394,6 +404,9 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
             "apply_edit" -> graphHarnessJson.encode(
                 snapshotManager.applyEdit(arguments.requiredString("edit_id")),
             )
+            "rebase_edit_plan" -> graphHarnessJson.encode(
+                snapshotManager.rebaseEditPlan(arguments.requiredString("edit_id")),
+            )
 
             "validate_edit" -> graphHarnessJson.encode(
                 snapshotManager.validateEdit(
@@ -607,6 +620,16 @@ internal class JsonCodec {
             "key_nodes" to value.key_nodes,
             "external_edges" to value.external_edges,
             "bridge_nodes" to value.bridge_nodes,
+            "strategy" to value.strategy,
+            "provenance" to value.provenance,
+        )
+
+        is SnapshotRuntimeState -> jObject(
+            "snapshot_epoch" to value.snapshot_epoch,
+            "graph_age_ms" to value.graph_age_ms,
+            "pending_rebuild" to value.pending_rebuild,
+            "dirty_files" to value.dirty_files,
+            "dirty_node_estimate" to value.dirty_node_estimate,
         )
 
         is ProjectSummary -> jObject(
@@ -634,6 +657,7 @@ internal class JsonCodec {
             "edit_id" to value.edit_id,
             "operation" to value.operation,
             "target_node_id" to value.target_node_id,
+            "rebased_from_edit_id" to value.rebased_from_edit_id,
             "diff" to value.diff,
             "affected_nodes" to value.affected_nodes,
             "affected_files" to value.affected_files,
@@ -692,6 +716,7 @@ internal class JsonCodec {
         is EditApplyResult -> jObject(
             "success" to value.success,
             "edit_id" to value.edit_id,
+            "rebased_suggestion" to value.rebased_suggestion,
             "updated_nodes" to value.updated_nodes,
             "affected_files" to value.affected_files,
             "validation_errors" to value.validation_errors,
@@ -786,22 +811,34 @@ internal class JsonCodec {
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
+            "semantic_level" to value.semantic_level,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
         )
         is CapabilitiesResult -> jObject(
             "languages" to value.languages,
             "analysis_engine" to value.analysis_engine,
+            "backend_mode" to value.backend_mode,
+            "semantic_level" to value.semantic_level,
             "engine_version" to value.engine_version,
             "available_tools" to value.available_tools,
+            "disabled_tools" to value.disabled_tools,
             "edit_operations" to value.edit_operations,
             "validation_modes" to value.validation_modes,
             "confidence_semantics" to value.confidence_semantics,
+            "tool_guarantees" to value.tool_guarantees,
+            "stability_guarantees" to value.stability_guarantees,
+            "best_effort_guarantees" to value.best_effort_guarantees,
             "degraded_mode_flags" to value.degraded_mode_flags,
+            "failure_semantics" to value.failure_semantics,
             "snapshot_semantics" to value.snapshot_semantics,
+            "clustering_semantics" to value.clustering_semantics,
+            "cluster_strategy" to value.cluster_strategy,
             "analysis_engine_capabilities" to value.analysis_engine_capabilities,
             "build_context_bundle_supported" to value.build_context_bundle_supported,
             "analysis_engine_first_backend" to value.analysis_engine_first_backend,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
         )
@@ -821,6 +858,8 @@ internal class JsonCodec {
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
+            "semantic_level" to value.semantic_level,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
         )
@@ -847,6 +886,9 @@ internal class JsonCodec {
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
+            "semantic_level" to value.semantic_level,
+            "rebinding_mode" to value.rebinding_mode,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
         )
@@ -860,6 +902,8 @@ internal class JsonCodec {
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
+            "semantic_level" to value.semantic_level,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
         )
@@ -872,6 +916,8 @@ internal class JsonCodec {
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
+            "semantic_level" to value.semantic_level,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
         )
@@ -883,6 +929,8 @@ internal class JsonCodec {
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
+            "semantic_level" to value.semantic_level,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
             "analysis_confidence" to value.analysis_confidence,
@@ -900,6 +948,8 @@ internal class JsonCodec {
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
+            "semantic_level" to value.semantic_level,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
             "analysis_confidence" to value.analysis_confidence,
@@ -913,6 +963,8 @@ internal class JsonCodec {
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
+            "semantic_level" to value.semantic_level,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
             "analysis_confidence" to value.analysis_confidence,
@@ -930,6 +982,8 @@ internal class JsonCodec {
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
+            "semantic_level" to value.semantic_level,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
             "latency_ms" to value.latency_ms,
@@ -942,6 +996,8 @@ internal class JsonCodec {
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
+            "semantic_level" to value.semantic_level,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
         )
@@ -958,6 +1014,8 @@ internal class JsonCodec {
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
+            "semantic_level" to value.semantic_level,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
         )
@@ -967,6 +1025,8 @@ internal class JsonCodec {
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
+            "semantic_level" to value.semantic_level,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
         )
@@ -977,6 +1037,8 @@ internal class JsonCodec {
             "analysis_engine" to value.analysis_engine,
             "engine_version" to value.engine_version,
             "build_duration_ms" to value.build_duration_ms,
+            "semantic_level" to value.semantic_level,
+            "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
             "analysis_confidence" to value.analysis_confidence,

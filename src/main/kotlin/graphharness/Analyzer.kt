@@ -8,10 +8,13 @@ import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardWatchEventKinds
 import java.security.MessageDigest
+import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.io.path.createDirectories
@@ -105,6 +108,9 @@ data class Snapshot(
     val sourceIndex: Map<String, Path>,
     val fileHashes: Map<String, String>,
     val packageCount: Int,
+    val clusterStrategy: String = "package",
+    val clusterProvenance: String = "package_name",
+    val epoch: Long = 0,
 )
 
 class SnapshotManager(private val projectRoot: Path) {
@@ -113,6 +119,11 @@ class SnapshotManager(private val projectRoot: Path) {
     private val snapshotOrder = ArrayDeque<String>()
     private val pendingEdits = ConcurrentHashMap<String, PendingEdit>()
     private val rebuildThreadIds = AtomicInteger(1)
+    private val snapshotEpoch = AtomicLong(1)
+    private val pendingRebuild = AtomicBoolean(false)
+    private val dirtyFiles = ConcurrentHashMap.newKeySet<String>()
+    private val requireJoern = readStrictJoernMode()
+    private val clusterStrategy = readClusterStrategy()
     private val rebuildExecutor = Executors.newSingleThreadScheduledExecutor { runnable ->
         Thread(runnable).apply {
             isDaemon = true
@@ -121,7 +132,7 @@ class SnapshotManager(private val projectRoot: Path) {
     }
 
     init {
-        val initial = buildSnapshot()
+        val initial = buildSnapshot().copy(epoch = snapshotEpoch.get())
         recordSnapshot(initial)
         activeSnapshot.set(initial)
         startWatcher()
@@ -158,10 +169,20 @@ class SnapshotManager(private val projectRoot: Path) {
                     val ctx = event.context()?.toString() ?: return@forEach
                     if (ctx.endsWith(".java")) {
                         touchedJava = true
+                        val watched = key.watchable() as? Path
+                        if (watched != null) {
+                            val abs = watched.resolve(ctx).normalize()
+                            runCatching {
+                                if (abs.startsWith(root)) {
+                                    dirtyFiles += normalize(root.relativize(abs).invariantSeparatorsPathString)
+                                }
+                            }
+                        }
                     }
                 }
                 key.reset()
                 if (touchedJava) {
+                    pendingRebuild.set(true)
                     rebuildExecutor.schedule({
                         runCatching { installSnapshot(buildSnapshot()) }
                     }, 800, TimeUnit.MILLISECONDS)
@@ -185,8 +206,11 @@ class SnapshotManager(private val projectRoot: Path) {
     }
 
     private fun installSnapshot(snapshot: Snapshot) {
-        recordSnapshot(snapshot)
-        activeSnapshot.set(snapshot)
+        val withEpoch = snapshot.copy(epoch = snapshotEpoch.incrementAndGet())
+        recordSnapshot(withEpoch)
+        activeSnapshot.set(withEpoch)
+        dirtyFiles.clear()
+        pendingRebuild.set(false)
     }
 
     private fun snapshotById(snapshotId: String): Snapshot =
@@ -200,11 +224,21 @@ class SnapshotManager(private val projectRoot: Path) {
                 .toList()
         }
 
-        val joernSnapshot = detectJoernInstallation()?.let { joern ->
-            runCatching { buildSnapshotWithJoern(javaFiles, joern, elapsedMs(buildStart)) }.getOrNull()
+        val joernInstallation = detectJoernInstallation()
+        val joernSnapshot = joernInstallation?.let { joern ->
+            runCatching { buildSnapshotWithJoern(javaFiles, joern, elapsedMs(buildStart)) }
+                .getOrElse { err ->
+                    if (requireJoern) {
+                        throw IllegalStateException("Joern backend required but failed: ${err.message}", err)
+                    }
+                    null
+                }
         }
         if (joernSnapshot != null) {
             return joernSnapshot
+        }
+        if (requireJoern) {
+            error("Joern backend is required (GRAPHHARNESS_REQUIRE_JOERN=true) but no usable Joern installation was found")
         }
 
         return buildSnapshotLegacy(javaFiles, elapsedMs(buildStart))
@@ -224,7 +258,8 @@ class SnapshotManager(private val projectRoot: Path) {
         val typeEdges = buildTypeEdges(typeInfos, typeByQualifiedName, typesBySimpleName)
         val dependencyEdges = buildDependencyEdges(methodInfos, typeInfos, typesBySimpleName)
         val edges = (callEdges + typeEdges + dependencyEdges).distinct()
-        val clusters = buildClusters(typeInfos, methodInfos, edges, nodeSummaries)
+        val clusters = buildClusters(typeInfos, methodInfos, edges, nodeSummaries, clusterStrategy)
+        val clusterProvenance = clusterProvenanceForStrategy(clusterStrategy)
         val sourceIndex = javaFiles.associateBy { normalize(projectRoot.relativize(it).invariantSeparatorsPathString) }
         val fileHashes = sourceIndex.mapValues { (_, path) -> sha256(readPathText(path)) }
         val generatedAt = Instant.now().toString()
@@ -248,12 +283,14 @@ class SnapshotManager(private val projectRoot: Path) {
             nodeSummaries = nodeSummaries,
             edges = edges,
             clusters = clusters,
-            clusterNodes = buildClusterNodes(clusters, typeInfos, methodInfos),
+            clusterNodes = buildClusterNodes(clusters, typeInfos, methodInfos, clusterStrategy),
             typeInfos = typeInfos,
             methodInfos = methodInfos,
             sourceIndex = sourceIndex,
             fileHashes = fileHashes,
             packageCount = typeInfos.values.map { it.packageName }.filter { it.isNotBlank() }.toSet().size,
+            clusterStrategy = clusterStrategy,
+            clusterProvenance = clusterProvenance,
         )
     }
 
@@ -263,7 +300,8 @@ class SnapshotManager(private val projectRoot: Path) {
         val methodInfos = graph.methods.associateBy { it.id }
         val nodeSummaries = buildNodeSummaries(typeInfos, methodInfos)
         val graphEdges = (graph.callEdges + graph.typeEdges + graph.dependencyEdges).distinct()
-        val clusters = buildClusters(typeInfos, methodInfos, graphEdges, nodeSummaries)
+        val clusters = buildClusters(typeInfos, methodInfos, graphEdges, nodeSummaries, clusterStrategy)
+        val clusterProvenance = clusterProvenanceForStrategy(clusterStrategy)
         val sourceIndex = javaFiles.associateBy { normalize(projectRoot.relativize(it).invariantSeparatorsPathString) }
         val fileHashes = sourceIndex.mapValues { (_, path) -> sha256(readPathText(path)) }
         val generatedAt = Instant.now().toString()
@@ -287,12 +325,14 @@ class SnapshotManager(private val projectRoot: Path) {
             nodeSummaries = nodeSummaries,
             edges = graphEdges,
             clusters = clusters,
-            clusterNodes = buildClusterNodes(clusters, typeInfos, methodInfos),
+            clusterNodes = buildClusterNodes(clusters, typeInfos, methodInfos, clusterStrategy),
             typeInfos = typeInfos,
             methodInfos = methodInfos,
             sourceIndex = sourceIndex,
             fileHashes = fileHashes,
             packageCount = typeInfos.values.map { it.packageName }.filter { it.isNotBlank() }.toSet().size,
+            clusterStrategy = clusterStrategy,
+            clusterProvenance = clusterProvenance,
         )
     }
 
@@ -396,15 +436,15 @@ class SnapshotManager(private val projectRoot: Path) {
         methodInfos: Map<String, MethodInfo>,
         edges: List<EdgeSummary>,
         nodeSummaries: Map<String, NodeSummary>,
+        clusterStrategy: String,
     ): List<ClusterSummary> {
         val groupedNodeIds = mutableMapOf<String, MutableList<String>>()
         typeInfos.values.forEach { type ->
-            val clusterId = clusterIdForPackage(type.packageName)
+            val clusterId = clusterIdForType(type, clusterStrategy)
             groupedNodeIds.getOrPut(clusterId) { mutableListOf() }.add(type.id)
         }
         methodInfos.values.forEach { method ->
-            val pkg = packageNameForMethod(method, typeInfos)
-            val clusterId = clusterIdForPackage(pkg)
+            val clusterId = clusterIdForMethod(method, typeInfos, clusterStrategy)
             groupedNodeIds.getOrPut(clusterId) { mutableListOf() }.add(method.id)
         }
 
@@ -422,11 +462,13 @@ class SnapshotManager(private val projectRoot: Path) {
             ClusterSummary(
                 cluster_id = clusterId,
                 label = clusterId.removePrefix("cluster:"),
-                description = "Package-oriented subsystem rooted at ${clusterId.removePrefix("cluster:")}.",
+                description = clusterDescription(clusterId, clusterStrategy),
                 node_count = ids.size,
                 key_nodes = keyNodes,
                 external_edges = externalEdges.size,
                 bridge_nodes = bridgeNodes,
+                strategy = clusterStrategy,
+                provenance = clusterProvenanceForStrategy(clusterStrategy),
             )
         }
     }
@@ -435,17 +477,62 @@ class SnapshotManager(private val projectRoot: Path) {
         clusters: List<ClusterSummary>,
         typeInfos: Map<String, TypeInfo>,
         methodInfos: Map<String, MethodInfo>,
+        clusterStrategy: String,
     ): Map<String, List<String>> {
         val result = mutableMapOf<String, MutableList<String>>()
         typeInfos.values.forEach { type ->
-            result.getOrPut(clusterIdForPackage(type.packageName)) { mutableListOf() }.add(type.id)
+            result.getOrPut(clusterIdForType(type, clusterStrategy)) { mutableListOf() }.add(type.id)
         }
         methodInfos.values.forEach { method ->
-            val packageName = packageNameForMethod(method, typeInfos)
-            result.getOrPut(clusterIdForPackage(packageName)) { mutableListOf() }.add(method.id)
+            result.getOrPut(clusterIdForMethod(method, typeInfos, clusterStrategy)) { mutableListOf() }.add(method.id)
         }
         return clusters.associate { it.cluster_id to result.getOrDefault(it.cluster_id, mutableListOf()).sorted() }
     }
+
+    private fun clusterIdForType(type: TypeInfo, strategy: String): String =
+        when (strategy) {
+            "package_tail" -> clusterIdForPackageTail(type.packageName)
+            "module" -> clusterIdForModule(type.file)
+            else -> clusterIdForPackage(type.packageName)
+        }
+
+    private fun clusterIdForMethod(method: MethodInfo, typeInfos: Map<String, TypeInfo>, strategy: String): String {
+        val packageName = packageNameForMethod(method, typeInfos)
+        return when (strategy) {
+            "package_tail" -> clusterIdForPackageTail(packageName)
+            "module" -> clusterIdForModule(method.file)
+            else -> clusterIdForPackage(packageName)
+        }
+    }
+
+    private fun clusterIdForPackageTail(packageName: String): String {
+        if (packageName.isBlank()) return "cluster:default"
+        return "cluster:domain:${packageName.substringAfterLast('.')}"
+    }
+
+    private fun clusterIdForModule(file: String): String {
+        val normalized = normalize(file)
+        val segments = normalized.split('/').filter { it.isNotBlank() }
+        if (segments.isEmpty()) return "cluster:module:root"
+        return when {
+            segments.size >= 3 && segments[0] == "src" -> "cluster:module:${segments[0]}/${segments[1]}/${segments[2]}"
+            else -> "cluster:module:${segments.first()}"
+        }
+    }
+
+    private fun clusterProvenanceForStrategy(strategy: String): String =
+        when (strategy) {
+            "package_tail" -> "package_tail_segment"
+            "module" -> "file_path_module_segment"
+            else -> "package_name_prefix"
+        }
+
+    private fun clusterDescription(clusterId: String, strategy: String): String =
+        when (strategy) {
+            "package_tail" -> "Domain-oriented subsystem grouped by package tail: ${clusterId.removePrefix("cluster:domain:")}."
+            "module" -> "Module-oriented subsystem grouped by source path: ${clusterId.removePrefix("cluster:module:")}."
+            else -> "Package-oriented subsystem rooted at ${clusterId.removePrefix("cluster:")}."
+        }
 
     fun summaryMap(snapshot: Snapshot = current()): SummaryMapResult {
         val summaryMode = summaryModeFor(snapshot)
@@ -519,6 +606,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
         )
@@ -587,47 +676,131 @@ class SnapshotManager(private val projectRoot: Path) {
         return "${node.kind}|${node.file}|${node.line_range.start}|$simpleName"
     }
 
-    fun capabilities(snapshot: Snapshot = current()): CapabilitiesResult =
-        CapabilitiesResult(
+    private fun readStrictJoernMode(): Boolean {
+        val raw = System.getenv("GRAPHHARNESS_REQUIRE_JOERN")?.trim()?.lowercase() ?: return false
+        return raw in setOf("1", "true", "yes", "on")
+    }
+
+    private fun readClusterStrategy(): String {
+        val raw = System.getenv("GRAPHHARNESS_CLUSTER_STRATEGY")?.trim()?.lowercase() ?: "package"
+        return when (raw) {
+            "package", "package_tail", "module" -> raw
+            else -> "package"
+        }
+    }
+
+    private fun isApproximateBackend(snapshot: Snapshot): Boolean = snapshot.analysisEngine != "joern"
+
+    private fun semanticLevelFor(snapshot: Snapshot): String = if (isApproximateBackend(snapshot)) "approximate" else "stable"
+
+    private fun snapshotRuntimeState(snapshot: Snapshot = current()): SnapshotRuntimeState {
+        val graphAgeMs = runCatching {
+            Duration.between(Instant.parse(snapshot.generatedAt), Instant.now()).toMillis().coerceAtLeast(0)
+        }.getOrDefault(0)
+        val dirty = dirtyFiles.toList().sorted()
+        val dirtyNodeEstimate = if (dirty.isEmpty()) 0 else snapshot.nodeSummaries.values.count { it.file in dirty }
+        return SnapshotRuntimeState(
+            snapshot_epoch = snapshot.epoch,
+            graph_age_ms = graphAgeMs,
+            pending_rebuild = pendingRebuild.get(),
+            dirty_files = dirty,
+            dirty_node_estimate = dirtyNodeEstimate,
+        )
+    }
+
+    private fun requireDeterministicTool(toolName: String, snapshot: Snapshot) {
+        if (!isApproximateBackend(snapshot)) return
+        if (toolName in setOf("get_call_paths", "get_implementations", "get_impact")) {
+            error("Tool $toolName is disabled for heuristic backend; run with Joern or enable GRAPHHARNESS_REQUIRE_JOERN=true")
+        }
+    }
+
+    fun capabilities(snapshot: Snapshot = current()): CapabilitiesResult {
+        val isApproximate = isApproximateBackend(snapshot)
+        val disabledTools = if (isApproximate) listOf("get_call_paths", "get_implementations", "get_impact") else emptyList()
+        val available = listOf(
+            "get_capabilities",
+            "build_context_bundle",
+            "get_snapshot_delta",
+            "get_summary_map",
+            "get_cluster_detail",
+            "search_graph",
+            "get_node_detail",
+            "get_call_paths",
+            "get_callers",
+            "get_callees",
+            "get_implementations",
+            "get_type_hierarchy",
+            "get_dependencies",
+            "get_impact",
+            "get_source",
+            "get_source_batch",
+            "get_edit_candidates",
+            "resolve_edit_target",
+            "verify_candidate",
+            "plan_edit",
+            "rebase_edit_plan",
+            "apply_edit",
+            "validate_edit",
+            "get_validation_targets",
+            "get_agent_fitness",
+            "get_cluster_fitness",
+        ).filterNot { it in disabledTools }
+        val guarantees = buildMap<String, String> {
+            put("get_summary_map", "stable")
+            put("search_graph", "stable")
+            put("get_source", "stable")
+            put("get_source_batch", "stable")
+            put("plan_edit", "best_effort")
+            put("rebase_edit_plan", "best_effort")
+            put("apply_edit", "best_effort")
+            put("validate_edit", "best_effort")
+            put("get_snapshot_delta", "best_effort")
+            put("get_dependencies", if (isApproximate) "approximate" else "best_effort")
+            put("get_type_hierarchy", if (isApproximate) "approximate" else "best_effort")
+            put("get_node_detail", if (isApproximate) "approximate" else "best_effort")
+            put("get_callers", if (isApproximate) "approximate" else "best_effort")
+            put("get_callees", if (isApproximate) "approximate" else "best_effort")
+            put("get_impact", if (isApproximate) "disabled" else "best_effort")
+            put("get_call_paths", if (isApproximate) "disabled" else "best_effort")
+            put("get_implementations", if (isApproximate) "disabled" else "best_effort")
+        }
+        return CapabilitiesResult(
             languages = listOf("java"),
             analysis_engine = snapshot.analysisEngine,
+            backend_mode = if (isApproximate) "heuristic" else "joern",
+            semantic_level = semanticLevelFor(snapshot),
             engine_version = snapshot.engineVersion,
-            available_tools = listOf(
-                "get_capabilities",
-                "build_context_bundle",
-                "get_snapshot_delta",
-                "get_summary_map",
-                "get_cluster_detail",
-                "search_graph",
-                "get_node_detail",
-                "get_call_paths",
-                "get_callers",
-                "get_callees",
-                "get_implementations",
-                "get_type_hierarchy",
-                "get_dependencies",
-                "get_impact",
-                "get_source",
-                "get_source_batch",
-                "get_edit_candidates",
-                "resolve_edit_target",
-                "verify_candidate",
-                "plan_edit",
-                "apply_edit",
-                "validate_edit",
-                "get_validation_targets",
-                "get_agent_fitness",
-                "get_cluster_fitness",
-            ),
+            available_tools = available,
+            disabled_tools = disabledTools,
             edit_operations = listOf("modify_method_body", "rename_node"),
             validation_modes = listOf("auto", "compile", "test"),
             confidence_semantics = listOf(
-                "analysis_confidence fields are heuristic 0-1 scores rather than formal guarantees",
-                "candidate and validation target confidence values indicate ranking confidence for orchestration",
-                "degraded validation means repo-aware validation failed or was blocked and a fallback path was attempted",
+                "analysis_confidence values are bounded scores for orchestration and never formal proof",
+                "confidence below 0.65 should be treated as ambiguous and require disambiguation",
+                "degraded validation means repo-aware validation failed or was blocked and fallback paths were attempted",
             ),
-            degraded_mode_flags = listOf("degraded", "attempted_validators", "summary_mode"),
-            snapshot_semantics = "Node ids are snapshot-scoped and responses carry snapshot_id; get_snapshot_delta compares retained snapshots and rebinding is heuristic rather than guaranteed.",
+            tool_guarantees = guarantees,
+            stability_guarantees = listOf(
+                "snapshot_id and snapshot_epoch are stable for each installed snapshot",
+                "node ids are stable only within the same snapshot epoch",
+                "rebase_edit_plan can re-plan stale edits when snapshot changes",
+            ),
+            best_effort_guarantees = listOf(
+                "snapshot deltas perform heuristic node rebinding when identifiers shift",
+                "call/dependency edges may be incomplete for dynamic runtime behavior",
+                "validation targeting is heuristic unless explicit tests are provided",
+            ),
+            degraded_mode_flags = listOf("degraded", "attempted_validators", "summary_mode", "pending_rebuild"),
+            failure_semantics = listOf(
+                "stale_snapshot: planned edit snapshot no longer matches active snapshot",
+                "approximate_backend: backend is heuristic, high-trust tools may be disabled",
+                "validation_degraded: validation required fallback path",
+                "unsupported_query: tool or operation unavailable in current backend mode",
+            ),
+            snapshot_semantics = "Node ids are snapshot-scoped. Responses include snapshot_id and snapshot_state. get_snapshot_delta compares retained snapshots and rebinding is heuristic.",
+            clustering_semantics = "Clusters are strategy-driven and include provenance; strategy can be package, package_tail, or module.",
+            cluster_strategy = snapshot.clusterStrategy,
             analysis_engine_capabilities = listOf(
                 "joern-backed java analysis",
                 "snapshot-based traversal",
@@ -637,9 +810,11 @@ class SnapshotManager(private val projectRoot: Path) {
             ),
             build_context_bundle_supported = true,
             analysis_engine_first_backend = snapshot.analysisEngine == "joern",
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
         )
+    }
 
     fun snapshotDelta(oldSnapshotId: String, newSnapshotId: String): SnapshotDeltaResult {
         val oldSnapshot = snapshotById(oldSnapshotId)
@@ -710,6 +885,9 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = newSnapshot.analysisEngine,
             engine_version = newSnapshot.engineVersion,
             build_duration_ms = newSnapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(newSnapshot),
+            rebinding_mode = "heuristic",
+            snapshot_state = snapshotRuntimeState(newSnapshot),
             snapshot_id = newSnapshot.id,
             generated_at = newSnapshot.generatedAt,
         )
@@ -755,10 +933,14 @@ class SnapshotManager(private val projectRoot: Path) {
                 .filter { it.from in focusIds && it.to in focusIds }
                 .filter { it.relationship in setOf("calls", "implements", "extends", "uses_type") }
                 .take(12)
-            val impact = impact(chosenNode.id, 2, snapshot)
-            impactFiles += impact.affected_files.take(6)
+            val impact = runCatching { impact(chosenNode.id, 2, snapshot) }.getOrNull()
+            impactFiles += impact?.affected_files.orEmpty().take(6)
             notes += "chosen_node=${chosenNode.name}"
-            notes += "impact_basis=${impact.analysis_basis.joinToString(",")}"
+            if (impact != null) {
+                notes += "impact_basis=${impact.analysis_basis.joinToString(",")}"
+            } else {
+                notes += "impact_basis=unavailable_for_backend"
+            }
         } else {
             notes += "no_node_resolved"
         }
@@ -810,6 +992,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
         )
@@ -871,8 +1055,8 @@ class SnapshotManager(private val projectRoot: Path) {
         val resolvedNodeId = nodeId ?: pending?.targetNodeId
         require(!resolvedNodeId.isNullOrBlank()) { "Unable to resolve validation target node" }
         val targetNode = snapshot.nodeSummaries[resolvedNodeId]
-        val impact = impact(resolvedNodeId!!, 2, snapshot)
-        val affectedFiles = listOfNotNull(targetNode?.file) + (pending?.affectedFiles ?: emptyList()) + impact.affected_files
+        val impact = runCatching { impact(resolvedNodeId!!, 2, snapshot) }.getOrNull()
+        val affectedFiles = listOfNotNull(targetNode?.file) + (pending?.affectedFiles ?: emptyList()) + impact?.affected_files.orEmpty()
         val distinctFiles = affectedFiles.distinct()
         val buildRoots = groupedBuildRoots(distinctFiles)
         val relatedTests = inferRelatedTests(resolvedNodeId, distinctFiles, snapshot)
@@ -908,6 +1092,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
         )
@@ -1095,6 +1281,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
         )
@@ -1115,7 +1303,16 @@ class SnapshotManager(private val projectRoot: Path) {
             val annotationMatch = annotation == null || node.annotations.any { it.contains(annotation, ignoreCase = true) }
             clusterMatch && queryMatch && kindMatch && annotationMatch
         }.sortedBy { it.name }
-        return SearchResult(results, snapshot.analysisEngine, snapshot.engineVersion, snapshot.buildDurationMs, snapshot.id, snapshot.generatedAt)
+        return SearchResult(
+            results = results,
+            analysis_engine = snapshot.analysisEngine,
+            engine_version = snapshot.engineVersion,
+            build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
+            snapshot_id = snapshot.id,
+            generated_at = snapshot.generatedAt,
+        )
     }
 
     fun editCandidates(task: String, limit: Int, snapshot: Snapshot = current()): EditCandidatesResult {
@@ -1212,6 +1409,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
         )
@@ -1267,6 +1466,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
         )
@@ -1285,6 +1486,8 @@ class SnapshotManager(private val projectRoot: Path) {
                 analysis_engine = snapshot.analysisEngine,
                 engine_version = snapshot.engineVersion,
                 build_duration_ms = snapshot.buildDurationMs,
+                semantic_level = semanticLevelFor(snapshot),
+                snapshot_state = snapshotRuntimeState(snapshot),
                 snapshot_id = snapshot.id,
                 generated_at = snapshot.generatedAt,
             )
@@ -1332,6 +1535,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
         )
@@ -1410,6 +1615,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
             analysis_confidence = 0.68,
@@ -1424,6 +1631,7 @@ class SnapshotManager(private val projectRoot: Path) {
         targetNodeId: String? = null,
         snapshot: Snapshot = current(),
     ): CallPathsResult {
+        requireDeterministicTool("get_call_paths", snapshot)
         val start = System.nanoTime()
         require(nodeId in snapshot.nodeSummaries) { "Unknown node_id: $nodeId" }
         if (targetNodeId != null) {
@@ -1492,6 +1700,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
             analysis_confidence = 0.64,
@@ -1547,6 +1757,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
             analysis_confidence = 0.62,
@@ -1556,6 +1768,7 @@ class SnapshotManager(private val projectRoot: Path) {
     }
 
     fun implementations(nodeId: String, snapshot: Snapshot = current()): TraversalResult {
+        requireDeterministicTool("get_implementations", snapshot)
         val start = System.nanoTime()
         require(nodeId in snapshot.nodeSummaries) { "Unknown node_id: $nodeId" }
         val results = resolvedImplementationMatches(nodeId, snapshot).map {
@@ -1566,6 +1779,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
             analysis_confidence = 0.72,
@@ -1592,6 +1807,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
             analysis_confidence = 0.7,
@@ -1618,6 +1835,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
             analysis_confidence = 0.66,
@@ -1627,6 +1846,7 @@ class SnapshotManager(private val projectRoot: Path) {
     }
 
     fun impact(nodeId: String, maxDepth: Int, snapshot: Snapshot = current()): ImpactResult {
+        requireDeterministicTool("get_impact", snapshot)
         val start = System.nanoTime()
         val depth = maxDepth.coerceIn(1, 6)
         val visited = mutableSetOf<String>()
@@ -1665,6 +1885,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
             latency_ms = elapsedMs(start),
@@ -1685,6 +1907,8 @@ class SnapshotManager(private val projectRoot: Path) {
             analysis_engine = snapshot.analysisEngine,
             engine_version = snapshot.engineVersion,
             build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
         )
@@ -1695,7 +1919,16 @@ class SnapshotManager(private val projectRoot: Path) {
             val item = source(nodeId, 0, snapshot)
             SourceBatchItem(nodeId, item.source, item.file, item.line_range)
         }
-        return SourceBatchResult(items, snapshot.analysisEngine, snapshot.engineVersion, snapshot.buildDurationMs, snapshot.id, snapshot.generatedAt)
+        return SourceBatchResult(
+            sources = items,
+            analysis_engine = snapshot.analysisEngine,
+            engine_version = snapshot.engineVersion,
+            build_duration_ms = snapshot.buildDurationMs,
+            semantic_level = semanticLevelFor(snapshot),
+            snapshot_state = snapshotRuntimeState(snapshot),
+            snapshot_id = snapshot.id,
+            generated_at = snapshot.generatedAt,
+        )
     }
 
     fun planEdit(
@@ -1703,19 +1936,21 @@ class SnapshotManager(private val projectRoot: Path) {
         targetNodeId: String,
         payload: EditRequestPayload,
         snapshot: Snapshot = current(),
+        rebasedFromEditId: String? = null,
     ): EditPlanResult {
         val validationErrors = mutableListOf<String>()
         if (operation !in setOf("modify_method_body", "rename_node")) {
             validationErrors += "Unsupported operation: $operation"
         }
         return when (operation) {
-            "modify_method_body" -> planModifyMethodBody(targetNodeId, payload, snapshot, validationErrors)
-            "rename_node" -> planRenameNode(targetNodeId, payload, snapshot, validationErrors)
+            "modify_method_body" -> planModifyMethodBody(targetNodeId, payload, snapshot, validationErrors, rebasedFromEditId)
+            "rename_node" -> planRenameNode(targetNodeId, payload, snapshot, validationErrors, rebasedFromEditId)
             else -> {
                 validationErrors += "Unsupported operation: $operation"
                 EditPlanResult(
                     operation = operation,
                     target_node_id = targetNodeId,
+                    rebased_from_edit_id = rebasedFromEditId,
                     diff = "",
                     affected_nodes = emptyList(),
                     affected_files = emptyList(),
@@ -1730,11 +1965,53 @@ class SnapshotManager(private val projectRoot: Path) {
         }
     }
 
+    fun rebaseEditPlan(editId: String, snapshot: Snapshot = current()): EditPlanResult {
+        val pending = pendingEdits[editId]
+            ?: return EditPlanResult(
+                operation = "unknown",
+                target_node_id = "unknown",
+                rebased_from_edit_id = editId,
+                diff = "",
+                affected_nodes = emptyList(),
+                affected_files = emptyList(),
+                validation_errors = listOf("Unknown edit_id: $editId"),
+                analysis_engine = snapshot.analysisEngine,
+                engine_version = snapshot.engineVersion,
+                build_duration_ms = snapshot.buildDurationMs,
+                snapshot_id = snapshot.id,
+                generated_at = snapshot.generatedAt,
+            )
+        if (pending.applied) {
+            return EditPlanResult(
+                operation = pending.operation,
+                target_node_id = pending.targetNodeId,
+                rebased_from_edit_id = editId,
+                diff = "",
+                affected_nodes = pending.affectedNodeIds,
+                affected_files = pending.affectedFiles,
+                validation_errors = listOf("Cannot rebase an already applied edit: $editId"),
+                analysis_engine = snapshot.analysisEngine,
+                engine_version = snapshot.engineVersion,
+                build_duration_ms = snapshot.buildDurationMs,
+                snapshot_id = snapshot.id,
+                generated_at = snapshot.generatedAt,
+            )
+        }
+        return planEdit(
+            operation = pending.operation,
+            targetNodeId = pending.targetNodeId,
+            payload = pending.payload,
+            snapshot = snapshot,
+            rebasedFromEditId = editId,
+        )
+    }
+
     private fun planModifyMethodBody(
         targetNodeId: String,
         payload: EditRequestPayload,
         snapshot: Snapshot,
         validationErrors: MutableList<String>,
+        rebasedFromEditId: String?,
     ): EditPlanResult {
         val method = snapshot.methodInfos[targetNodeId]
         if (method == null) {
@@ -1754,6 +2031,7 @@ class SnapshotManager(private val projectRoot: Path) {
             return EditPlanResult(
                 operation = "modify_method_body",
                 target_node_id = targetNodeId,
+                rebased_from_edit_id = rebasedFromEditId,
                 diff = "",
                 affected_nodes = emptyList(),
                 affected_files = emptyList(),
@@ -1774,6 +2052,7 @@ class SnapshotManager(private val projectRoot: Path) {
             return EditPlanResult(
                 operation = "modify_method_body",
                 target_node_id = targetNodeId,
+                rebased_from_edit_id = rebasedFromEditId,
                 diff = "",
                 affected_nodes = emptyList(),
                 affected_files = listOf(targetMethod.file),
@@ -1791,6 +2070,7 @@ class SnapshotManager(private val projectRoot: Path) {
             return EditPlanResult(
                 operation = "modify_method_body",
                 target_node_id = targetNodeId,
+                rebased_from_edit_id = rebasedFromEditId,
                 diff = "",
                 affected_nodes = emptyList(),
                 affected_files = listOf(targetMethod.file),
@@ -1817,9 +2097,9 @@ class SnapshotManager(private val projectRoot: Path) {
                 mode = patchMode,
             )
         }
-        val impact = impact(targetNodeId, 2, snapshot)
-        val affectedNodeIds = (listOf(targetNodeId) + impact.affected_nodes.map { it.id }).distinct()
-        val affectedFiles = (listOf(targetMethod.file) + impact.affected_files).distinct()
+        val impact = runCatching { impact(targetNodeId, 2, snapshot) }.getOrNull()
+        val affectedNodeIds = (listOf(targetNodeId) + impact?.affected_nodes.orEmpty().map { it.id }).distinct()
+        val affectedFiles = (listOf(targetMethod.file) + impact?.affected_files.orEmpty()).distinct()
         val editId = makeEditId()
 
         pendingEdits[editId] = PendingEdit(
@@ -1827,6 +2107,7 @@ class SnapshotManager(private val projectRoot: Path) {
             operation = "modify_method_body",
             targetNodeId = targetNodeId,
             snapshotId = snapshot.id,
+            payload = payload,
             fileEdits = listOf(
                 PendingFileEdit(
                     file = targetMethod.file,
@@ -1842,6 +2123,7 @@ class SnapshotManager(private val projectRoot: Path) {
             edit_id = editId,
             operation = "modify_method_body",
             target_node_id = targetNodeId,
+            rebased_from_edit_id = rebasedFromEditId,
             diff = diff,
             affected_nodes = affectedNodeIds,
             affected_files = affectedFiles,
@@ -1859,6 +2141,7 @@ class SnapshotManager(private val projectRoot: Path) {
         payload: EditRequestPayload,
         snapshot: Snapshot,
         validationErrors: MutableList<String>,
+        rebasedFromEditId: String?,
     ): EditPlanResult {
         val method = snapshot.methodInfos[targetNodeId]
         if (method == null) {
@@ -1875,6 +2158,7 @@ class SnapshotManager(private val projectRoot: Path) {
             return EditPlanResult(
                 operation = "rename_node",
                 target_node_id = targetNodeId,
+                rebased_from_edit_id = rebasedFromEditId,
                 diff = "",
                 affected_nodes = emptyList(),
                 affected_files = emptyList(),
@@ -1908,6 +2192,7 @@ class SnapshotManager(private val projectRoot: Path) {
             return EditPlanResult(
                 operation = "rename_node",
                 target_node_id = targetNodeId,
+                rebased_from_edit_id = rebasedFromEditId,
                 diff = "",
                 affected_nodes = emptyList(),
                 affected_files = emptyList(),
@@ -1920,15 +2205,16 @@ class SnapshotManager(private val projectRoot: Path) {
             )
         }
 
-        val impact = impact(targetNodeId, 2, snapshot)
+        val impact = runCatching { impact(targetNodeId, 2, snapshot) }.getOrNull()
         val editId = makeEditId()
-        val affectedFiles = (fileEdits.map { it.file } + impact.affected_files).distinct()
-        val affectedNodes = (listOf(targetNodeId) + impact.affected_nodes.map { it.id }).distinct()
+        val affectedFiles = (fileEdits.map { it.file } + impact?.affected_files.orEmpty()).distinct()
+        val affectedNodes = (listOf(targetNodeId) + impact?.affected_nodes.orEmpty().map { it.id }).distinct()
         pendingEdits[editId] = PendingEdit(
             id = editId,
             operation = "rename_node",
             targetNodeId = targetNodeId,
             snapshotId = snapshot.id,
+            payload = payload.copy(new_name = newName),
             fileEdits = fileEdits,
             affectedNodeIds = affectedNodes,
             affectedFiles = affectedFiles,
@@ -1938,6 +2224,7 @@ class SnapshotManager(private val projectRoot: Path) {
             edit_id = editId,
             operation = "rename_node",
             target_node_id = targetNodeId,
+            rebased_from_edit_id = rebasedFromEditId,
             diff = diffParts.joinToString("\n"),
             affected_nodes = affectedNodes,
             affected_files = affectedFiles,
@@ -1969,9 +2256,25 @@ class SnapshotManager(private val projectRoot: Path) {
             return EditApplyResult(
                 success = false,
                 edit_id = editId,
+                rebased_suggestion = null,
                 updated_nodes = pending.affectedNodeIds.filter { it in snapshot.nodeSummaries },
                 affected_files = pending.affectedFiles,
                 validation_errors = listOf("Edit already applied: $editId"),
+                analysis_engine = snapshot.analysisEngine,
+                engine_version = snapshot.engineVersion,
+                build_duration_ms = snapshot.buildDurationMs,
+                snapshot_id = snapshot.id,
+                generated_at = snapshot.generatedAt,
+            )
+        }
+        if (pending.snapshotId != snapshot.id) {
+            return EditApplyResult(
+                success = false,
+                edit_id = editId,
+                rebased_suggestion = "Call rebase_edit_plan for edit_id=$editId before apply_edit",
+                updated_nodes = emptyList(),
+                affected_files = pending.affectedFiles,
+                validation_errors = listOf("stale_snapshot: plan was created on snapshot ${pending.snapshotId}, active snapshot is ${snapshot.id}"),
                 analysis_engine = snapshot.analysisEngine,
                 engine_version = snapshot.engineVersion,
                 build_duration_ms = snapshot.buildDurationMs,
@@ -1987,9 +2290,10 @@ class SnapshotManager(private val projectRoot: Path) {
                 return EditApplyResult(
                     success = false,
                     edit_id = editId,
+                    rebased_suggestion = "Call rebase_edit_plan for edit_id=$editId before apply_edit",
                     updated_nodes = emptyList(),
                     affected_files = pending.affectedFiles,
-                    validation_errors = listOf("Source file changed since plan_edit; regenerate the edit plan"),
+                    validation_errors = listOf("stale_snapshot: source file changed since plan_edit"),
                     analysis_engine = snapshot.analysisEngine,
                     engine_version = snapshot.engineVersion,
                     build_duration_ms = snapshot.buildDurationMs,

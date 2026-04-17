@@ -9,6 +9,7 @@ data class EditPlanResult(
     val edit_id: String? = null,
     val operation: String,
     val target_node_id: String,
+    val rebased_from_edit_id: String? = null,
     val diff: String,
     val affected_nodes: List<String>,
     val affected_files: List<String>,
@@ -23,6 +24,7 @@ data class EditPlanResult(
 data class EditApplyResult(
     val success: Boolean,
     val edit_id: String,
+    val rebased_suggestion: String? = null,
     val updated_nodes: List<String>,
     val affected_files: List<String>,
     val validation_errors: List<String>,
@@ -60,6 +62,7 @@ data class PendingEdit(
     val operation: String,
     val targetNodeId: String,
     val snapshotId: String,
+    val payload: EditRequestPayload,
     val fileEdits: List<PendingFileEdit>,
     val affectedNodeIds: List<String>,
     val affectedFiles: List<String>,
@@ -230,8 +233,10 @@ fun patchMethodBody(existingSource: String, bodyRange: IntRange, payload: EditRe
 
 fun applyBodyPatch(currentBody: String, anchor: String, snippet: String, mode: String): String {
     val lines = currentBody.lines().toMutableList()
-    val anchorIndex = lines.indexOfFirst { it.contains(anchor) }
-    require(anchorIndex >= 0) { "Anchor not found in method body: $anchor" }
+    val anchorMatches = lines.withIndex().filter { it.value.contains(anchor) }.map { it.index }
+    require(anchorMatches.isNotEmpty()) { "Anchor not found in method body: $anchor" }
+    require(anchorMatches.size == 1) { "Anchor is ambiguous in method body (${"%d".format(anchorMatches.size)} matches): $anchor" }
+    val anchorIndex = anchorMatches.first()
     val snippetLines = snippet.lines()
     when (mode) {
         "insert_before" -> lines.addAll(anchorIndex, snippetLines)
@@ -292,8 +297,10 @@ fun buildAnchorPatchDiff(
     mode: String,
 ): String {
     val lines = methodSource.lines()
-    val anchorIndex = lines.indexOfFirst { it.contains(anchor) }
-    require(anchorIndex >= 0) { "Anchor not found in method source: $anchor" }
+    val anchorMatches = lines.withIndex().filter { it.value.contains(anchor) }.map { it.index }
+    require(anchorMatches.isNotEmpty()) { "Anchor not found in method source: $anchor" }
+    require(anchorMatches.size == 1) { "Anchor is ambiguous in method source (${"%d".format(anchorMatches.size)} matches): $anchor" }
+    val anchorIndex = anchorMatches.first()
     val contextStart = (anchorIndex - 1).coerceAtLeast(0)
     val contextEnd = (anchorIndex + 1).coerceAtMost(lines.lastIndex)
     val oldHunk = lines.subList(contextStart, contextEnd + 1)
