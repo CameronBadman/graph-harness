@@ -126,6 +126,7 @@ class SnapshotManager(private val projectRoot: Path) {
     private val requireJoern = readStrictJoernMode()
     private val clusterStrategy = readClusterStrategy()
     private val incrementalFileThreshold = 40
+    private val propagatedDirtyFileCap = 250
     private val rebuildExecutor = Executors.newSingleThreadScheduledExecutor { runnable ->
         Thread(runnable).apply {
             isDaemon = true
@@ -219,8 +220,12 @@ class SnapshotManager(private val projectRoot: Path) {
         snapshotHistory[snapshotId] ?: error("Unknown snapshot_id: $snapshotId")
 
     private fun rebuildFromDirty() {
+        val active = activeSnapshot.get()
         val changed = dirtyFiles.toSet()
-        val snapshot = runCatching { buildSnapshot(changed) }
+        val propagated = if (active != null) propagateDirtyFiles(active, changed) else changed
+        dirtyFiles.clear()
+        dirtyFiles.addAll(propagated)
+        val snapshot = runCatching { buildSnapshot(propagated) }
             .recoverCatching { buildSnapshot(emptySet()) }
             .getOrElse {
                 pendingRebuild.set(false)
@@ -889,6 +894,55 @@ class SnapshotManager(private val projectRoot: Path) {
             recompute_mode = snapshot.recomputeMode,
             incremental_supported = snapshot.analysisEngine == "fallback-parser",
         )
+    }
+
+    private fun propagateDirtyFiles(snapshot: Snapshot, changedFiles: Set<String>): Set<String> {
+        if (changedFiles.isEmpty()) return emptySet()
+        val normalizedChanged = changedFiles.map(::normalize).toMutableSet()
+        val seedNodes = snapshot.nodeSummaries.values
+            .filter { it.file in normalizedChanged }
+            .map { it.id }
+            .toMutableSet()
+        if (seedNodes.isEmpty()) return normalizedChanged
+
+        val expandedNodes = seedNodes.toMutableSet()
+
+        // Direct dependency expansion.
+        snapshot.edges.forEach { edge ->
+            if (edge.from in seedNodes) expandedNodes += edge.to
+            if (edge.to in seedNodes) expandedNodes += edge.from
+        }
+
+        // One-hop transitive expansion to catch boundary-crossing callers/callees.
+        val frontier = (expandedNodes - seedNodes).toMutableSet()
+        frontier.forEach { nodeId ->
+            snapshot.edges.forEach { edge ->
+                if (edge.from == nodeId) expandedNodes += edge.to
+                if (edge.to == nodeId) expandedNodes += edge.from
+            }
+        }
+
+        // Cluster-level refresh for any cluster touched by expanded nodes.
+        val touchedClusters = snapshot.clusterNodes.entries
+            .filter { (_, nodeIds) -> nodeIds.any { it in expandedNodes } }
+            .map { it.key }
+            .toSet()
+        touchedClusters.forEach { clusterId ->
+            snapshot.clusterNodes[clusterId].orEmpty().forEach { expandedNodes += it }
+        }
+
+        val expandedFiles = expandedNodes
+            .mapNotNull { snapshot.nodeSummaries[it]?.file }
+            .map(::normalize)
+            .toMutableSet()
+        expandedFiles += normalizedChanged
+
+        return if (expandedFiles.size <= propagatedDirtyFileCap) {
+            expandedFiles
+        } else {
+            // Cap to avoid turning every small edit into full invalidation storms.
+            expandedFiles.sorted().take(propagatedDirtyFileCap).toSet()
+        }
     }
 
     private fun requireDeterministicTool(toolName: String, snapshot: Snapshot) {
