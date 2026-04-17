@@ -273,8 +273,9 @@ class SnapshotManager(private val projectRoot: Path) {
 
     private fun buildSnapshotLegacy(javaFiles: List<Path>, buildDurationMs: Long): Snapshot {
         val parsedFiles = javaFiles.map { path -> path to parseJavaFile(path, projectRoot) }.toMap()
-        val typeInfos = parsedFiles.values.flatMap { it.types }.associateBy { it.id }
-        val methodInfos = parsedFiles.values.flatMap { it.methods }.associateBy { it.id }
+        val rawTypeInfos = parsedFiles.values.flatMap { it.types }.associateBy { it.id }
+        val rawMethodInfos = parsedFiles.values.flatMap { it.methods }.associateBy { it.id }
+        val (typeInfos, methodInfos) = stabilizeNodeIds(activeSnapshot.get(), rawTypeInfos, rawMethodInfos)
 
         val typesBySimpleName = typeInfos.values.groupBy { it.simpleName }
         val methodsBySimpleName = methodInfos.values.groupBy { it.simpleName }
@@ -327,15 +328,15 @@ class SnapshotManager(private val projectRoot: Path) {
         changedFiles: Set<String>,
         buildDurationMs: Long,
     ): Snapshot {
-        val typeInfos = previous.typeInfos.toMutableMap()
-        val methodInfos = previous.methodInfos.toMutableMap()
+        val rawTypeInfos = previous.typeInfos.toMutableMap()
+        val rawMethodInfos = previous.methodInfos.toMutableMap()
         val sourceIndex = previous.sourceIndex.toMutableMap()
         val fileHashes = previous.fileHashes.toMutableMap()
 
         changedFiles.forEach { relative ->
             val absPath = projectRoot.resolve(relative).normalize()
-            typeInfos.entries.removeIf { it.value.file == relative }
-            methodInfos.entries.removeIf { it.value.file == relative }
+            rawTypeInfos.entries.removeIf { it.value.file == relative }
+            rawMethodInfos.entries.removeIf { it.value.file == relative }
 
             if (!Files.exists(absPath) || !Files.isRegularFile(absPath) || absPath.extension != "java") {
                 sourceIndex.remove(relative)
@@ -344,11 +345,13 @@ class SnapshotManager(private val projectRoot: Path) {
             }
 
             val parsed = parseJavaFile(absPath, projectRoot)
-            parsed.types.forEach { typeInfos[it.id] = it }
-            parsed.methods.forEach { methodInfos[it.id] = it }
+            parsed.types.forEach { rawTypeInfos[it.id] = it }
+            parsed.methods.forEach { rawMethodInfos[it.id] = it }
             sourceIndex[relative] = absPath
             fileHashes[relative] = sha256(readPathText(absPath))
         }
+
+        val (typeInfos, methodInfos) = stabilizeNodeIds(previous, rawTypeInfos, rawMethodInfos)
 
         val typesBySimpleName = typeInfos.values.groupBy { it.simpleName }
         val methodsBySimpleName = methodInfos.values.groupBy { it.simpleName }
@@ -395,8 +398,9 @@ class SnapshotManager(private val projectRoot: Path) {
 
     private fun buildSnapshotWithJoern(javaFiles: List<Path>, joern: JoernInstallation, buildDurationMs: Long): Snapshot {
         val graph = joern.exportGraph(projectRoot)
-        val typeInfos = graph.types.associateBy { it.id }
-        val methodInfos = graph.methods.associateBy { it.id }
+        val rawTypeInfos = graph.types.associateBy { it.id }
+        val rawMethodInfos = graph.methods.associateBy { it.id }
+        val (typeInfos, methodInfos) = stabilizeNodeIds(activeSnapshot.get(), rawTypeInfos, rawMethodInfos)
         val nodeSummaries = buildNodeSummaries(typeInfos, methodInfos)
         val graphEdges = (graph.callEdges + graph.typeEdges + graph.dependencyEdges).distinct()
         val clusters = buildClusters(typeInfos, methodInfos, graphEdges, nodeSummaries, clusterStrategy)
@@ -468,6 +472,83 @@ class SnapshotManager(private val projectRoot: Path) {
         }
         return result
     }
+
+    private fun stabilizeNodeIds(
+        previous: Snapshot?,
+        typeInfos: Map<String, TypeInfo>,
+        methodInfos: Map<String, MethodInfo>,
+    ): Pair<Map<String, TypeInfo>, Map<String, MethodInfo>> {
+        if (previous == null) return typeInfos to methodInfos
+
+        val previousTypeBySignature = previous.typeInfos.values.associateUniqueBy(::typeSignatureKey)
+        val previousTypeByHash = previous.typeInfos.values.associateUniqueBy(::typeHashKey)
+        val previousMethodBySignature = previous.methodInfos.values.associateUniqueBy(::methodSignatureKey)
+        val previousMethodByHash = previous.methodInfos.values.associateUniqueBy(::methodHashKey)
+
+        val remappedTypes = linkedMapOf<String, TypeInfo>()
+        val typeIdRemap = mutableMapOf<String, String>()
+        typeInfos.values.sortedBy { it.qualifiedName }.forEach { type ->
+            val signatureMatch = previousTypeBySignature[typeSignatureKey(type)]?.id
+            val hashMatch = previousTypeByHash[typeHashKey(type)]?.id
+            val chosenId = when {
+                signatureMatch != null && signatureMatch !in remappedTypes -> signatureMatch
+                hashMatch != null && hashMatch !in remappedTypes -> hashMatch
+                else -> type.id
+            }
+            typeIdRemap[type.id] = chosenId
+            remappedTypes[chosenId] = type.copy(id = chosenId)
+        }
+
+        val remappedMethods = linkedMapOf<String, MethodInfo>()
+        methodInfos.values.sortedBy { it.qualifiedName + "|" + it.signature }.forEach { method ->
+            val remappedParentTypeId = typeIdRemap[method.parentTypeId] ?: method.parentTypeId
+            val normalized = method.copy(parentTypeId = remappedParentTypeId)
+            val signatureMatch = previousMethodBySignature[methodSignatureKey(normalized)]?.id
+            val hashMatch = previousMethodByHash[methodHashKey(normalized)]?.id
+            val chosenId = when {
+                signatureMatch != null && signatureMatch !in remappedMethods -> signatureMatch
+                hashMatch != null && hashMatch !in remappedMethods -> hashMatch
+                else -> method.id
+            }
+            remappedMethods[chosenId] = normalized.copy(id = chosenId)
+        }
+
+        return remappedTypes to remappedMethods
+    }
+
+    private fun typeSignatureKey(type: TypeInfo): String =
+        "${type.kind}|${type.qualifiedName}"
+
+    private fun typeHashKey(type: TypeInfo): String =
+        sha256(
+            listOf(
+                type.kind,
+                type.simpleName,
+                type.packageName,
+                type.visibility,
+                type.extendsType.orEmpty(),
+                type.implementsTypes.joinToString(","),
+                normalize(type.file),
+            ).joinToString("|"),
+        )
+
+    private fun methodSignatureKey(method: MethodInfo): String =
+        "${method.parentQualifiedName}.${method.simpleName}|${signatureOf(method.parameterTypes, method.returnType)}"
+
+    private fun methodHashKey(method: MethodInfo): String =
+        sha256(
+            listOf(
+                method.simpleName,
+                signatureOf(method.parameterTypes, method.returnType),
+                normalizeMethodBodyFingerprint(method.body),
+            ).joinToString("|"),
+        )
+
+    private fun normalizeMethodBodyFingerprint(body: String): String =
+        body.lineSequence()
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .joinToString(" ")
 
     private fun buildCallEdges(
         methodInfos: Map<String, MethodInfo>,
@@ -3249,5 +3330,10 @@ class SnapshotManager(private val projectRoot: Path) {
             .sortedBy { it.node.name }
             .toList()
     }
+
+    private fun <T> Collection<T>.associateUniqueBy(keySelector: (T) -> String): Map<String, T> =
+        this.groupBy(keySelector)
+            .filterValues { it.size == 1 }
+            .mapValues { (_, values) -> values.first() }
 
 }
