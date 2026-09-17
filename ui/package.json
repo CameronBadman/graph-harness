@@ -1,0 +1,17 @@
+{
+  "name": "graphharness-live-ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "cytoscape": "3.33.1"
+  },
+  "devDependencies": {
+    "typescript": "5.9.2",
+    "vite": "7.3.6"
+  }
+}

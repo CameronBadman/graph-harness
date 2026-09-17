@@ -25,6 +25,7 @@ application {
 distributions {
     main {
         contents {
+            from("ui/dist") { into("ui") }
             from("parsers") {
                 into("parsers")
                 exclude("tests/**", "fixtures/**", "__pycache__/**", "**/*.pyc")
