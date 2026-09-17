@@ -1,0 +1,14 @@
+{
+  "attempts": [
+    {
+      "status": "failed_before_agents",
+      "reason": "A newly created observer context did not initialize the paired browser session; workspace remained hidden.",
+      "public_artifacts_removed": [
+        "page@0be6d5d7db9b259d0677660436232327.webm",
+        "page@5154f2c70c9a05dd05389b9e6af109e4.webm"
+      ],
+      "private_logs_retained_in_repository": false,
+      "next_action": "Rerun only after the UI reconnect/pairing fix is frozen."
+    }
+  ]
+}

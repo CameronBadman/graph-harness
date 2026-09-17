@@ -1,0 +1,30 @@
+{
+  "scripted": true,
+  "claim_boundary": "Synthetic fixture and SCRIPT client measurements; not autonomous-agent evidence.",
+  "machine": {
+    "cpu_count": 32,
+    "memory_gib": 30.39
+  },
+  "samples_requested": 30,
+  "launcher_distribution_sha256": "81817fa04bcbc73b1928f6699301bb2b6e6f6154fa60a653ce4a7db8b238e303",
+  "initial_index_elapsed_ms": 6871.37,
+  "method_symbol_count": 1001,
+  "event_latency_method": "first MutationObserver DOM insertion of an actual activity item minus daemon UTC event timestamp; paint_opportunity is the following requestAnimationFrame timestamp, not compositor presentation",
+  "event_latency_sample_count": 30,
+  "event_dom_update_p95_ms": 72,
+  "event_paint_opportunity_p95_ms": 132.89990234375,
+  "external_edit_visible_latency_ms": 7638.05,
+  "external_snapshot_owner": "unattributed",
+  "targets": {
+    "initial_index_ms": 3000,
+    "event_dom_update_p95_ms": 500,
+    "external_edit_visible_ms": 3000
+  },
+  "target_results": {
+    "initial_index": false,
+    "event_dom_update": true,
+    "external_edit_visible": false
+  },
+  "artifact_manifest": "release-artifact.json",
+  "script_sha256": "494a745a3b2f7638e36da989b1f6d0dfd592ff3bcc6d9cc61f7079d32fcef10a"
+}

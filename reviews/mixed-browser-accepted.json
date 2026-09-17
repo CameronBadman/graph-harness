@@ -1,0 +1,19 @@
+{
+  "scripted": true,
+  "claim_boundary": "Browser interaction coverage only; not agent evidence.",
+  "languages_checked": [
+    "typescript",
+    "javascript",
+    "python"
+  ],
+  "checks": [
+    "language_filter",
+    "keyboard_operable_code_list",
+    "selected_symbol_source",
+    "no_page_errors"
+  ],
+  "artifact_manifest": "release-artifact.json",
+  "script_sha256": "3ff9bf720fd480b672473e170df8bcc6953ea82f67c4de0ede30667229a78cf5",
+  "observed_exit_code": 0,
+  "visual_review": "Integrator inspected final 1440x900 captures; separate file groups and bounded single-symbol zoom."
+}

@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "kind": "coordinated_browser_acceptance",
+  "scripted": true,
+  "claim_boundary": "This is scripted-client browser evidence. It does not establish autonomous-agent behavior.",
+  "fixture": "examples/ticket-office copied to a temporary local checkout",
+  "daemon": "independent temporary local daemon with --allow-edits",
+  "clients": ["SCRIPT A", "SCRIPT B"],
+  "observed_checks": [
+    "browser pairing with HttpOnly SameSite=Strict observer cookie",
+    "SCRIPT A planned a Java method-body edit and acquired a file reservation",
+    "SCRIPT B received a real lease_busy conflict",
+    "browser displayed the holder, denied requester and retained planned preview",
+    "SCRIPT A applied and released the reservation",
+    "browser displayed retained applied preview with syntax-not-tests wording",
+    "event reconciliation, 1440x900, 1280x800 and 390x844 overflow checks",
+    "no page errors and no localStorage"
+  ],
+  "public_artifacts": [
+    "docs/assets/coordinated-scripted-smoke.png"
+  ],
+  "temporary_artifacts": [
+    "/tmp/graphharness-coordinated-browser-check/coordinated-1440x900.png",
+    "/tmp/graphharness-coordinated-browser-check/coordinated-1280x800.png",
+    "/tmp/graphharness-coordinated-browser-check/coordinated-390x844.png"
+  ],
+  "reproduction": "uv run --script scripts/coordinated_browser_smoke.py build/install/graphharness/bin/graphharness --ui ui/dist --fixture examples/ticket-office --chromium /path/to/chromium --artifacts /tmp/graphharness-coordinated-browser-check"
+}

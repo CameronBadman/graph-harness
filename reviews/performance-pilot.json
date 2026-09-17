@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "stage": "pre-final-D pilot distribution copied into the test-owned temporary workspace",
+  "scripted": true,
+  "claim_boundary": "Synthetic fixture and SCRIPT-client measurements only; not autonomous-agent evidence and not final-D performance evidence.",
+  "machine": {"cpu_count": 32, "memory_gib": 30.39},
+  "fixture": {"intended_method_symbols": 1000, "actual_method_symbols": 1001},
+  "launcher_distribution_sha256": "ae067974df1df37f45031fcaf601b89895d2e3c26dd94631f387706b49742e23",
+  "measurements": {
+    "initial_index_elapsed_ms": 6821.3,
+    "event_dom_update_p95_ms": 83,
+    "event_paint_opportunity_p95_ms": 144.900146484375,
+    "external_edit_visible_latency_ms": 7722.06
+  },
+  "method": {
+    "event_latency": "First MutationObserver DOM insertion of an actual activity item minus daemon UTC event timestamp. The rAF value is a paint opportunity, not compositor presentation.",
+    "external_edit": "Raw unaffiliated snapshot_updated event with a changed snapshot identity, then browser presentation of that exact snapshot."
+  },
+  "targets": {
+    "initial_index_ms": {"target": 3000, "passed": false},
+    "event_dom_update_p95_ms": {"target": 500, "passed": true},
+    "external_edit_visible_ms": {"target": 3000, "passed": false}
+  },
+  "recovery_probe": {
+    "result": "inconclusive",
+    "reason": "Chromium offline emulation did not terminate the existing SSE stream. A deterministic transport-cutoff probe was added afterward and must run against final D."
+  },
+  "external_snapshot_owner": "unattributed",
+  "artifacts": {
+    "report": {"temporary_name": "performance-report.json", "sha256": "2bc45ef2218d4614dd1e605d53764c0c9c7e0e0976513f830640a2d3afadc393"},
+    "screenshot": {"temporary_name": "performance-1440x900.png", "sha256": "f263c5eb8823ea87a5411b13341e1c9849e02ba03d71b9fcba30710caf3e022b"}
+  }
+}

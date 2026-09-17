@@ -1,0 +1,293 @@
+{
+  "client": "Codex CLI 0.154.0",
+  "configured_model": "gpt-5.6-terra",
+  "model_evidence": "Actual codex exec startup/output, separate from display labels",
+  "two_labels_connected_simultaneously": false,
+  "sessions": [
+    {
+      "session_id": "7fbda281-f373-4411-a775-563be09c3e70",
+      "label": "Inventory agent",
+      "connected": "2026-09-17T17:30:58.933418864Z",
+      "events": [
+        {
+          "event_id": "5",
+          "event_type": "session_connected",
+          "tool_name": null,
+          "operation_id": null,
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:30:58.933418864Z"
+        },
+        {
+          "event_id": "6",
+          "event_type": "tool_started",
+          "tool_name": "get_capabilities",
+          "operation_id": "1",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:31:05.768771174Z"
+        },
+        {
+          "event_id": "7",
+          "event_type": "tool_completed",
+          "tool_name": "get_capabilities",
+          "operation_id": "1",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:31:05.769559868Z"
+        },
+        {
+          "event_id": "8",
+          "event_type": "tool_started",
+          "tool_name": "search_graph",
+          "operation_id": "2",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:31:07.891163076Z"
+        },
+        {
+          "event_id": "9",
+          "event_type": "tool_completed",
+          "tool_name": "search_graph",
+          "operation_id": "2",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [
+            "method:tickets.TicketInventory.reserve:int:boolean"
+          ],
+          "file_paths": [
+            "java/TicketInventory.java"
+          ],
+          "timestamp": "2026-09-17T17:31:07.892375232Z"
+        },
+        {
+          "event_id": "10",
+          "event_type": "tool_started",
+          "tool_name": "get_source",
+          "operation_id": "3",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:31:10.722159148Z"
+        },
+        {
+          "event_id": "11",
+          "event_type": "tool_completed",
+          "tool_name": "get_source",
+          "operation_id": "3",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [
+            "method:tickets.TicketInventory.reserve:int:boolean"
+          ],
+          "file_paths": [
+            "java/TicketInventory.java"
+          ],
+          "timestamp": "2026-09-17T17:31:10.723241773Z"
+        },
+        {
+          "event_id": "12",
+          "event_type": "session_disconnected",
+          "tool_name": null,
+          "operation_id": null,
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:31:13.955804927Z"
+        }
+      ]
+    },
+    {
+      "session_id": "07b39be5-6a33-40fb-8735-23f5fe73eafc",
+      "label": "Pricing agent",
+      "connected": "2026-09-17T17:39:08.839549889Z",
+      "events": [
+        {
+          "event_id": "13",
+          "event_type": "session_connected",
+          "tool_name": null,
+          "operation_id": null,
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:39:08.839549889Z"
+        },
+        {
+          "event_id": "14",
+          "event_type": "tool_started",
+          "tool_name": "get_capabilities",
+          "operation_id": "1",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:39:16.948653612Z"
+        },
+        {
+          "event_id": "15",
+          "event_type": "tool_completed",
+          "tool_name": "get_capabilities",
+          "operation_id": "1",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:39:16.949256175Z"
+        },
+        {
+          "event_id": "16",
+          "event_type": "tool_started",
+          "tool_name": "search_graph",
+          "operation_id": "2",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:39:19.537425989Z"
+        },
+        {
+          "event_id": "17",
+          "event_type": "tool_completed",
+          "tool_name": "search_graph",
+          "operation_id": "2",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [
+            "method:tickets.PriceQuote.totalCents:int|int:int"
+          ],
+          "file_paths": [
+            "java/PriceQuote.java"
+          ],
+          "timestamp": "2026-09-17T17:39:19.537875761Z"
+        },
+        {
+          "event_id": "18",
+          "event_type": "tool_started",
+          "tool_name": "get_source",
+          "operation_id": "3",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:39:22.491502773Z"
+        },
+        {
+          "event_id": "19",
+          "event_type": "tool_completed",
+          "tool_name": "get_source",
+          "operation_id": "3",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [
+            "method:tickets.PriceQuote.totalCents:int|int:int"
+          ],
+          "file_paths": [
+            "java/PriceQuote.java"
+          ],
+          "timestamp": "2026-09-17T17:39:22.492368417Z"
+        },
+        {
+          "event_id": "20",
+          "event_type": "session_disconnected",
+          "tool_name": null,
+          "operation_id": null,
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:39:26.724679317Z"
+        }
+      ]
+    },
+    {
+      "session_id": "d60c510d-21b9-4b4c-968d-6cb1f3696a80",
+      "label": "Inventory agent",
+      "connected": "2026-09-17T17:39:27.496809913Z",
+      "events": [
+        {
+          "event_id": "21",
+          "event_type": "session_connected",
+          "tool_name": null,
+          "operation_id": null,
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:39:27.496809913Z"
+        },
+        {
+          "event_id": "22",
+          "event_type": "tool_started",
+          "tool_name": "get_capabilities",
+          "operation_id": "1",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:39:35.255576966Z"
+        },
+        {
+          "event_id": "23",
+          "event_type": "tool_completed",
+          "tool_name": "get_capabilities",
+          "operation_id": "1",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:39:35.256096049Z"
+        },
+        {
+          "event_id": "24",
+          "event_type": "tool_started",
+          "tool_name": "search_graph",
+          "operation_id": "2",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:39:37.420326266Z"
+        },
+        {
+          "event_id": "25",
+          "event_type": "tool_completed",
+          "tool_name": "search_graph",
+          "operation_id": "2",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [
+            "method:tickets.TicketInventory.reserve:int:boolean"
+          ],
+          "file_paths": [
+            "java/TicketInventory.java"
+          ],
+          "timestamp": "2026-09-17T17:39:37.420797088Z"
+        },
+        {
+          "event_id": "26",
+          "event_type": "tool_started",
+          "tool_name": "get_source",
+          "operation_id": "3",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:39:39.465032049Z"
+        },
+        {
+          "event_id": "27",
+          "event_type": "tool_completed",
+          "tool_name": "get_source",
+          "operation_id": "3",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [
+            "method:tickets.TicketInventory.reserve:int:boolean"
+          ],
+          "file_paths": [
+            "java/TicketInventory.java"
+          ],
+          "timestamp": "2026-09-17T17:39:39.468833748Z"
+        },
+        {
+          "event_id": "28",
+          "event_type": "session_disconnected",
+          "tool_name": null,
+          "operation_id": null,
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:39:42.093260669Z"
+        }
+      ]
+    }
+  ]
+}

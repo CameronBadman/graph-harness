@@ -1,132 +1,120 @@
-# GraphHarness
+# GraphHarness Live
 
-GraphHarness is a local MCP-style stdio server that gives coding agents structural context for Java repositories before they open source files directly.
+Give coding agents a shared map of a checkout, and watch their actual searches, source reads and coordinated changes on an interactive graph.
 
-This prototype is mostly read-only, with a narrow graph-guided edit path:
+The local daemon provides **Java, TypeScript, JavaScript and Python structural navigation**, separate authenticated MCP sessions, and a browser observer. Java additionally supports opt-in coordinated method-body edits. Agent activity comes from actual tool dispatch; it does not represent private reasoning. See the [verification ledger](DEVELOPMENT_STATUS.md) for measured results, artifact versions and remaining limits.
 
-- snapshot-based Java project analysis
-- topology-oriented summary and cluster expansion
-- callers, callees, hierarchy, dependency, impact, and source retrieval tools
-- preview-and-apply method body edits and method renames via `plan_edit` and `apply_edit`
-- local stdio transport using JSON-RPC with MCP-compatible `tools/list` and `tools/call`
+[Watch the recorded two-agent demo](docs/assets/real-agents-demo.mp4) · [Development plan](DEVELOPMENT_PLAN.md) · [Evidence and limits](DEVELOPMENT_STATUS.md)
 
-## Status
+The recording uses two actual Codex clients configured with `gpt-5.6-terra`, deliberate reservation timing, and the public fixture. Playback is 1.1×. The journal and expected-failure/passing-test evidence are in [the recording report](reviews/recorded-demo-evidence.json).
 
-This implementation now prefers a **Joern-backed** Java analysis path when Joern is installed. If Joern is unavailable, it falls back to the lightweight parser so the server still runs, but the intended path is Joern first.
+## Build and run
 
-## Run With Nix
+The supported live environment is Linux with a local POSIX filesystem, JDK 21, Gradle 8, Node.js 20.19+ or 22.12+, npm, and Python 3.11+. The checked-in Nix development shell supplies the JVM tools; Node/npm must also be available.
+
+From this repository:
 
 ```bash
-nix build
-./result/bin/graphharness /path/to/java/repo
+./scripts/build_live.sh
+build/install/graphharness/bin/graphharness daemon examples/ticket-office
 ```
 
-Install Joern locally for the preferred analysis engine:
+The build script installs locked UI and parser dependencies, builds the browser, runs the JVM tests and packages the application. It uses Gradle 8/JDK 21 directly or the Nix development shell. The distribution includes browser assets and the pinned TypeScript compiler; Node and Python remain external runtimes. Copy the entire `build/install/graphharness` directory when installing elsewhere. The daemon prints a loopback URL to stderr after indexing; Joern's first analysis can take time. Open that exact URL, choose **Start pairing**, then run the displayed `authorize-browser` command from a terminal. The public pairing code expires after 60 seconds. Approval grants the browser read-only inspection; it never exposes the daemon bootstrap credential.
+
+The daemon must start explicitly. A second daemon for the same canonical checkout is rejected. Bridges connect to the running daemon; they do not launch another coordinator. Stop the daemon with Ctrl-C.
+
+Joern is preferred when available:
 
 ```bash
 ./scripts/install_joern.sh
 export GRAPHHARNESS_JOERN_HOME="$HOME/.local/share/graphharness/joern"
 ```
 
-For local development:
+Otherwise GraphHarness uses a javac-backed Java declaration parser with approximate call analysis. The UI and capability tool identify the backend. Fallback mode disables call paths, implementations and impact rather than promising reliable results for them.
 
-```bash
-nix develop
-kotlinc src/main/kotlin/graphharness/*.kt -include-runtime -d graphharness.jar
-java -XX:+PerfDisableSharedMem -jar graphharness.jar /path/to/java/repo
+## Connect Codex sessions
+
+Use absolute paths for your installation and checkout in the client's MCP configuration. For Codex, add a server entry to your chosen configuration:
+
+```toml
+[mcp_servers.graphharness]
+command = "/absolute/path/to/graph-harness/build/install/graphharness/bin/graphharness"
+args = ["bridge", "/absolute/path/to/checkout", "Inventory agent"]
+required = true
 ```
 
-## MCP-style Usage
+A second Codex session can use a different display label. Every bridge obtains its own server-issued identity; labels do not grant authority. Both bridges must use the same checkout and runtime directory. `GRAPHHARNESS_RUNTIME_DIR` optionally selects an owner-only runtime directory and must match across daemon, bridge and authorization commands. Otherwise the runtime uses a private application directory outside the checkout.
 
-The server speaks JSON-RPC 2.0 over stdio using `Content-Length` framing. It supports:
+The bridge uses newline-delimited MCP stdio. Protocol messages are the only stdout output. Current configuration keys follow the [official Codex MCP documentation](https://learn.chatgpt.com/docs/extend/mcp?surface=cli).
 
-- `initialize`
-- `notifications/initialized`
-- `tools/list`
-- `tools/call`
+Try the public [ticket-office example](examples/ticket-office/README.md): ask one agent to inspect `TicketInventory.reserve` and another to inspect `PriceQuote.totalCents`. Watch their search/source events, select an event to focus its nodes, follow a session, or use the keyboard-operable code list to inspect source. Use the language filter to inspect the fixture’s TypeScript formatter and Python report. These have parser-observed definitions and containment; runtime calls between languages are not inferred.
 
-For a persistent demo session that behaves more like a real MCP client:
+## Coordinated edits
 
-```bash
-python3 scripts/session_demo.py ./result/bin/graphharness /path/to/java/repo
-```
-
-For a simple benchmark that compares GraphHarness context use against a naive file-loading workflow:
+Start a daemon with writes enabled explicitly:
 
 ```bash
-python3 scripts/benchmark_demo.py ./result/bin/graphharness /path/to/java/repo
+build/install/graphharness/bin/graphharness daemon examples/ticket-office --allow-edits
 ```
 
-For an edit-focused demo that benchmarks full-body replacement, anchor patching, and method rename planning:
+Agents read fresh source, call `plan_edit` with the returned snapshot/file hash and a new method body, acquire a file lease, inspect the preview, apply it, and release. A second agent receives `lease_busy` with the holder and expiration. It can keep reading; there is no waiting queue. The bridge renews its leases, with a 120-second maximum hold. The browser shows reservations, denied requests and the actual retained before/after preview.
+
+Only a concrete Java method whose enclosing type, parameter metadata and source bounds match the compiler parser can be edited. Unsupported metadata fails closed. Constructors, initializers, multi-file rename and semantic refactoring are unavailable. Reservations coordinate clients using this daemon; they do not make arbitrary external editor writes transactional or prevent incompatible changes in separate files.
+
+`validate_project` runs an explicitly chosen command on a captured copy with a source manifest. It requires Linux user namespaces, `/usr/bin/bwrap` and `/usr/bin/prlimit`; missing isolation support returns `validation_blocked`. The sandbox has private filesystem/process/network namespaces and read-only system/toolchain mounts. Dependencies must already be available offline. Its resource limits apply per process; aggregate tree memory/CPU are not controlled by a cgroup. Results include the command, manifest, exit code, stale-input state and isolation limits. A caller-declared `test` mode alone does not establish that meaningful tests ran.
+
+The reproducible coordination check uses two official SDK clients and an actual failing-to-passing Java assertion:
 
 ```bash
-python3 scripts/edit_demo.py ./result/bin/graphharness /path/to/java/repo
+uv run --script scripts/coordinated_smoke.py build/install/graphharness/bin/graphharness ui/dist
 ```
 
-That demo now exercises the intended edit loop:
+The separate `scripts/coordinated_agent_demo.py` runs two actual Codex CLI processes with an orchestrated reservation checkpoint. Its report checks server-issued sessions and event order; the [recorded evidence](reviews/real-agent-coordination.json) identifies the configured model and monitoring health. Scripted clients and real agents are reported separately.
 
-- `get_edit_candidates`
-- `verify_candidate`
-- `plan_edit`
-- `validate_edit`
-- `get_agent_fitness`
-- `get_cluster_fitness`
-- `get_validation_targets`
-- `apply_edit` smoke test on a scratch copy
+## Capabilities and limits
 
-The available tools are:
+| Surface | Current behavior |
+| --- | --- |
+| Live daemon / bridge | Search, source, structural context and per-language capabilities; Java semantic tools retain their backend restrictions |
+| Browser | Grouped graph, source inspector, search, sessions, observed activity, cursor recovery, reservation conflicts and retained edit previews |
+| Source versions | Snapshot bytes and hashes stay together; a current-source request rejects disk drift |
+| Graph quality | Exact UTF-8 spans and parser containment where available; Joern or approximate Java calls can be incomplete. Unsupported spans remain null with diagnostics |
+| Graph size | State has node, edge and encoded-byte limits; omitted counts remain visible; search can locate omitted symbols |
+| Writes / reservations | Opt-in parser-confirmed Java method-body replacement; file leases, stale preimage rejection and commit receipts |
+| Languages | Java, TS/TSX, JS/JSX and Python definitions; no inferred cross-language runtime calls or non-Java semantic edit support |
+| Replay | Retained activity history; no exact reconstruction of old graph topology |
 
-- `get_capabilities`
-- `build_context_bundle`
-- `get_snapshot_delta`
-- `get_summary_map`
-- `get_edit_candidates`
-- `resolve_edit_target`
-- `verify_candidate`
-- `plan_edit`
-- `validate_edit`
-- `get_agent_fitness`
-- `get_cluster_fitness`
-- `get_validation_targets`
-- `apply_edit`
-- `get_cluster_detail`
-- `get_node_detail`
-- `get_call_paths`
-- `search_graph`
-- `get_callers`
-- `get_callees`
-- `get_implementations`
-- `get_type_hierarchy`
-- `get_dependencies`
-- `get_impact`
-- `get_source`
-- `get_source_batch`
+Package/type/method totals, clusters, hotspots and entrypoints in the legacy summary cover Java; `structural_nodes_by_language` covers all parsed languages. Dynamic constructs, anonymous declarations and some destructuring are omitted. Syntax errors and unavailable interpreters produce visible diagnostics.
 
-For orchestration-heavy clients, the intended higher-level context flow is:
+External file changes have no inferred agent owner. A connected agent with no recent tool call may still be working elsewhere. Browser reconnection either resumes retained events or explicitly refreshes authoritative state. Source, prompts and credentials are excluded from the event journal by default.
 
-- `get_capabilities`
-- `build_context_bundle`
-- expand with narrower traversal or source tools only when the bundle is not enough
+## Verification
 
-## Notes
+```bash
+nix develop --command gradle test installDist --console=plain
+uv run --script scripts/mcp_smoke.py build/install/graphharness/bin/graphharness
+npm --prefix ui run build
+npm --prefix ui audit
+uv run --script scripts/mixed_mcp_smoke.py build/install/graphharness/bin/graphharness ui/dist
+python3 scripts/installation_smoke.py build/install/graphharness
+```
 
-- Every response includes a `snapshot_id`.
-- File watching triggers background snapshot rebuilds with atomic swap on completion.
-- Clustering is package-oriented in this prototype.
-- The packaged launcher disables JVM shared perf data to avoid noisy `hsperfdata` warnings during CLI use.
-- When Joern is installed, GraphHarness builds the project snapshot from a Joern-generated CPG and derives the tool responses from that graph model.
-- The current edit surface is intentionally narrow: `modify_method_body` and method-only `rename_node`, with preview diff generation and stale-file validation before apply.
-- `modify_method_body` supports both full-body replacement and smaller anchor-based patch modes (`insert_before`, `insert_after`, `replace_line`).
-- `get_edit_candidates` uses lightweight heuristics to suggest likely edit targets, operations, and starter payloads from a natural-language task description.
-- `verify_candidate` is the cheap confirmation step for targeted edits; use it before `plan_edit` when `get_edit_candidates` returns `needs_disambiguation: true` or when the task wording is vague.
-- `validate_edit` replays a planned edit, or validates an already-applied edit, on a scratch copy of the repo. It prefers Maven/Gradle test or compile commands and falls back to a local `javac -proc:none` syntax check when no project build tool is detected.
-- `validate_edit` now consumes the same planning logic as `get_validation_targets`, so module selection and test targeting stay consistent between “what should I run?” and “run validation now.”
-- When repo-aware validation is blocked by wrapper/bootstrap failures or environment constraints, `validate_edit` reports `attempted_validators`, marks the result as `degraded`, and falls back to syntax validation when possible.
-- `validate_edit` scopes repo-aware validation to the nearest touched Maven/Gradle module when possible, and reports that choice as `validation_target`.
-- `get_agent_fitness` reports a repo-wide structural fitness score, subscores, issues, and recommended actions for how well the codebase supports graph-guided agent workflows.
-- `get_cluster_fitness` drills the same fitness model down to a single cluster so you can identify which subsystem is actually dragging the repo-wide score down.
-- `get_validation_targets` uses impact plus build-root layout to suggest the most relevant modules, tests, and validation command shapes for a node or planned edit.
-- `get_capabilities` is the explicit capability handshake for orchestration. It reports supported languages, engine/backend details, edit operations, validation modes, confidence semantics, and degraded-mode flags in one place.
-- `build_context_bundle` compresses the common orientation flow into one response: focus node resolution, key graph relationships, likely impact files, and a budget-limited set of source slices.
-- `get_snapshot_delta` compares two retained snapshots and reports added, removed, and heuristically changed nodes/files so clients can react to background rebuilds or post-edit refreshes.
-# code-agent
+The MCP smoke script pins the official Python SDK and uses a temporary Java fixture. The browser check in `scripts/browser_smoke.py` exercises a running daemon and local browser approval; its arguments name the endpoint, launcher, fixture root and runtime directory. It requires Playwright and an installed Chromium. See the ledger for the exact environment used here. A passing script is not proof of an autonomous agent; real client evidence is recorded separately.
+
+The final local synthetic benchmark used 1,001 method nodes: activity DOM insertion was 72ms p95 over 30 scripted calls, initial indexing took 6.87s, and an external edit appeared in the updated graph after 7.64s. The three-second refresh target was missed; see the [measured evidence](reviews/performance-accepted.json).
+
+## Troubleshooting
+
+- No Python/TypeScript symbols: check `get_capabilities` or the browser diagnostics, then install Python/Node and rebuild with `npm --prefix parsers ci`. Restart the daemon after changing runtime availability; unavailable parser results are cached for unchanged files.
+- Pairing expired: start pairing again and authorize the newly displayed code within 60 seconds. Use the same runtime directory as the daemon.
+- Source became stale: wait for indexing, search again and reread before planning. A committed edit can be visible on disk while the graph is still indexing.
+- Validation blocked: inspect returned isolation diagnostics. Install bubblewrap and util-linux `prlimit`, enable supported Linux user namespaces, and ensure dependencies are available offline. Validation does not silently fall back to running on the host.
+- Slow large-repository indexing: reduce generated/vendor inputs and inspect omitted counts. The current release does not guarantee a three-second refresh; performance evidence records the measured result.
+
+## Direct stdio compatibility
+
+`graphharness stdio ROOT` (or `graphharness ROOT`) runs the original standalone server using newline MCP. `graphharness legacy-stdio ROOT` retains the old Content-Length framing for the demo scripts. These modes own separate snapshots, have no live coordination guarantee, and are not the live multi-agent route.
+
+Legacy edit tools remain experimental: rename is regex based and method-body boundaries are not the new safe parser-backed implementation. They are not exposed by the live daemon. Use scratch checkouts for legacy edit experiments. The original `scripts/session_demo.py`, `benchmark_demo.py` and `edit_demo.py` explicitly select compatibility framing.
+
+`nix build` remains the standalone JVM package; the Gradle distribution above is the documented live build that includes browser assets. No hosted service, public launch or competition submission has been deployed by this work.

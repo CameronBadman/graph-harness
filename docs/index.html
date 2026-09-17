@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="A shared structural map for coding agents and the developers supervising their observed work." />
+    <title>GraphHarness Live</title>
+    <link rel="stylesheet" href="site.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="GraphHarness Live home"><span>GH</span> GraphHarness <em>Live</em></a>
+      <nav aria-label="Primary navigation">
+        <a href="#how-it-works">How it works</a>
+        <a href="#evidence">Evidence</a>
+        <a href="https://github.com/CameronBadman/graph-harness">Source</a>
+      </nav>
+    </header>
+    <main id="top">
+      <section class="hero">
+        <p class="eyebrow">LOCAL · OBSERVED · STRUCTURAL</p>
+        <h1>Give your agents a shared map of the code.</h1>
+        <p class="lede">GraphHarness Live maps a checkout, gives coding agents focused structural context, and lets you inspect the tool calls and reservations that actually happened.</p>
+        <div class="actions">
+          <a class="button primary" href="https://github.com/CameronBadman/graph-harness#build-and-run">Install locally</a>
+          <a class="button" href="https://github.com/CameronBadman/graph-harness#coordinated-edits">Read the limits</a>
+        </div>
+        <p class="note">The browser is an observer. It shows daemon-recorded activity, not an agent’s private reasoning.</p>
+      </section>
+
+      <section id="how-it-works" class="workflow" aria-labelledby="workflow-title">
+        <div>
+          <p class="eyebrow">ONE LOCAL DAEMON</p>
+          <h2 id="workflow-title">A useful map for both sides of the work.</h2>
+        </div>
+        <ol>
+          <li><strong>Map the checkout</strong><span>Explore Java, TypeScript, JavaScript and Python definitions in a common graph.</span></li>
+          <li><strong>Observe real tool use</strong><span>Searches, source reads, plans, validation and failures appear only when dispatched by the daemon.</span></li>
+          <li><strong>Coordinate a change</strong><span>Opt-in Java method-body edits use short-lived file reservations, stale-version checks and retained previews.</span></li>
+        </ol>
+      </section>
+
+      <section class="feature-grid" aria-label="Capabilities">
+        <article><span class="icon">⌘</span><h2>Focused context</h2><p>Agents can search the graph and retrieve source linked to the same snapshot the browser displays.</p></article>
+        <article><span class="icon">◌</span><h2>Observed activity</h2><p>Follow connections, inspect actual calls and distinguish a denial from a queue that does not exist.</p></article>
+        <article><span class="icon">↔</span><h2>Guarded edits</h2><p>Java method-body plans can be previewed, reserved, applied and released through the local coordinator.</p></article>
+      </section>
+
+      <section id="evidence" class="evidence" aria-labelledby="evidence-title">
+        <div class="evidence-copy">
+          <p class="eyebrow">SCRIPTED COORDINATION CHECK</p>
+          <h2 id="evidence-title">A visible conflict, then an actual retained diff.</h2>
+          <p>This local browser check used two labeled <strong>SCRIPT</strong> clients on the public ticket-office fixture. One planned and reserved a Java file; the other received a real <code>lease_busy</code> response. The first client applied and released its plan.</p>
+          <p class="note">This screenshot is scripted-client evidence, not evidence of autonomous agent work. The repository keeps separate <a href="https://github.com/CameronBadman/graph-harness/tree/main/reviews">real-agent journal evidence</a> with configured-client details.</p>
+        </div>
+        <figure>
+          <img src="assets/coordinated-scripted-smoke.png" alt="GraphHarness Live showing a Java code graph, an applied edit preview, and recorded SCRIPT client reservation events." />
+          <figcaption>Public ticket-office fixture. The graph, before/after preview and reservation events came from the local daemon.</figcaption>
+        </figure>
+      </section>
+
+      <section id="demo" class="evidence" aria-labelledby="demo-title">
+        <div class="evidence-copy">
+          <p class="eyebrow">TWO REAL CODEX CLIENTS</p>
+          <h2 id="demo-title">Watch a reservation conflict and repair.</h2>
+          <p>Two clients inspect a public mixed-language fixture. The writer reserves a Java file; the reader receives a real conflict. A guarded edit changes zero-ticket reservations into a clean rejection, and the fixture checks pass afterward.</p>
+          <p class="note">Recorded at 1.1× speed. Reservation timing was deliberately orchestrated. Both clients were configured with gpt-5.6-terra; provider-side model identity is not independently attested. No private reasoning is displayed.</p>
+        </div>
+        <figure>
+          <video controls preload="metadata" poster="assets/real-agents-applied.png" aria-label="Recorded two-agent reservation and Java repair demonstration">
+            <source src="assets/real-agents-demo.mp4" type="video/mp4" />
+            <a href="assets/real-agents-demo.mp4">Download the recorded demo</a>
+          </video>
+          <figcaption>Actual local tool activity and retained edit preview. The repository records session/event and failing-to-passing test evidence.</figcaption>
+        </figure>
+      </section>
+
+      <section class="install" aria-labelledby="install-title">
+        <div><p class="eyebrow">RUN IT LOCALLY</p><h2 id="install-title">Start with the public fixture.</h2><p>GraphHarness is a local developer tool. The daemon is explicit, browser pairing is local, and the browser does not receive a bootstrap credential.</p></div>
+        <pre aria-label="Installation commands"><code>git clone https://github.com/CameronBadman/graph-harness.git
+cd graph-harness
+./scripts/build_live.sh
+build/install/graphharness/bin/graphharness daemon examples/ticket-office</code></pre>
+      </section>
+
+      <section class="limits" aria-labelledby="limits-title">
+        <h2 id="limits-title">Current capability boundary</h2>
+        <p><strong>Java, TypeScript, JavaScript and Python structural navigation; opt-in coordinated Java method-body edits.</strong> The daemon identifies its parser and backend. New-language adapters provide definitions, source spans and containment; semantic calls and edits remain unavailable for them. Graph relationships may be incomplete, and a reservation coordinates cooperating daemon clients rather than arbitrary editor writes.</p>
+        <a href="https://github.com/CameronBadman/graph-harness#capabilities-and-limits">See capabilities, verification and limits in the README →</a>
+      </section>
+    </main>
+    <footer><a class="brand" href="#top"><span>GH</span> GraphHarness <em>Live</em></a><p>Local code maps for observed collaboration.</p><a href="https://github.com/CameronBadman/graph-harness">GitHub source</a></footer>
+  </body>
+</html>

@@ -1,0 +1,549 @@
+{
+  "baseline": "2c775198edff0e48588b150571751f3bdbada0db",
+  "organization": "Commits created retrospectively at current timestamps; existing history preserved; no push.",
+  "verification_method": "Export the exact Git index to an isolated directory with checkout-index; install locked dependencies there; compile and test without untracked workspace implementation files.",
+  "boundaries": [
+    {
+      "boundary": "graph-and-mcp",
+      "tree": "f840292a9ec652cb9dbc301c7b2fbf2d254f5fce",
+      "check": "Isolated staged-tree Gradle test and installDist; full tests present at this boundary",
+      "counts": {
+        "tests": 32,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "graphharness.AnalysisProcessTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.AnalyzerTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.JavaDeclarationsTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.JavaStructureTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.ServerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.SnapshotSafetyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.StructuralAdapterTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "commit": "8547b2bd89777d2972c202ad950eac0a61d42f58"
+    },
+    {
+      "boundary": "guarded-edit-primitives",
+      "tree": "3a119ecd74381e6eb9fdbb618d559fd0b2ba54aa",
+      "check": "Isolated staged-tree EditCoordinator, SafeJavaEdit and ValidationRunner tests",
+      "counts": {
+        "tests": 26,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "graphharness.EditCoordinatorTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.SafeJavaEditTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.ValidationRunnerTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "commit": "4f50318e8372c7e3986450171a75568a650a0a46"
+    },
+    {
+      "boundary": "shared-daemon",
+      "tree": "3bbc7fa45b3d41f8464a78c0404c4a6d6fa06369",
+      "check": "Isolated staged-tree daemon, bridge, session, runtime and edit integration tests plus installDist",
+      "counts": {
+        "tests": 30,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "graphharness.CoordinatedDaemonTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.LiveBridgeTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.LiveDaemonTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.LiveEditsTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.LiveStateTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.LocalRuntimeTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "commit": "f1b59d89e79762f308704ce1a81f03f858dba35b"
+    },
+    {
+      "boundary": "live-ui-and-distribution",
+      "tree": "85bd21cb4687670fbbc695cf3bd683a0d2bf9fea",
+      "checks": [
+        "Isolated staged-tree locked npm ci",
+        "TypeScript typecheck and Vite production build",
+        "Gradle installDist"
+      ],
+      "exit_code": 0,
+      "commit": "c24990c732db4fd21338f905493286a64736369c"
+    },
+    {
+      "boundary": "full-integration",
+      "tree": "f80223c4264561d0871ae67e27803f749631ca4b",
+      "check": "Isolated staged-tree full Gradle test and installDist; all 88 tests",
+      "counts": {
+        "tests": 88,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "suites": [
+        {
+          "name": "graphharness.AnalysisProcessTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.AnalyzerTest",
+          "tests": 12,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.CoordinatedDaemonTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.EditCoordinatorTest",
+          "tests": 10,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.JavaDeclarationsTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.JavaStructureTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.LiveBridgeTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.LiveDaemonTest",
+          "tests": 9,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.LiveEditsTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.LiveStateTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.LocalRuntimeTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.SafeJavaEditTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.ServerTest",
+          "tests": 6,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.SnapshotSafetyTest",
+          "tests": 5,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.StructuralAdapterTest",
+          "tests": 3,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        {
+          "name": "graphharness.ValidationRunnerTest",
+          "tests": 11,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      ],
+      "commit": "36392bfaf2e4d660087a0dc57bc6c5e6a7088fe1"
+    }
+  ],
+  "fresh_integration": {
+    "direct_mcp": {
+      "sdk": "mcp 1.30.0",
+      "protocol": "2025-06-18",
+      "server": "graphharness",
+      "tools": 26,
+      "checks": [
+        "initialize",
+        "ping",
+        "list",
+        "search",
+        "source",
+        "raw_hash",
+        "unicode",
+        "crlf",
+        "tool_failure",
+        "unknown_tool"
+      ],
+      "agent_evidence": false
+    },
+    "mixed_mcp": {
+      "agent_evidence": false,
+      "client": "official MCP SDK1.30.0",
+      "languages": [
+        "java",
+        "javascript",
+        "python",
+        "typescript"
+      ],
+      "adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "javascript": {
+          "language": "javascript",
+          "parser": "typescript-compiler-api",
+          "version": "typescript/5.9.2",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "python": {
+          "language": "python",
+          "parser": "python-ast",
+          "version": "python-ast/3.12.13",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": [
+            "invalid syntax"
+          ]
+        },
+        "typescript": {
+          "language": "typescript",
+          "parser": "typescript-compiler-api",
+          "version": "typescript/5.9.2",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "checks": [
+        "installed_parser_discovery_outside_checkout",
+        "distinct_language_labels",
+        "exact_utf8_spans",
+        "crlf_non_bmp",
+        "hashes",
+        "containment",
+        "no_invented_semantics",
+        "nested_duplicate_identity",
+        "bounded_context",
+        "syntax_diagnostics",
+        "whitespace_identity",
+        "watcher_create_change_rename_delete"
+      ],
+      "context_source_characters": 245
+    },
+    "coordinated_mcp": {
+      "agent_evidence": false,
+      "protocol": "official MCP SDK1.30.0",
+      "checks": [
+        "two_bridges",
+        "capability",
+        "failing_project_test",
+        "parser_plan",
+        "lease_conflict",
+        "foreign_plan_rejected",
+        "committed_edit",
+        "release",
+        "passing_project_test",
+        "versioned_manifests",
+        "offline_validation"
+      ],
+      "before_exit": 1,
+      "after_exit": 0,
+      "before_manifest": "44dfa5be89f52f597435523d255f0abca166994c35e517c1fa39594f5347ca8f",
+      "after_manifest": "127ce845854b537807a7d79c42fad84739438eec88465e01e5156ee434c6b3c5",
+      "filesystem_isolated": true,
+      "resource_limits": {
+        "address_space_bytes": 4294967296,
+        "cpu_seconds": 110,
+        "process_count": 64,
+        "open_files": 1024,
+        "output_file_bytes": 134217728
+      },
+      "isolation_limitations": [
+        "Resource limits are inherited per process; no delegated writable cgroup is available for aggregate tree memory or CPU control.",
+        "The source manifest does not pin read-only toolchain binaries or external dependency caches."
+      ]
+    },
+    "installation": {
+      "checks": [
+        "copied_distribution",
+        "paths_with_spaces",
+        "empty_application_config",
+        "unrelated_working_directory",
+        "bundled_ui_and_parsers",
+        "missing_runtime_degradation"
+      ],
+      "installed": {
+        "languages": [
+          "java",
+          "python",
+          "typescript"
+        ],
+        "backend": "fallback-parser",
+        "node_count": 7
+      },
+      "missing_runtimes": {
+        "languages": [
+          "java"
+        ],
+        "backend": "fallback-parser",
+        "node_count": 5
+      },
+      "fresh_operating_system": false,
+      "limitation": "Fresh application prefix/configuration on the existing supported Linux host; not a new operating-system installation."
+    },
+    "browser_recovery": {
+      "scripted": true,
+      "claim_boundary": "Test-only browser transport injection with real server events, reset and epoch rejection; not agent evidence.",
+      "checks": {
+        "read_failure": {
+          "event_id": "4",
+          "rendered_once": true
+        },
+        "clean_eof": {
+          "event_id": "6",
+          "rendered_once": true
+        },
+        "fetch_rejection": {
+          "event_id": "8",
+          "rendered_once": true
+        },
+        "same_epoch_reset": {
+          "server_status": 200,
+          "event_id": "10",
+          "rendered_once": true
+        },
+        "epoch_409": {
+          "server_status": 409,
+          "event_id": "12",
+          "rendered_once": true
+        }
+      }
+    }
+  },
+  "source_sha256": {
+    "src/main/kotlin/graphharness/AnalysisSupport.kt": "195d88e36b1c6fb8d0125f339f57b12a181966d14cfbd2de009af450e2332c5c",
+    "src/main/kotlin/graphharness/Analyzer.kt": "f58c9aa0346bebe2899edbc75d5c623d2defca5aeb4a3c6bb60faf1cb0216662",
+    "src/main/kotlin/graphharness/EditCoordinator.kt": "c53a3fde35ab43346ba295fc585cd7f8f30a927aaea819f9a1b15384637fca03",
+    "src/main/kotlin/graphharness/EditSupport.kt": "e7c9d920b3d7a2d608cb5dc80025d1f7272ae91083503e703d94f1fd72aaa16b",
+    "src/main/kotlin/graphharness/JavaDeclarations.kt": "ebfc06261424c38b646b59777db7813d867a01a98e65e46d711ec74993d1a162",
+    "src/main/kotlin/graphharness/JavaStructure.kt": "54cf72d410a2fa949a7f50abed26929743982a198c399ecf4b469bfd24301709",
+    "src/main/kotlin/graphharness/JoernAdapter.kt": "440357860fa942ba4c7b7269ccc47b20a06b3b0c75c44335cbc219860b67be37",
+    "src/main/kotlin/graphharness/LiveBridge.kt": "4c787cd96a6b1d8b740e733fe7fdf427142bc26b35e77e911585655b434298d1",
+    "src/main/kotlin/graphharness/LiveDaemon.kt": "8ba837b8c65a88f6d73e83c44f2223260aca1e763f80ac87b6904a8759af5077",
+    "src/main/kotlin/graphharness/LiveEdits.kt": "a202f2c1590f93f6603385c40ea58b4c51672fe25ac3c8b7ad8414cac706bb60",
+    "src/main/kotlin/graphharness/LiveFailure.kt": "8d3b52e4d0ee93b608c6de4aff071bbecd783eb8308409d446d39b3900754be2",
+    "src/main/kotlin/graphharness/LiveState.kt": "c036244450520dc4f8d7ebcc3498d03dbedca2362285f817e50a986570f477b9",
+    "src/main/kotlin/graphharness/LocalRuntime.kt": "16c75c2e9929499101b21ff850304a7fe39127f69af8629d4c80a3e4953ed5b5",
+    "src/main/kotlin/graphharness/Main.kt": "828ac8582c5e01f3fde3039376956eec4adbc2f23f06d0719b2496d06be3e95e",
+    "src/main/kotlin/graphharness/MiniJson.kt": "3084fe2ad9845b4f490e86a118c03f4de3309e9d11ef18a9e1bd2dbfbf0eed00",
+    "src/main/kotlin/graphharness/Model.kt": "992df230fec5376dad27d03e104c99b5f60099ceba29787098504f788e1c6e18",
+    "src/main/kotlin/graphharness/SafeJavaEdit.kt": "98444a6a6860a0ad9493a95d1e45b23fc8b5b6ff1d53bda70e36aa193c608335",
+    "src/main/kotlin/graphharness/Server.kt": "aa01462aeae7eaea4263a2ce323bb49766d8628211fbe7630af92f2acef86e6d",
+    "src/main/kotlin/graphharness/StructuralAdapters.kt": "b2e055fc32e5bf97665ea5ee7abe02e34d7958556de0206ddc562be921c19c9f",
+    "src/main/kotlin/graphharness/ValidationRunner.kt": "9bf53c738e8dc781399f341b6227c24dba1946206f44f4886224c1b811b7247d",
+    "src/test/kotlin/graphharness/AnalysisProcessTest.kt": "6fe86c5042a394d9f805805a19d1196f002d90a545e2d89564320a51282c19a0",
+    "src/test/kotlin/graphharness/AnalyzerTest.kt": "4338fcefb164f58e81174b876f59d95a8b872375ecd437c8ca98788e3e8c389c",
+    "src/test/kotlin/graphharness/CoordinatedDaemonTest.kt": "c14731f8f8369b1282cb3130fa1f4e47a05a1d5ced0d05ac4a579f7ca5c33334",
+    "src/test/kotlin/graphharness/EditCoordinatorTest.kt": "29edcba652c3b7c78e59e513d50593bf4276401d2a3455829bffd5802e50ed45",
+    "src/test/kotlin/graphharness/JavaDeclarationsTest.kt": "f49ef034faf5daa7162ffb2b484206a2a1a92234e6e924b0106e07dba8e640b2",
+    "src/test/kotlin/graphharness/JavaStructureTest.kt": "21f39b55bc3445de84c178eaad0c800e1e8ab48cc3ce9335dbd76ce63528236e",
+    "src/test/kotlin/graphharness/LiveBridgeTest.kt": "5f6c9ea56d74cf12b86d7c67daee5c48b12a00942086a83c4df65d288e18cac5",
+    "src/test/kotlin/graphharness/LiveDaemonTest.kt": "282b0d4d9caf31547dd8163bc91c0e3537df48219706bf3be639c941aa2d27e0",
+    "src/test/kotlin/graphharness/LiveEditsTest.kt": "6dc2c29effa61d7c5a73bc9bc88b8b8e2a1e7464c6ab66d0c8e74b17a167a89f",
+    "src/test/kotlin/graphharness/LiveStateTest.kt": "34ae26b882fc7021ee4c7d8ffc0c6138810250391807f311f3a7f736629adeca",
+    "src/test/kotlin/graphharness/LocalRuntimeTest.kt": "7c9bcb51d1f7c6fa828de5663108d0fc53b9e19763980f7823f39870402b3746",
+    "src/test/kotlin/graphharness/SafeJavaEditTest.kt": "60971f836f3f45cc870083c74e68ea87be5bd690b98be112bca2ed4aff6432c5",
+    "src/test/kotlin/graphharness/ServerTest.kt": "a165d4787e1ce8b25ab96cb48cd1ebd021bfc6b76afc57879efd34219c57aed3",
+    "src/test/kotlin/graphharness/SnapshotSafetyTest.kt": "6ff19abb4e45ac85d889d44060d8052b1167617bcdda9774fdf2881555fd866c",
+    "src/test/kotlin/graphharness/StructuralAdapterTest.kt": "b04ba4aa549368f9527a28f29544be9acbcd94080e4b43221e0c65aff5081596",
+    "src/test/kotlin/graphharness/ValidationRunnerTest.kt": "e82b3c057305eee3fa684531f34a9fe9ce63ec94805b000b25d3dce057847766",
+    "ui/src/main.ts": "2c0fac9810aa7409b924357b686432a8cef9bc650949f18882be3fc23aeaa31e",
+    "ui/src/style.css": "10c2be9afabf4d1781961160da569515116135f3bb93847e846eb89cc8d3ca0c"
+  },
+  "preservation": {
+    "original_files_missing": false,
+    "preexisting_codex_untouched_and_untracked": true,
+    "intentional_existing_file_changes": [
+      "LiveFailure declaration moved unchanged out of LiveState.kt",
+      "Development status appended with version-history correction",
+      "Normalize trailing whitespace in three historical plan-review Markdown files; findings and scores unchanged"
+    ]
+  },
+  "limits": [
+    "Earlier release reviews/media retain their original artifact hashes and were not rerun as independent reviews or real-agent recordings during Git organization.",
+    "Source-location-only exception extraction is covered by the new compilation, 88-test and integration evidence; prior manifests are not silently rewritten."
+  ]
+}

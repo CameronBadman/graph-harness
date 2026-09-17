@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "stage": "final-D distribution copied into the test-owned temporary workspace",
+  "scripted": true,
+  "claim_boundary": "This is browser interaction coverage using a scripted client. It is not evidence of autonomous-agent work.",
+  "result": "passed",
+  "languages_checked": ["typescript", "javascript", "python"],
+  "checks": ["language_filter", "keyboard_operable_code_list", "selected_symbol_source", "no_page_errors"],
+  "fixture": "public ticket-office fixture plus a test-owned temporary JavaScript file",
+  "artifacts": {
+    "screenshot": {
+      "temporary_name": "mixed-1440x900.png",
+      "sha256": "7c6702d10dcf5c97789595f493d467cbe84b376113f23e9ab14a2f56498a6ed9"
+    }
+  },
+  "script": {
+    "path": "scripts/mixed_browser_smoke.py",
+    "sha256": "3ff9bf720fd480b672473e170df8bcc6953ea82f67c4de0ede30667229a78cf5",
+    "lock_sha256": "ce8bf3dc891cba466ffb9cf63b5b3a65e07e621aff256f6025375f3489129444"
+  }
+}

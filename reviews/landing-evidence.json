@@ -1,0 +1,24 @@
+{
+  "viewports": [
+    [
+      1440,
+      900
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "horizontal_overflow": false,
+  "page_errors": [],
+  "public_image_loaded": true,
+  "demo_video_playback": true,
+  "html_sha256": "62aadef20b9320db47e19843818bb28f54dbe3743b3ce6cc83f709b701fec804",
+  "css_sha256": "7de293bcd4107007bd972806bec005702d03cb69d68d92c167dd89acceb51b60",
+  "public_media_sha256": {
+    "docs/assets/coordinated-scripted-smoke.png": "2d1adfb5a2348d988f62f121ef68350717d7330564ecd6c3a05d503174e062c6",
+    "docs/assets/real-agents-applied.png": "577cfeb5c7a7a29265bd5527beb5a46fe07370c39de5b88ab2c9a4e6a64d5488",
+    "docs/assets/real-agents-conflict.png": "4034ae2816483db3f5f3e724f72871d4ca8cb95548d69a0622befbb49d075182",
+    "docs/assets/real-agents-demo.mp4": "4f64ea1c000894960526f2d294fdbf6389f84337059444793198d0d3d04ed349"
+  }
+}

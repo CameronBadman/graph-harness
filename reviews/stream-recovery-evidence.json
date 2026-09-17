@@ -1,0 +1,32 @@
+{
+  "scripted": true,
+  "claim_boundary": "Test-only browser transport injection with real server events, reset and epoch rejection; not agent evidence.",
+  "checks": {
+    "read_failure": {
+      "event_id": "4",
+      "rendered_once": true
+    },
+    "clean_eof": {
+      "event_id": "6",
+      "rendered_once": true
+    },
+    "fetch_rejection": {
+      "event_id": "8",
+      "rendered_once": true
+    },
+    "same_epoch_reset": {
+      "server_status": 200,
+      "event_id": "10",
+      "rendered_once": true
+    },
+    "epoch_409": {
+      "server_status": 409,
+      "event_id": "12",
+      "rendered_once": true
+    }
+  },
+  "artifact_manifest": "release-artifact.json",
+  "script_sha256": "7a07e90385bf44d3a232a54a1c9a39ff0a9b797e17deaaa09ac1d50d155a45e8",
+  "observed_exit_code": 0,
+  "visual_review": "Integrator inspected final 1440x900 captures; separate file groups and bounded single-symbol zoom."
+}

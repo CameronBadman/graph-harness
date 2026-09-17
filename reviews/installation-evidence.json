@@ -1,0 +1,31 @@
+{
+  "checks": [
+    "copied_distribution",
+    "paths_with_spaces",
+    "empty_application_config",
+    "unrelated_working_directory",
+    "bundled_ui_and_parsers",
+    "missing_runtime_degradation"
+  ],
+  "installed": {
+    "languages": [
+      "java",
+      "python",
+      "typescript"
+    ],
+    "backend": "fallback-parser",
+    "node_count": 7
+  },
+  "missing_runtimes": {
+    "languages": [
+      "java"
+    ],
+    "backend": "fallback-parser",
+    "node_count": 5
+  },
+  "fresh_operating_system": false,
+  "limitation": "Fresh application prefix/configuration on the existing supported Linux host; not a new operating-system installation.",
+  "artifact_manifest": "release-jvm-evidence.json",
+  "script_sha256": "74da844e21221ae0e3a74ba62257a73bd08d720638659c1829e396f1aac22782",
+  "observed_exit_code": 0
+}

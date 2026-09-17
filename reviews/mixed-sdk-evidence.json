@@ -1,0 +1,91 @@
+{
+  "agent_evidence": false,
+  "client": "official MCP SDK1.30.0",
+  "languages": [
+    "java",
+    "javascript",
+    "python",
+    "typescript"
+  ],
+  "adapters": {
+    "java": {
+      "language": "java",
+      "parser": "joern",
+      "version": "joern-4.0.520 / cpg-1.7.62",
+      "available": true,
+      "capabilities": [
+        "search",
+        "source",
+        "node_detail",
+        "context",
+        "calls",
+        "type_hierarchy",
+        "dependencies",
+        "containment"
+      ],
+      "diagnostics": []
+    },
+    "javascript": {
+      "language": "javascript",
+      "parser": "typescript-compiler-api",
+      "version": "typescript/5.9.2",
+      "available": true,
+      "capabilities": [
+        "search",
+        "source",
+        "node_detail",
+        "context",
+        "containment"
+      ],
+      "diagnostics": []
+    },
+    "python": {
+      "language": "python",
+      "parser": "python-ast",
+      "version": "python-ast/3.12.13",
+      "available": true,
+      "capabilities": [
+        "search",
+        "source",
+        "node_detail",
+        "context",
+        "containment"
+      ],
+      "diagnostics": [
+        "invalid syntax"
+      ]
+    },
+    "typescript": {
+      "language": "typescript",
+      "parser": "typescript-compiler-api",
+      "version": "typescript/5.9.2",
+      "available": true,
+      "capabilities": [
+        "search",
+        "source",
+        "node_detail",
+        "context",
+        "containment"
+      ],
+      "diagnostics": []
+    }
+  },
+  "checks": [
+    "installed_parser_discovery_outside_checkout",
+    "distinct_language_labels",
+    "exact_utf8_spans",
+    "crlf_non_bmp",
+    "hashes",
+    "containment",
+    "no_invented_semantics",
+    "nested_duplicate_identity",
+    "bounded_context",
+    "syntax_diagnostics",
+    "whitespace_identity",
+    "watcher_create_change_rename_delete"
+  ],
+  "context_source_characters": 245,
+  "artifact_manifest": "release-jvm-evidence.json",
+  "script_sha256": "0a5de2c474dca96fcc72a718d271398948a53f5d41c1af452fc7f8fd769226e3",
+  "observed_exit_code": 0
+}

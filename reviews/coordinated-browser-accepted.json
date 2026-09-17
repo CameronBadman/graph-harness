@@ -1,0 +1,21 @@
+{
+  "scripted_clients": [
+    "SCRIPT A",
+    "SCRIPT B"
+  ],
+  "browser": "paired observer",
+  "checks": [
+    "plan",
+    "lease_acquired",
+    "lease_denied",
+    "retained_diff",
+    "apply",
+    "release",
+    "event_reconciliation",
+    "viewports"
+  ],
+  "artifact_manifest": "release-artifact.json",
+  "script_sha256": "da09fcf38f22f9bff4762f3e3ff5177799d4f20dfc3e18ee16774d42f819965f",
+  "observed_exit_code": 0,
+  "visual_review": "Integrator inspected final 1440x900 captures; separate file groups and bounded single-symbol zoom."
+}

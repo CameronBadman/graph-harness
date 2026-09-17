@@ -1,0 +1,14 @@
+{
+  "status": "incomplete_observability",
+  "attempts": 2,
+  "reason": "The monitor session was not heartbeated and its SSE stream expired before the agents completed. The captured journal must not be used to infer agent noncompliance.",
+  "captured_final_attempt": {
+    "configured_model": "gpt-5.6-terra",
+    "model_identity_verified": false,
+    "codex_cli_version": "codex-cli 0.154.0",
+    "agent_exit_codes": {"a": 0, "b": 0},
+    "journal_event_count": 13,
+    "writer_observed": ["search_graph", "get_source", "plan_edit", "lease_acquired"],
+    "reader_observed": ["session_connected"]
+  }
+}

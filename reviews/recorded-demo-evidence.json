@@ -1,0 +1,509 @@
+{
+  "configured_model": "gpt-5.6-terra",
+  "model_identity_verified": false,
+  "content": "public fixture only; credentials and private client logs were deleted after the run",
+  "activity_claim": "Two real Codex CLI clients performed observed MCP operations. Reservation contention was deliberately orchestrated, not autonomous behavior.",
+  "languages_expected": [
+    "java",
+    "typescript",
+    "python"
+  ],
+  "health": {
+    "daemon_epoch": "YwjW8uwpBvHePLj0JRYF6w",
+    "stream_healthy": true,
+    "agent_exit_codes": [
+      0,
+      0
+    ]
+  },
+  "distinct_session_ids": {
+    "writer": [
+      "bdca3c8f-1090-4300-8478-480d52525e3d"
+    ],
+    "reader": [
+      "4f592c32-7883-4484-bbf6-8d3cc8030c69"
+    ],
+    "distinct": true
+  },
+  "repair_test": {
+    "before_expected_failure": true,
+    "after_exit_code": 0,
+    "after_output": "Ticket office checks passed\n"
+  },
+  "ordered_observed_sequence": true,
+  "journal": [
+    {
+      "event_id": "3",
+      "event_type": "session_connected",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "status": "connected"
+    },
+    {
+      "event_id": "4",
+      "event_type": "tool_started",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "1",
+      "tool_name": "get_capabilities",
+      "status": "started"
+    },
+    {
+      "event_id": "5",
+      "event_type": "tool_completed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "1",
+      "tool_name": "get_capabilities",
+      "status": "completed"
+    },
+    {
+      "event_id": "6",
+      "event_type": "tool_started",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "2",
+      "tool_name": "search_graph",
+      "status": "started"
+    },
+    {
+      "event_id": "7",
+      "event_type": "tool_completed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "2",
+      "tool_name": "search_graph",
+      "status": "completed"
+    },
+    {
+      "event_id": "8",
+      "event_type": "tool_started",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "3",
+      "tool_name": "get_source",
+      "status": "started"
+    },
+    {
+      "event_id": "9",
+      "event_type": "tool_completed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "3",
+      "tool_name": "get_source",
+      "status": "completed"
+    },
+    {
+      "event_id": "10",
+      "event_type": "tool_started",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "4",
+      "tool_name": "validate_project",
+      "status": "started"
+    },
+    {
+      "event_id": "11",
+      "event_type": "validation_started",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "4",
+      "tool_name": "validate_project",
+      "status": "started"
+    },
+    {
+      "event_id": "12",
+      "event_type": "validation_failed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "4",
+      "tool_name": "validate_project",
+      "status": "failed"
+    },
+    {
+      "event_id": "13",
+      "event_type": "tool_completed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "4",
+      "tool_name": "validate_project",
+      "status": "completed"
+    },
+    {
+      "event_id": "14",
+      "event_type": "tool_started",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "5",
+      "tool_name": "plan_edit",
+      "status": "started"
+    },
+    {
+      "event_id": "15",
+      "event_type": "edit_planned",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "status": "planned"
+    },
+    {
+      "event_id": "16",
+      "event_type": "tool_completed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "5",
+      "tool_name": "plan_edit",
+      "status": "completed"
+    },
+    {
+      "event_id": "17",
+      "event_type": "tool_started",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "6",
+      "tool_name": "acquire_edit_lease",
+      "status": "started"
+    },
+    {
+      "event_id": "18",
+      "event_type": "lease_acquired",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "status": "acquired"
+    },
+    {
+      "event_id": "19",
+      "event_type": "tool_completed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "6",
+      "tool_name": "acquire_edit_lease",
+      "status": "completed"
+    },
+    {
+      "event_id": "20",
+      "event_type": "session_connected",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "status": "connected"
+    },
+    {
+      "event_id": "21",
+      "event_type": "lease_renewed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "status": "renewed"
+    },
+    {
+      "event_id": "22",
+      "event_type": "tool_started",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "1",
+      "tool_name": "search_graph",
+      "status": "started"
+    },
+    {
+      "event_id": "23",
+      "event_type": "tool_completed",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "1",
+      "tool_name": "search_graph",
+      "status": "completed"
+    },
+    {
+      "event_id": "24",
+      "event_type": "tool_started",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "2",
+      "tool_name": "get_source",
+      "status": "started"
+    },
+    {
+      "event_id": "25",
+      "event_type": "tool_completed",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "2",
+      "tool_name": "get_source",
+      "status": "completed"
+    },
+    {
+      "event_id": "26",
+      "event_type": "tool_started",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "3",
+      "tool_name": "search_graph",
+      "status": "started"
+    },
+    {
+      "event_id": "27",
+      "event_type": "tool_completed",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "3",
+      "tool_name": "search_graph",
+      "status": "completed"
+    },
+    {
+      "event_id": "28",
+      "event_type": "tool_started",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "4",
+      "tool_name": "get_source",
+      "status": "started"
+    },
+    {
+      "event_id": "29",
+      "event_type": "tool_completed",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "4",
+      "tool_name": "get_source",
+      "status": "completed"
+    },
+    {
+      "event_id": "30",
+      "event_type": "lease_renewed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "status": "renewed"
+    },
+    {
+      "event_id": "31",
+      "event_type": "tool_started",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "5",
+      "tool_name": "acquire_edit_lease",
+      "status": "started"
+    },
+    {
+      "event_id": "32",
+      "event_type": "lease_denied",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "status": "denied"
+    },
+    {
+      "event_id": "33",
+      "event_type": "tool_failed",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "5",
+      "tool_name": "acquire_edit_lease",
+      "status": "failed"
+    },
+    {
+      "event_id": "36",
+      "event_type": "lease_renewed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "status": "renewed"
+    },
+    {
+      "event_id": "37",
+      "event_type": "lease_renewed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "status": "renewed"
+    },
+    {
+      "event_id": "38",
+      "event_type": "tool_started",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "7",
+      "tool_name": "apply_edit",
+      "status": "started"
+    },
+    {
+      "event_id": "39",
+      "event_type": "edit_applied",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "7",
+      "tool_name": "apply_edit",
+      "status": "applied"
+    },
+    {
+      "event_id": "40",
+      "event_type": "tool_completed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "7",
+      "tool_name": "apply_edit",
+      "status": "completed"
+    },
+    {
+      "event_id": "41",
+      "event_type": "lease_renewed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "status": "renewed"
+    },
+    {
+      "event_id": "42",
+      "event_type": "tool_started",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "8",
+      "tool_name": "release_edit_lease",
+      "status": "started"
+    },
+    {
+      "event_id": "43",
+      "event_type": "lease_released",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "status": "released"
+    },
+    {
+      "event_id": "44",
+      "event_type": "tool_completed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "8",
+      "tool_name": "release_edit_lease",
+      "status": "completed"
+    },
+    {
+      "event_id": "45",
+      "event_type": "tool_started",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "9",
+      "tool_name": "validate_project",
+      "status": "started"
+    },
+    {
+      "event_id": "46",
+      "event_type": "validation_started",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "9",
+      "tool_name": "validate_project",
+      "status": "started"
+    },
+    {
+      "event_id": "47",
+      "event_type": "validation_completed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "9",
+      "tool_name": "validate_project",
+      "status": "completed"
+    },
+    {
+      "event_id": "48",
+      "event_type": "tool_completed",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "operation_id": "9",
+      "tool_name": "validate_project",
+      "status": "completed"
+    },
+    {
+      "event_id": "50",
+      "event_type": "session_disconnected",
+      "session_id": "bdca3c8f-1090-4300-8478-480d52525e3d",
+      "agent_label": "Codex coordinated writer A",
+      "status": "disconnected"
+    },
+    {
+      "event_id": "53",
+      "event_type": "tool_started",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "6",
+      "tool_name": "get_source",
+      "status": "started"
+    },
+    {
+      "event_id": "54",
+      "event_type": "tool_completed",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "6",
+      "tool_name": "get_source",
+      "status": "completed"
+    },
+    {
+      "event_id": "55",
+      "event_type": "tool_started",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "7",
+      "tool_name": "acquire_edit_lease",
+      "status": "started"
+    },
+    {
+      "event_id": "56",
+      "event_type": "lease_acquired",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "status": "acquired"
+    },
+    {
+      "event_id": "57",
+      "event_type": "tool_completed",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "7",
+      "tool_name": "acquire_edit_lease",
+      "status": "completed"
+    },
+    {
+      "event_id": "58",
+      "event_type": "tool_started",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "8",
+      "tool_name": "release_edit_lease",
+      "status": "started"
+    },
+    {
+      "event_id": "59",
+      "event_type": "lease_released",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "status": "released"
+    },
+    {
+      "event_id": "60",
+      "event_type": "tool_completed",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "operation_id": "8",
+      "tool_name": "release_edit_lease",
+      "status": "completed"
+    },
+    {
+      "event_id": "61",
+      "event_type": "session_disconnected",
+      "session_id": "4f592c32-7883-4484-bbf6-8d3cc8030c69",
+      "agent_label": "Codex coordinated reader B",
+      "status": "disconnected"
+    }
+  ],
+  "artifact_manifest": "release-artifact.json",
+  "codex_cli_version": "0.154.0",
+  "script_sha256": "681324b3b056d99c9f0ca236c60efe14a1f03200c686e0b4761a4e1c694930b0",
+  "media": {
+    "raw_duration_seconds": 97.28,
+    "raw_sha256": "32de726eb5441eee8a42b0835650955aaec085b58bade838a91f8b442105f485",
+    "published_playback_speed": 1.1,
+    "public_video": "docs/assets/real-agents-demo.mp4",
+    "privacy_review": "Only the paired observer page is retained. First frame, conflict and applied-edit screenshots inspected; public fixture and relative source paths only.",
+    "public_duration_seconds": 88.48,
+    "public_video_sha256": "4f64ea1c000894960526f2d294fdbf6389f84337059444793198d0d3d04ed349",
+    "encoding": "H.264 MP4, full frames, 1.1x playback; no event reordering"
+  },
+  "evidence_limits": [
+    "The compact activity journal omits file paths and timestamps; same-file contention is also visible in the captured observer screenshot.",
+    "Validation lifecycle events establish command execution; the independent fixture run verifies expected pre-repair failure and post-repair success."
+  ]
+}

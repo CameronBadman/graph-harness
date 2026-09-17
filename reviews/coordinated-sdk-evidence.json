@@ -1,0 +1,34 @@
+{
+  "agent_evidence": false,
+  "protocol": "official MCP SDK1.30.0",
+  "checks": [
+    "two_bridges",
+    "capability",
+    "failing_project_test",
+    "parser_plan",
+    "lease_conflict",
+    "foreign_plan_rejected",
+    "committed_edit",
+    "release",
+    "passing_project_test",
+    "versioned_manifests",
+    "offline_validation"
+  ],
+  "before_exit": 1,
+  "after_exit": 0,
+  "before_manifest": "44dfa5be89f52f597435523d255f0abca166994c35e517c1fa39594f5347ca8f",
+  "after_manifest": "127ce845854b537807a7d79c42fad84739438eec88465e01e5156ee434c6b3c5",
+  "filesystem_isolated": true,
+  "resource_limits": {
+    "address_space_bytes": 4294967296,
+    "cpu_seconds": 110,
+    "process_count": 64,
+    "open_files": 1024,
+    "output_file_bytes": 134217728
+  },
+  "isolation_limitations": [
+    "Resource limits are inherited per process; no delegated writable cgroup is available for aggregate tree memory or CPU control.",
+    "The source manifest does not pin read-only toolchain binaries or external dependency caches."
+  ],
+  "implementation_evidence": "coordinated-jvm-evidence.json"
+}

@@ -1,0 +1,198 @@
+{
+  "client": "Codex CLI 0.154.0",
+  "configured_model": "gpt-5.6-terra",
+  "model_evidence": "Actual codex exec startup/output, separate from display labels",
+  "two_labels_connected_simultaneously": true,
+  "sessions": [
+    {
+      "session_id": "d0f84915-fcfd-49b4-90ef-a5d8e29a00d3",
+      "label": "Pricing agent",
+      "connected": "2026-09-17T17:59:06.893855504Z",
+      "events": [
+        {
+          "event_id": "16",
+          "event_type": "session_connected",
+          "tool_name": null,
+          "operation_id": null,
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:59:06.893855504Z"
+        },
+        {
+          "event_id": "18",
+          "event_type": "tool_started",
+          "tool_name": "get_capabilities",
+          "operation_id": "1",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:59:13.187728824Z"
+        },
+        {
+          "event_id": "19",
+          "event_type": "tool_completed",
+          "tool_name": "get_capabilities",
+          "operation_id": "1",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:59:13.188584708Z"
+        },
+        {
+          "event_id": "22",
+          "event_type": "tool_started",
+          "tool_name": "search_graph",
+          "operation_id": "2",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:59:15.303364971Z"
+        },
+        {
+          "event_id": "23",
+          "event_type": "tool_completed",
+          "tool_name": "search_graph",
+          "operation_id": "2",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [
+            "method:tickets.PriceQuote.totalCents:int|int:int"
+          ],
+          "file_paths": [
+            "java/PriceQuote.java"
+          ],
+          "timestamp": "2026-09-17T17:59:15.303800483Z"
+        },
+        {
+          "event_id": "26",
+          "event_type": "tool_started",
+          "tool_name": "get_source",
+          "operation_id": "3",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:59:18.119628257Z"
+        },
+        {
+          "event_id": "27",
+          "event_type": "tool_completed",
+          "tool_name": "get_source",
+          "operation_id": "3",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [
+            "method:tickets.PriceQuote.totalCents:int|int:int"
+          ],
+          "file_paths": [
+            "java/PriceQuote.java"
+          ],
+          "timestamp": "2026-09-17T17:59:18.120332240Z"
+        },
+        {
+          "event_id": "31",
+          "event_type": "session_disconnected",
+          "tool_name": null,
+          "operation_id": null,
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:59:21.435678450Z"
+        }
+      ]
+    },
+    {
+      "session_id": "d49867e1-72a3-4e42-8820-3d811699954a",
+      "label": "Inventory agent",
+      "connected": "2026-09-17T17:59:06.951369410Z",
+      "events": [
+        {
+          "event_id": "17",
+          "event_type": "session_connected",
+          "tool_name": null,
+          "operation_id": null,
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:59:06.951369410Z"
+        },
+        {
+          "event_id": "20",
+          "event_type": "tool_started",
+          "tool_name": "get_capabilities",
+          "operation_id": "1",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:59:13.621830554Z"
+        },
+        {
+          "event_id": "21",
+          "event_type": "tool_completed",
+          "tool_name": "get_capabilities",
+          "operation_id": "1",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:59:13.622388206Z"
+        },
+        {
+          "event_id": "24",
+          "event_type": "tool_started",
+          "tool_name": "search_graph",
+          "operation_id": "2",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:59:16.173785682Z"
+        },
+        {
+          "event_id": "25",
+          "event_type": "tool_completed",
+          "tool_name": "search_graph",
+          "operation_id": "2",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [
+            "method:tickets.TicketInventory.reserve:int:boolean"
+          ],
+          "file_paths": [
+            "java/TicketInventory.java"
+          ],
+          "timestamp": "2026-09-17T17:59:16.174173744Z"
+        },
+        {
+          "event_id": "28",
+          "event_type": "tool_started",
+          "tool_name": "get_source",
+          "operation_id": "3",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:59:18.593314330Z"
+        },
+        {
+          "event_id": "29",
+          "event_type": "tool_completed",
+          "tool_name": "get_source",
+          "operation_id": "3",
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [
+            "method:tickets.TicketInventory.reserve:int:boolean"
+          ],
+          "file_paths": [
+            "java/TicketInventory.java"
+          ],
+          "timestamp": "2026-09-17T17:59:18.594081734Z"
+        },
+        {
+          "event_id": "30",
+          "event_type": "session_disconnected",
+          "tool_name": null,
+          "operation_id": null,
+          "snapshot_id": "51998e50b4559663",
+          "node_ids": [],
+          "file_paths": [],
+          "timestamp": "2026-09-17T17:59:20.912301061Z"
+        }
+      ]
+    }
+  ]
+}
