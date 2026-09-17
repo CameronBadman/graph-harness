@@ -327,17 +327,7 @@ fun refineJoernRanges(graph: JoernGraphData, projectRoot: Path): JoernGraphData 
         type.copy(lineRange = SourceRange(type.lineRange.start, endLine ?: type.lineRange.end))
     }
 
-    val refinedMethods = graph.methods.map { method ->
-        val fileData = load(method.file) ?: return@map method
-        val endLine = findBlockEndLine(fileData.second, method.lineRange.start)
-        val finalEnd = endLine ?: method.lineRange.end
-        method.copy(
-            lineRange = SourceRange(method.lineRange.start, finalEnd),
-            loc = (finalEnd - method.lineRange.start + 1).coerceAtLeast(1),
-        )
-    }
-
-    return graph.copy(types = refinedTypes, methods = refinedMethods)
+    return graph.copy(types = refinedTypes)
 }
 
 fun findBlockEndLine(source: String, startLine: Int): Int? {
@@ -378,10 +368,16 @@ fun closingLineForSource(source: String, openBraceIdx: Int): Int {
 }
 
 fun sourceSlice(fileSource: String, lineRange: SourceRange): String {
-    val lines = fileSource.lines()
-    val start = lineRange.start.coerceAtLeast(1)
-    val end = lineRange.end.coerceAtMost(lines.size)
-    return lines.subList(start - 1, end).joinToString("\n")
+    if (fileSource.isEmpty()) return ""
+    val starts = mutableListOf(0)
+    fileSource.forEachIndexed { index, char ->
+        if (char == '\n' && index + 1 < fileSource.length) starts += index + 1
+    }
+    val start = lineRange.start.coerceIn(1, starts.size)
+    val end = lineRange.end.coerceIn(start, starts.size)
+    val startOffset = starts[start - 1]
+    val endOffset = if (end < starts.size) starts[end] else fileSource.length
+    return fileSource.substring(startOffset, endOffset)
 }
 
 fun extractEditTaskTerms(task: String): List<String> {

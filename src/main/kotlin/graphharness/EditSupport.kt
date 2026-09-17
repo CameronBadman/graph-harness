@@ -2,6 +2,11 @@ package graphharness
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
+import java.nio.charset.CharacterCodingException
+import java.nio.charset.CodingErrorAction
+import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.UUID
 
@@ -75,10 +80,59 @@ data class PendingFileEdit(
     val newFileContent: String,
 )
 
-fun sha256(text: String): String =
+fun sha256(bytes: ByteArray): String =
     MessageDigest.getInstance("SHA-256")
-        .digest(text.toByteArray())
+        .digest(bytes)
         .joinToString("") { "%02x".format(it) }
+
+fun sha256(text: String): String = sha256(text.toByteArray(StandardCharsets.UTF_8))
+
+class RetainedSource private constructor(private val rawBytes: ByteArray) {
+    val hash: String = sha256(rawBytes)
+
+    val size: Int get() = rawBytes.size
+
+    fun bytes(): ByteArray = rawBytes.copyOf()
+
+    fun text(): String = decodeUtf8(rawBytes)
+
+    fun hasSameBytes(bytes: ByteArray): Boolean = rawBytes.contentEquals(bytes)
+
+    companion object {
+        fun fromBytes(bytes: ByteArray): RetainedSource {
+            decodeUtf8(bytes)
+            return RetainedSource(bytes.copyOf())
+        }
+    }
+}
+
+fun decodeUtf8(bytes: ByteArray): String = try {
+    StandardCharsets.UTF_8.newDecoder()
+        .onMalformedInput(CodingErrorAction.REPORT)
+        .onUnmappableCharacter(CodingErrorAction.REPORT)
+        .decode(ByteBuffer.wrap(bytes))
+        .toString()
+} catch (error: CharacterCodingException) {
+    throw IllegalArgumentException("unsupported_encoding: expected UTF-8 source", error)
+}
+
+fun readRetainedUtf8(path: Path, maxBytes: Long = Long.MAX_VALUE): RetainedSource {
+    require(maxBytes >= 0) { "maxBytes must not be negative" }
+    if (Files.size(path) > maxBytes) throw IllegalArgumentException("source exceeds configured byte limit")
+    val output = ByteArrayOutputStream()
+    Files.newInputStream(path).use { input ->
+        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+        while (true) {
+            val count = input.read(buffer)
+            if (count < 0) break
+            if (output.size().toLong() + count > maxBytes) {
+                throw IllegalArgumentException("source exceeds configured byte limit")
+            }
+            output.write(buffer, 0, count)
+        }
+    }
+    return RetainedSource.fromBytes(output.toByteArray())
+}
 
 fun makeEditId(): String = UUID.randomUUID().toString()
 
@@ -211,7 +265,7 @@ fun buildMethodDiff(
     }.trimEnd()
 }
 
-fun readPathText(path: Path): String = Files.readString(path)
+fun readPathText(path: Path): String = readRetainedUtf8(path).text()
 
 fun methodBodyText(existingSource: String, bodyRange: IntRange): String =
     existingSource.substring(bodyRange.first, bodyRange.last + 1)

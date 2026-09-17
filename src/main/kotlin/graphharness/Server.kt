@@ -1,12 +1,22 @@
 package graphharness
 
-import java.io.BufferedInputStream
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
+import java.nio.charset.CodingErrorAction
 import java.time.Instant
 
-class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
+enum class McpTransport {
+    NEWLINE,
+    CONTENT_LENGTH,
+}
+
+class GraphHarnessServer(
+    private val snapshotManager: SnapshotManager,
+    private val defaultTransport: McpTransport = McpTransport.NEWLINE,
+    private val maxFrameBytes: Int = DEFAULT_MAX_FRAME_BYTES,
+) {
     private val tools = listOf(
         tool(
             "get_capabilities",
@@ -192,7 +202,7 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
             objectSchema(
                 properties = mapOf(
                     "query" to stringSchema("Fuzzy name match."),
-                    "kind" to enumSchema("Optional node kind filter.", listOf("class", "interface", "method", "field", "enum", "annotation")),
+                    "kind" to enumSchema("Optional node kind filter.", listOf("file", "class", "interface", "method", "function", "field", "variable", "enum", "annotation", "type_alias", "namespace", "module", "constructor")),
                     "annotation" to stringSchema("Optional annotation filter."),
                     "cluster_id" to stringSchema("Optional cluster scope."),
                 ),
@@ -291,65 +301,107 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
         ),
     )
 
-    fun run(input: InputStream, output: OutputStream) {
-        val stream = BufferedInputStream(input)
-        while (true) {
-            val payload = readFrame(stream) ?: break
-            val request = MiniJson.parse(payload).asObject()
-            val id = request["id"]
-            val method = request.requiredString("method")
-            val params = request.optionalObject("params") ?: emptyJsonObject()
+    fun toolDefinitions(): List<ToolDefinition> = tools
 
-            val response = runCatching { dispatch(method, params, id) }.getOrElse { err ->
-                buildError(id, -32000, err.message ?: err::class.simpleName.orEmpty())
+    fun run(input: InputStream, output: OutputStream, transport: McpTransport = defaultTransport) {
+        while (true) {
+            val payload = try {
+                readFrame(input, transport)
+            } catch (err: FrameException) {
+                writeResponse(output, buildError(JNull, -32600, err.message.orEmpty()), transport)
+                continue
             }
+            if (payload == null) break
+            val response = processRequest(payload, transport)
             if (response != null) {
-                writeResponse(output, response)
+                writeResponse(output, response, transport)
             }
         }
     }
 
-    private fun dispatch(method: String, params: JObject, id: JsonValue?): JObject? {
-        return when (method) {
-            "initialize" -> buildResult(
-                id,
-                graphHarnessJson.encode(
-                    mapOf(
-                        "protocolVersion" to "2024-11-05",
-                        "serverInfo" to mapOf("name" to "graphharness", "version" to "0.1.0"),
-                        "capabilities" to mapOf("tools" to emptyMap<String, Any?>()),
-                    ),
-                ),
-            )
+    private fun processRequest(payload: String, transport: McpTransport): JObject? {
+        val request = try {
+            MiniJson.parse(payload).asObject()
+        } catch (err: Exception) {
+            return buildError(JNull, -32700, "Parse error")
+        }
+        if (request.optionalString("jsonrpc") != "2.0") {
+            return buildError(JNull, -32600, "Invalid Request: jsonrpc must be 2.0")
+        }
+        val idPresent = request.fields.containsKey("id")
+        val id = request["id"]
+        if (idPresent && id !is JString && id !is JNumber && id != JNull) {
+            return buildError(JNull, -32600, "Invalid Request: id must be a string, number, or null")
+        }
+        val method = request.optionalString("method")
+            ?: return buildError(JNull, -32600, "Invalid Request: method must be a string")
+        val notification = !idPresent
+        val paramsValue = request["params"]
+        if (paramsValue != null && paramsValue !is JObject) {
+            return if (notification) null else buildError(id ?: JNull, -32602, "Invalid params: params must be an object")
+        }
+        val params = paramsValue as? JObject ?: emptyJsonObject()
+        if (notification) return null
+        return try {
+            dispatch(method, params, id ?: JNull, transport == McpTransport.CONTENT_LENGTH)
+        } catch (err: InvalidParamsException) {
+            if (notification) null else buildError(id ?: JNull, -32602, err.message.orEmpty())
+        } catch (err: NoSuchMethodException) {
+            if (notification) null else buildError(id ?: JNull, -32601, err.message.orEmpty())
+        } catch (err: Exception) {
+            if (notification) null else buildError(id ?: JNull, -32603, "Internal error")
+        }
+    }
 
-            "notifications/initialized" -> null
-            "tools/list" -> buildResult(id, graphHarnessJson.encode(mapOf("tools" to tools)))
-            "tools/call" -> {
-                val toolName = params.requiredString("name")
-                val arguments = params.optionalObject("arguments") ?: emptyJsonObject()
-                val result = invokeTool(toolName, arguments)
+    private fun dispatch(method: String, params: JObject, id: JsonValue, legacyTransport: Boolean): JObject? {
+        return when (method) {
+            "initialize" -> {
+                val requestedVersion = params.optionalString("protocolVersion")
+                if (requestedVersion == null && !legacyTransport) {
+                    throw InvalidParamsException("Invalid params: protocolVersion must be a string")
+                }
                 buildResult(
                     id,
                     graphHarnessJson.encode(
                         mapOf(
-                            "content" to listOf(
-                                mapOf(
-                                    "type" to "text",
-                                    "text" to result.stringify(),
-                                ),
-                            ),
-                            "structuredContent" to result,
-                            "isError" to false,
+                            "protocolVersion" to MCP_PROTOCOL_VERSION,
+                            "serverInfo" to mapOf("name" to "graphharness", "version" to "0.1.0"),
+                            "capabilities" to mapOf("tools" to emptyMap<String, Any?>()),
                         ),
                     ),
                 )
             }
 
-            else -> buildResult(id, invokeTool(method, params))
+            "ping" -> buildResult(id, emptyJsonObject())
+            "notifications/initialized" -> buildResult(id, emptyJsonObject())
+            "tools/list" -> buildResult(id, graphHarnessJson.encode(mapOf("tools" to tools)))
+            "tools/call" -> {
+                val toolName = params.optionalString("name")
+                    ?: throw InvalidParamsException("Invalid params: name must be a string")
+                val argumentsValue = params["arguments"]
+                if (argumentsValue != null && argumentsValue !is JObject) {
+                    throw InvalidParamsException("Invalid params: arguments must be an object")
+                }
+                val arguments = argumentsValue as? JObject ?: emptyJsonObject()
+                val result = runCatching { invokeTool(toolName, arguments) }
+                buildResult(
+                    id,
+                    result.fold(
+                        onSuccess = { toolResult(it, false) },
+                        onFailure = { toolResult(JString(it.message ?: "Tool execution failed"), true) },
+                    ),
+                )
+            }
+            else -> throw NoSuchMethodException("Method not found: $method")
         }
     }
 
-    private fun invokeTool(toolName: String, arguments: JObject): JsonValue {
+    fun invokeTool(toolName: String, arguments: JObject): JsonValue {
+        if (toolName in setOf("verify_candidate", "plan_edit", "get_validation_targets")) {
+            val nodeId = arguments.optionalString("node_id") ?: arguments.optionalString("target_node_id")
+            val node = nodeId?.let { snapshotManager.current().nodeSummaries[it] }
+            if (node != null && node.language != "java") throw LiveFailure("unsupported_operation", 422, "This language supports structural navigation, not Java edits or validation targeting.")
+        }
         return when (toolName) {
             "get_edit_candidates" -> graphHarnessJson.encode(
                 snapshotManager.editCandidates(
@@ -520,13 +572,24 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
         )
     }
 
-    private fun buildResult(id: JsonValue?, result: JsonValue): JObject = jObject(
+    private fun toolResult(result: JsonValue, isError: Boolean): JsonValue = jObject(
+        "content" to listOf(
+            mapOf(
+                "type" to "text",
+                "text" to result.stringify(),
+            ),
+        ),
+        "structuredContent" to if (isError) null else result,
+        "isError" to isError,
+    )
+
+    private fun buildResult(id: JsonValue, result: JsonValue): JObject = jObject(
         "jsonrpc" to "2.0",
         "id" to id,
         "result" to result,
     )
 
-    private fun buildError(id: JsonValue?, code: Int, message: String): JObject = jObject(
+    private fun buildError(id: JsonValue, code: Int, message: String): JObject = jObject(
         "jsonrpc" to "2.0",
         "id" to id,
         "error" to mapOf(
@@ -536,29 +599,74 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
         ),
     )
 
-    private fun readFrame(input: BufferedInputStream): String? {
+    private fun readFrame(input: InputStream, transport: McpTransport): String? = when (transport) {
+        McpTransport.NEWLINE -> readNewlineFrame(input)
+        McpTransport.CONTENT_LENGTH -> readContentLengthFrame(input)
+    }
+
+    private fun readNewlineFrame(input: InputStream): String? {
+        val bytes = readLine(input) ?: return null
+        return decodeUtf8(bytes)
+    }
+
+    private fun readContentLengthFrame(input: InputStream): String? {
         val headers = mutableMapOf<String, String>()
         while (true) {
             val line = readAsciiLine(input) ?: return null
             if (line.isBlank()) break
-            val idx = line.indexOf(':')
-            if (idx > 0) {
-                headers[line.substring(0, idx).trim().lowercase()] = line.substring(idx + 1).trim()
-            }
+            val separator = line.indexOf(':')
+            if (separator <= 0) throw FrameException("Invalid Content-Length header")
+            headers[line.substring(0, separator).trim().lowercase()] = line.substring(separator + 1).trim()
         }
-        val length = headers["content-length"]?.toIntOrNull() ?: return null
+        val length = headers["content-length"]?.toIntOrNull()
+            ?: throw FrameException("Missing or invalid Content-Length header")
+        if (length < 0 || length > maxFrameBytes) throw FrameException("Message exceeds $maxFrameBytes bytes")
         val bytes = input.readNBytes(length)
-        return bytes.toString(StandardCharsets.UTF_8)
+        if (bytes.size != length) throw FrameException("Unexpected EOF while reading Content-Length frame")
+        return decodeUtf8(bytes)
     }
 
-    private fun writeResponse(output: OutputStream, payload: JObject) {
+    private fun decodeUtf8(bytes: ByteArray): String = try {
+        StandardCharsets.UTF_8.newDecoder()
+            .onMalformedInput(CodingErrorAction.REPORT)
+            .onUnmappableCharacter(CodingErrorAction.REPORT)
+            .decode(ByteBuffer.wrap(bytes))
+            .toString()
+    } catch (err: Exception) {
+        throw FrameException("Invalid UTF-8 message")
+    }
+
+    private fun writeResponse(output: OutputStream, payload: JObject, transport: McpTransport) {
         val body = payload.stringify().toByteArray(StandardCharsets.UTF_8)
-        output.write("Content-Length: ${body.size}\r\n\r\n".toByteArray(StandardCharsets.US_ASCII))
+        if (transport == McpTransport.CONTENT_LENGTH) {
+            output.write("Content-Length: ${body.size}\r\n\r\n".toByteArray(StandardCharsets.US_ASCII))
+        }
         output.write(body)
+        if (transport == McpTransport.NEWLINE) output.write('\n'.code)
         output.flush()
     }
 
-    private fun readAsciiLine(input: BufferedInputStream): String? {
+    private fun readLine(input: InputStream): ByteArray? {
+        val buffer = ArrayList<Byte>()
+        while (true) {
+            val read = input.read()
+            if (read == -1) return if (buffer.isEmpty()) null else buffer.toByteArray()
+            if (read == '\n'.code) {
+                if (buffer.lastOrNull()?.toInt() == '\r'.code) buffer.removeAt(buffer.lastIndex)
+                return buffer.toByteArray()
+            }
+            if (buffer.size >= maxFrameBytes) {
+                while (true) {
+                    val discarded = input.read()
+                    if (discarded == -1 || discarded == '\n'.code) break
+                }
+                throw FrameException("Message exceeds $maxFrameBytes bytes")
+            }
+            buffer += read.toByte()
+        }
+    }
+
+    private fun readAsciiLine(input: InputStream): String? {
         val buffer = ArrayList<Byte>()
         while (true) {
             val read = input.read()
@@ -567,10 +675,20 @@ class GraphHarnessServer(private val snapshotManager: SnapshotManager) {
             }
             if (read == '\n'.code) break
             if (read != '\r'.code) {
+                if (buffer.size >= maxFrameBytes) throw FrameException("Message exceeds $maxFrameBytes bytes")
                 buffer += read.toByte()
             }
         }
         return buffer.toByteArray().toString(StandardCharsets.US_ASCII)
+    }
+
+    private class FrameException(message: String) : Exception(message)
+
+    private class InvalidParamsException(message: String) : Exception(message)
+
+    private companion object {
+        const val MCP_PROTOCOL_VERSION = "2025-06-18"
+        const val DEFAULT_MAX_FRAME_BYTES = 1_048_576
     }
 }
 
@@ -591,6 +709,11 @@ internal class JsonCodec {
         })
 
         is SourceRange -> jObject("start" to value.start, "end" to value.end)
+        is ByteSpan -> jObject("start" to value.start, "end" to value.end)
+        is LanguageAdapterInfo -> jObject(
+            "language" to value.language, "parser" to value.parser, "version" to value.version,
+            "available" to value.available, "capabilities" to value.capabilities, "diagnostics" to value.diagnostics,
+        )
         is NodeSummary -> jObject(
             "id" to value.id,
             "kind" to value.kind,
@@ -602,6 +725,12 @@ internal class JsonCodec {
             "annotations" to value.annotations,
             "complexity" to value.complexity,
             "loc" to value.loc,
+            "file_hash" to value.file_hash,
+            "language" to value.language,
+            "qualified_name" to value.qualified_name,
+            "parent" to value.parent,
+            "byte_span" to value.byte_span,
+            "provenance" to value.provenance,
         )
 
         is EdgeSummary -> jObject(
@@ -610,6 +739,8 @@ internal class JsonCodec {
             "relationship" to value.relationship,
             "file" to value.file,
             "line" to value.line,
+            "provenance" to value.provenance,
+            "resolution" to value.resolution,
         )
 
         is ClusterSummary -> jObject(
@@ -637,6 +768,8 @@ internal class JsonCodec {
         is ProjectSummary -> jObject(
             "root" to value.root,
             "total_files" to value.total_files,
+            "structural_nodes_by_language" to value.structural_nodes_by_language,
+            "semantic_summary_scope" to value.semantic_summary_scope,
             "total_packages" to value.total_packages,
             "total_types" to value.total_types,
             "total_methods" to value.total_methods,
@@ -820,6 +953,7 @@ internal class JsonCodec {
         )
         is CapabilitiesResult -> jObject(
             "languages" to value.languages,
+            "language_adapters" to value.language_adapters,
             "analysis_engine" to value.analysis_engine,
             "backend_mode" to value.backend_mode,
             "semantic_level" to value.semantic_level,
@@ -1002,6 +1136,10 @@ internal class JsonCodec {
             "snapshot_state" to value.snapshot_state,
             "snapshot_id" to value.snapshot_id,
             "generated_at" to value.generated_at,
+            "file_hash" to value.file_hash,
+            "language" to value.language,
+            "provenance" to value.provenance,
+            "byte_span" to value.byte_span,
         )
 
         is SourceBatchItem -> jObject(
@@ -1009,6 +1147,10 @@ internal class JsonCodec {
             "source" to value.source,
             "file" to value.file,
             "line_range" to value.line_range,
+            "file_hash" to value.file_hash,
+            "language" to value.language,
+            "provenance" to value.provenance,
+            "byte_span" to value.byte_span,
         )
 
         is SourceBatchResult -> jObject(

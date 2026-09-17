@@ -1,0 +1,9 @@
+{
+  "name": "graph-harness-structural-parsers",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Pinned runtime dependency for GraphHarness structural parser helpers.",
+  "dependencies": {
+    "typescript": "5.9.2"
+  }
+}

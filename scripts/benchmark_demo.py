@@ -270,7 +270,7 @@ def timed_tool_call(
 
 
 def harness_run(server: str, project_root: str) -> BenchmarkResult:
-    session = JsonRpcSession([server, project_root])
+    session = JsonRpcSession([server, "legacy-stdio", project_root])
     started = time.perf_counter()
     tokens = 0
     notes: list[str] = []
@@ -336,7 +336,7 @@ def harness_run(server: str, project_root: str) -> BenchmarkResult:
 
 
 def harness_bundle_run(server: str, project_root: str) -> BenchmarkResult:
-    session = JsonRpcSession([server, project_root])
+    session = JsonRpcSession([server, "legacy-stdio", project_root])
     started = time.perf_counter()
     tokens = 0
     notes: list[str] = []
@@ -385,7 +385,7 @@ def harness_bundle_run(server: str, project_root: str) -> BenchmarkResult:
 
 
 def harness_contract_run(server: str, project_root: str) -> BenchmarkResult:
-    session = JsonRpcSession([server, project_root])
+    session = JsonRpcSession([server, "legacy-stdio", project_root])
     started = time.perf_counter()
     tokens = 0
     notes: list[str] = []
@@ -488,7 +488,7 @@ def naive_contract_run(project_root: str) -> BenchmarkResult:
 
 
 def harness_edit_run(server: str, project_root: str) -> tuple[BenchmarkResult, BenchmarkResult]:
-    session = JsonRpcSession([server, project_root])
+    session = JsonRpcSession([server, "legacy-stdio", project_root])
     started = time.perf_counter()
     tool_latencies: dict[str, int] = {}
     try:
@@ -548,7 +548,7 @@ def harness_edit_run(server: str, project_root: str) -> tuple[BenchmarkResult, B
 
 
 def harness_feature_run(server: str, project_root: str) -> BenchmarkResult:
-    session = JsonRpcSession([server, project_root])
+    session = JsonRpcSession([server, "legacy-stdio", project_root])
     started = time.perf_counter()
     tokens = 0
     artifacts: list[str] = []
@@ -609,7 +609,7 @@ def harness_edit_execution_run(server: str, project_root: str) -> dict[str, Any]
     if scratch.exists():
         shutil.rmtree(scratch)
     shutil.copytree(project_root, scratch)
-    session = JsonRpcSession([server, str(scratch)])
+    session = JsonRpcSession([server, "legacy-stdio", str(scratch)])
     try:
         session.request("initialize", {})
         search = session.tool_call("search_graph", {"query": "processCreationForm", "kind": "method"})

@@ -98,7 +98,7 @@ def syntax_check(project_root: Path) -> dict[str, Any]:
 
 
 def run_method_patch_demo(server: str, project_root: Path, env: dict[str, str]) -> dict[str, Any]:
-    session = JsonRpcSession([server, str(project_root)], env=env)
+    session = JsonRpcSession([server, "legacy-stdio", str(project_root)], env=env)
     try:
         session.request("initialize", {})
         candidate_task = 'Insert "pet.setOwner(owner);" before "owner.addPet(pet);" in processCreationForm'
@@ -144,7 +144,7 @@ def run_method_patch_demo(server: str, project_root: Path, env: dict[str, str]) 
 
 
 def run_rename_demo(server: str, project_root: Path, env: dict[str, str]) -> dict[str, Any]:
-    session = JsonRpcSession([server, str(project_root)], env=env)
+    session = JsonRpcSession([server, "legacy-stdio", str(project_root)], env=env)
     try:
         session.request("initialize", {})
         candidate_task = "Rename method findById to findOwnerById in the repository"
@@ -177,7 +177,7 @@ def run_apply_smoke(server: str, source_root: Path, env: dict[str, str]) -> dict
         shutil.rmtree(scratch)
     shutil.copytree(source_root, scratch)
 
-    session = JsonRpcSession([server, str(scratch)], env=env)
+    session = JsonRpcSession([server, "legacy-stdio", str(scratch)], env=env)
     try:
         session.request("initialize", {})
         search = session.tool_call("search_graph", {"query": "processCreationForm", "kind": "method"})

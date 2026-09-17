@@ -98,7 +98,7 @@ def main() -> int:
     parser.add_argument("project_root", help="Path to the Java project to analyze.")
     args = parser.parse_args()
 
-    session = JsonRpcSession([args.server, args.project_root])
+    session = JsonRpcSession([args.server, "legacy-stdio", args.project_root])
     try:
         initialize = session.request("initialize", {})
         print_json("initialize", initialize["result"])

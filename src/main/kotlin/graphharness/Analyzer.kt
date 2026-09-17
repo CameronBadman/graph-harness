@@ -3,10 +3,13 @@ package graphharness
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.nio.file.FileSystems
+import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardWatchEventKinds
+import java.nio.file.attribute.BasicFileAttributes
 import java.security.MessageDigest
 import java.time.Duration
 import java.time.Instant
@@ -17,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.Collections
 import kotlin.io.path.createDirectories
 import kotlin.io.path.extension
 import kotlin.io.path.invariantSeparatorsPathString
@@ -107,6 +111,10 @@ data class Snapshot(
     val methodInfos: Map<String, MethodInfo>,
     val sourceIndex: Map<String, Path>,
     val fileHashes: Map<String, String>,
+    val sourceFiles: Map<String, RetainedSource> = emptyMap(),
+    val omittedFileCount: Int = 0,
+    val sourceDiagnostics: List<SourceAdmissionDiagnostic> = emptyList(),
+    val adapterInfo: Map<String, LanguageAdapterInfo> = emptyMap(),
     val packageCount: Int,
     val clusterStrategy: String = "package",
     val clusterProvenance: String = "package_name",
@@ -114,7 +122,47 @@ data class Snapshot(
     val epoch: Long = 0,
 )
 
-class SnapshotManager(private val projectRoot: Path) {
+data class SourceAdmissionDiagnostic(
+    val file: String,
+    val reason: String,
+)
+
+data class SourceAdmissionLimits(
+    val maxFileBytes: Long = 1024L * 1024,
+    val maxFiles: Int = 10_000,
+    val maxRetainedBytes: Long = 128L * 1024 * 1024,
+    val maxDiagnostics: Int = 100,
+)
+
+interface SnapshotBuildHook {
+    fun afterImmutableCapture(generation: Long) {}
+    fun beforeInstall(generation: Long) {}
+    fun afterInstall(snapshot: Snapshot) {}
+}
+
+private fun isJavaSourcePath(path: String): Boolean = path.lowercase().endsWith(".java")
+
+private fun isSupportedSourcePath(path: Path): Boolean = isSupportedSourcePath(path.fileName.toString())
+
+private fun isSupportedSourcePath(path: String): Boolean = when (path.substringAfterLast('.', "").lowercase()) {
+    "java", "ts", "tsx", "js", "jsx", "py" -> true
+    else -> false
+}
+
+private data class CapturedSources(
+    val root: Path,
+    val paths: Map<String, Path>,
+    val sources: Map<String, RetainedSource>,
+    val omittedFileCount: Int,
+    val diagnostics: List<SourceAdmissionDiagnostic>,
+)
+
+class SnapshotManager(
+    private val projectRoot: Path,
+    private val buildHook: SnapshotBuildHook? = null,
+    private val useJoern: Boolean = true,
+    private val sourceAdmissionLimits: SourceAdmissionLimits = SourceAdmissionLimits(),
+) : AutoCloseable {
     private val activeSnapshot = AtomicReference<Snapshot>()
     private val snapshotHistory = ConcurrentHashMap<String, Snapshot>()
     private val snapshotOrder = ArrayDeque<String>()
@@ -122,8 +170,14 @@ class SnapshotManager(private val projectRoot: Path) {
     private val rebuildThreadIds = AtomicInteger(1)
     private val snapshotEpoch = AtomicLong(1)
     private val pendingRebuild = AtomicBoolean(false)
-    private val dirtyFiles = ConcurrentHashMap.newKeySet<String>()
+    private val lastBuildFailure = AtomicReference<String?>(null)
+    private val dirtyFiles = ConcurrentHashMap<String, Long>()
+    private val dirtyGeneration = AtomicLong(0)
+    private val publicationLock = Any()
+    @Volatile private var watchService: java.nio.file.WatchService? = null
+    @Volatile private var watcherThread: Thread? = null
     private val requireJoern = readStrictJoernMode()
+    private val structuralAdapters = StructuralAdapters()
     private val clusterStrategy = readClusterStrategy()
     private val incrementalFileThreshold = 40
     private val propagatedDirtyFileCap = 250
@@ -135,6 +189,7 @@ class SnapshotManager(private val projectRoot: Path) {
     }
 
     init {
+        require(!requireJoern || useJoern) { "GRAPHHARNESS_REQUIRE_JOERN=true is incompatible with useJoern=false" }
         val initial = buildSnapshot().copy(epoch = snapshotEpoch.get())
         recordSnapshot(initial)
         activeSnapshot.set(initial)
@@ -143,47 +198,95 @@ class SnapshotManager(private val projectRoot: Path) {
 
     fun current(): Snapshot = activeSnapshot.get()
 
+    fun refresh(): Snapshot {
+        markDirty("<manual-refresh>")
+        rebuildFromDirty()
+        return current()
+    }
+
+    fun queueRefresh(file: String) {
+        val root = projectRoot.toRealPath()
+        val requested = Path.of(file)
+        if (requested.isAbsolute || !file.endsWith(".java")) {
+            throw LiveFailure("invalid_path", 422, "A repository-relative Java file is required.")
+        }
+        val candidate = root.resolve(requested).normalize()
+        if (!candidate.startsWith(root)) {
+            throw LiveFailure("invalid_path", 422, "The file is outside the configured repository.")
+        }
+        if (Files.exists(candidate)) {
+            val canonical = runCatching { candidate.toRealPath() }.getOrElse {
+                throw LiveFailure("invalid_path", 422, "The file cannot be resolved safely.")
+            }
+            if (!canonical.startsWith(root)) {
+                throw LiveFailure("invalid_path", 422, "The file is outside the configured repository.")
+            }
+        }
+        markDirty(root.relativize(candidate).invariantSeparatorsPathString)
+        pendingRebuild.set(true)
+        rebuildExecutor.schedule({ rebuildFromDirty() }, 0, TimeUnit.MILLISECONDS)
+    }
+
+    fun snapshotState(): SnapshotRuntimeState = snapshotRuntimeState()
+
+    fun lastBuildFailure(): String? = lastBuildFailure.get()
+
+    override fun close() {
+        watcherThread?.interrupt()
+        runCatching { watchService?.close() }
+        rebuildExecutor.shutdownNow()
+    }
+
+    private fun markDirty(file: String): Long {
+        val generation = dirtyGeneration.incrementAndGet()
+        dirtyFiles.merge(normalize(file), generation) { old, new -> maxOf(old, new) }
+        return generation
+    }
+
     private fun startWatcher() {
-        val root = projectRoot
+        val root = runCatching { projectRoot.toRealPath() }.getOrElse { return }
         if (!Files.isDirectory(root)) {
             return
         }
 
         val watchService = FileSystems.getDefault().newWatchService()
-        Files.walk(root).use { paths ->
-            paths.filter { Files.isDirectory(it) }
-                .forEach {
-                    runCatching {
-                        it.register(
-                            watchService,
-                            StandardWatchEventKinds.ENTRY_CREATE,
-                            StandardWatchEventKinds.ENTRY_DELETE,
-                            StandardWatchEventKinds.ENTRY_MODIFY,
-                        )
-                    }
-                }
-        }
+        this.watchService = watchService
+        registerDirectoryTree(root, watchService)
 
         val watcherThread = Thread {
             while (!Thread.currentThread().isInterrupted) {
                 val key = runCatching { watchService.take() }.getOrNull() ?: break
                 var touchedJava = false
                 key.pollEvents().forEach { event ->
-                    val ctx = event.context()?.toString() ?: return@forEach
-                    if (ctx.endsWith(".java")) {
+                    if (event.kind() == StandardWatchEventKinds.OVERFLOW) {
+                        markDirty("<watch-overflow>")
                         touchedJava = true
-                        val watched = key.watchable() as? Path
-                        if (watched != null) {
+                        return@forEach
+                    }
+                    val ctx = event.context()?.toString() ?: return@forEach
+                    val watched = key.watchable() as? Path
+                    if (watched != null) {
+                        val abs = watched.resolve(ctx).normalize()
+                        if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE && Files.isDirectory(abs)) {
+                            registerDirectoryTree(abs, watchService)
+                            markDirty("<directory-created>")
+                            touchedJava = true
+                        }
+                        if (isSupportedSourcePath(ctx)) {
+                            touchedJava = true
                             val abs = watched.resolve(ctx).normalize()
                             runCatching {
                                 if (abs.startsWith(root)) {
-                                    dirtyFiles += normalize(root.relativize(abs).invariantSeparatorsPathString)
+                                    markDirty(root.relativize(abs).invariantSeparatorsPathString)
                                 }
                             }
                         }
                     }
                 }
-                key.reset()
+                if (!key.reset()) {
+                    markDirty("<watch-key-invalid>")
+                    touchedJava = true
+                }
                 if (touchedJava) {
                     pendingRebuild.set(true)
                     rebuildExecutor.schedule({
@@ -194,7 +297,32 @@ class SnapshotManager(private val projectRoot: Path) {
         }
         watcherThread.isDaemon = true
         watcherThread.name = "graphharness-watcher"
+        this.watcherThread = watcherThread
         watcherThread.start()
+    }
+
+    private fun registerDirectoryTree(root: Path, watchService: java.nio.file.WatchService) {
+        val ignoredDirectories = setOf(".git", ".gradle", "build", "node_modules", "vendor", "target", ".graphharness")
+        Files.walk(root).use { paths ->
+            paths.filter { directory ->
+                Files.isDirectory(directory) &&
+                    !Files.isSymbolicLink(directory) &&
+                    runCatching {
+                        val real = directory.toRealPath()
+                        real.startsWith(projectRoot.toRealPath()) &&
+                            projectRoot.toRealPath().relativize(real).none { it.toString() in ignoredDirectories }
+                    }.getOrDefault(false)
+            }.forEach { directory ->
+                runCatching {
+                    directory.register(
+                        watchService,
+                        StandardWatchEventKinds.ENTRY_CREATE,
+                        StandardWatchEventKinds.ENTRY_DELETE,
+                        StandardWatchEventKinds.ENTRY_MODIFY,
+                    )
+                }
+            }
+        }
     }
 
     @Synchronized
@@ -202,63 +330,228 @@ class SnapshotManager(private val projectRoot: Path) {
         snapshotHistory[snapshot.id] = snapshot
         snapshotOrder.remove(snapshot.id)
         snapshotOrder.addLast(snapshot.id)
-        while (snapshotOrder.size > 12) {
+        while (snapshotOrder.size > 3 || retainedSnapshotBytes() > 128L * 1024 * 1024) {
             val expired = snapshotOrder.removeFirst()
             snapshotHistory.remove(expired)
         }
     }
 
-    private fun installSnapshot(snapshot: Snapshot) {
+    private fun retainedSnapshotBytes(): Long =
+        snapshotOrder.sumOf { snapshotId -> snapshotHistory[snapshotId]?.sourceFiles?.values?.sumOf { it.size.toLong() } ?: 0L }
+
+    private fun installSnapshot(snapshot: Snapshot, consumed: Map<String, Long> = emptyMap()): Snapshot {
         val withEpoch = snapshot.copy(epoch = snapshotEpoch.incrementAndGet())
         recordSnapshot(withEpoch)
         activeSnapshot.set(withEpoch)
-        dirtyFiles.clear()
-        pendingRebuild.set(false)
+        consumed.forEach { (file, generation) -> dirtyFiles.remove(file, generation) }
+        pendingRebuild.set(dirtyFiles.isNotEmpty())
+        return withEpoch
     }
 
     private fun snapshotById(snapshotId: String): Snapshot =
         snapshotHistory[snapshotId] ?: error("Unknown snapshot_id: $snapshotId")
 
     private fun rebuildFromDirty() {
-        val active = activeSnapshot.get()
-        val changed = dirtyFiles.toSet()
-        val propagated = if (active != null) propagateDirtyFiles(active, changed) else changed
-        dirtyFiles.clear()
-        dirtyFiles.addAll(propagated)
-        val snapshot = runCatching { buildSnapshot(propagated) }
-            .recoverCatching { buildSnapshot(emptySet()) }
-            .getOrElse {
-                pendingRebuild.set(false)
-                return
-            }
-        installSnapshot(snapshot)
+        synchronized(publicationLock) {
+            val active = activeSnapshot.get()
+            val capturedDirty = dirtyFiles.entries.associate { it.key to it.value }
+            val changed = capturedDirty.keys
+            val propagated = if (active != null) propagateDirtyFiles(active, changed) else changed
+            val generation = dirtyGeneration.get()
+            val captured = captureSources()
+            buildHook?.afterImmutableCapture(generation)
+            val snapshot = runCatching { buildSnapshot(propagated, captured) }
+                .recoverCatching { buildSnapshot(emptySet(), captured) }
+                .getOrElse {
+                    lastBuildFailure.set("snapshot build failed")
+                    pendingRebuild.set(dirtyFiles.isNotEmpty())
+                    return
+                }
+            buildHook?.beforeInstall(generation)
+            val installed = installSnapshot(snapshot, capturedDirty)
+            lastBuildFailure.set(null)
+            buildHook?.afterInstall(installed)
+        }
+        if (dirtyFiles.isNotEmpty()) {
+            pendingRebuild.set(true)
+            rebuildExecutor.schedule({ rebuildFromDirty() }, 0, TimeUnit.MILLISECONDS)
+        }
     }
 
-    private fun buildSnapshot(changedFiles: Set<String> = emptySet()): Snapshot {
+    private fun captureSources(): CapturedSources {
+        val canonicalRoot = projectRoot.toRealPath()
+        val paths = linkedMapOf<String, Path>()
+        val sources = linkedMapOf<String, RetainedSource>()
+        val diagnostics = mutableListOf<SourceAdmissionDiagnostic>()
+        val ignoredDirectories = setOf(".git", ".gradle", "build", "node_modules", "vendor", "target", ".graphharness")
+        val trackedFiles = trackedGitPaths(canonicalRoot)
+        val ignoredCache = mutableMapOf<String, Boolean>()
+        var omittedFileCount = 0
+        var retainedBytes = 0L
+
+        fun omit(relative: String, reason: String) {
+            omittedFileCount++
+            if (diagnostics.size < sourceAdmissionLimits.maxDiagnostics) {
+                diagnostics += SourceAdmissionDiagnostic(relative, reason)
+            }
+        }
+
+        Files.walkFileTree(canonicalRoot, object : SimpleFileVisitor<Path>() {
+            override fun preVisitDirectory(directory: Path, attrs: BasicFileAttributes): FileVisitResult {
+                if (directory == canonicalRoot) return FileVisitResult.CONTINUE
+                val relative = normalize(canonicalRoot.relativize(directory).invariantSeparatorsPathString)
+                val real = runCatching { directory.toRealPath() }.getOrNull()
+                if (real == null || !real.startsWith(canonicalRoot)) {
+                    omit(relative, "symlink_escape")
+                    return FileVisitResult.SKIP_SUBTREE
+                }
+                val hasTrackedDescendant = trackedFiles.any { it.startsWith("$relative/") }
+                if (relative.split('/').any { it in ignoredDirectories } ||
+                    (isGitIgnored(canonicalRoot, relative, trackedFiles, ignoredCache) && !hasTrackedDescendant)
+                ) {
+                    omit(relative, "ignored")
+                    return FileVisitResult.SKIP_SUBTREE
+                }
+                return FileVisitResult.CONTINUE
+            }
+
+            override fun visitFile(path: Path, attrs: BasicFileAttributes): FileVisitResult {
+                if (!isSupportedSourcePath(path)) return FileVisitResult.CONTINUE
+                val relative = normalize(canonicalRoot.relativize(path).invariantSeparatorsPathString)
+                if (isGitIgnored(canonicalRoot, relative, trackedFiles, ignoredCache)) {
+                    omit(relative, "ignored")
+                    return FileVisitResult.CONTINUE
+                }
+                val realPath = runCatching { path.toRealPath() }.getOrNull()
+                if (realPath == null || !realPath.startsWith(canonicalRoot)) {
+                    omit(relative, "symlink_escape")
+                    return FileVisitResult.CONTINUE
+                }
+                val size = runCatching { Files.size(realPath) }.getOrElse {
+                    omit(relative, "unreadable")
+                    return FileVisitResult.CONTINUE
+                }
+                if (size > sourceAdmissionLimits.maxFileBytes) {
+                    omit(relative, "oversize")
+                    return FileVisitResult.CONTINUE
+                }
+                if (sources.size >= sourceAdmissionLimits.maxFiles) {
+                    omit(relative, "file_limit")
+                    return FileVisitResult.CONTINUE
+                }
+                if (retainedBytes + size > sourceAdmissionLimits.maxRetainedBytes) {
+                    omit(relative, "retained_byte_limit")
+                    return FileVisitResult.CONTINUE
+                }
+                val source = runCatching { readRetainedUtf8(realPath, sourceAdmissionLimits.maxFileBytes) }.getOrElse { error ->
+                    omit(relative, if (error.message?.contains("byte limit") == true) "oversize" else "unsupported_encoding")
+                    return FileVisitResult.CONTINUE
+                }
+                if (retainedBytes + source.size > sourceAdmissionLimits.maxRetainedBytes) {
+                    omit(relative, "retained_byte_limit")
+                    return FileVisitResult.CONTINUE
+                }
+                retainedBytes += source.size
+                paths[relative] = realPath
+                sources[relative] = source
+                return FileVisitResult.CONTINUE
+            }
+        })
+        return CapturedSources(
+            canonicalRoot,
+            Collections.unmodifiableMap(LinkedHashMap(paths)),
+            Collections.unmodifiableMap(LinkedHashMap(sources)),
+            omittedFileCount,
+            Collections.unmodifiableList(ArrayList(diagnostics)),
+        )
+    }
+
+    private fun trackedGitPaths(root: Path): Set<String> = runCatching {
+        val process = ProcessBuilder("git", "-C", root.toString(), "ls-files", "-z")
+            .redirectErrorStream(true)
+            .start()
+        val output = process.inputStream.readBytes()
+        if (!process.waitFor(2, TimeUnit.SECONDS) || process.exitValue() != 0) {
+            process.destroyForcibly()
+            emptySet()
+        } else {
+            output.toString(Charsets.UTF_8)
+                .split('\u0000')
+                .filter { it.isNotEmpty() }
+                .map(::normalize)
+                .toSet()
+        }
+    }.getOrDefault(emptySet())
+
+    private fun isGitIgnored(
+        root: Path,
+        relative: String,
+        trackedFiles: Set<String>,
+        cache: MutableMap<String, Boolean>,
+    ): Boolean {
+        if (normalize(relative) in trackedFiles) return false
+        return cache.getOrPut(relative) {
+            gitCheckIgnored(root, relative)
+        }
+    }
+
+    private fun gitCheckIgnored(root: Path, relative: String): Boolean = runCatching {
+        val process = ProcessBuilder("git", "-C", root.toString(), "check-ignore", "-q", "--", relative)
+            .redirectErrorStream(true)
+            .start()
+        process.inputStream.close()
+        if (!process.waitFor(2, TimeUnit.SECONDS)) {
+            process.destroyForcibly()
+            false
+        } else {
+            process.exitValue() == 0
+        }
+    }.getOrDefault(false)
+
+    private fun buildSnapshot(
+        changedFiles: Set<String> = emptySet(),
+        captured: CapturedSources = captureSources(),
+    ): Snapshot {
         val buildStart = System.nanoTime()
         val active = activeSnapshot.get()
         val changedJava = changedFiles
             .map { normalize(it) }
-            .filter { it.endsWith(".java") }
+            .filter(::isJavaSourcePath)
             .toSet()
+        val capturedChanged = if (active == null) emptySet() else {
+            (captured.sources.keys.filter(::isJavaSourcePath) + active.fileHashes.keys.filter(::isJavaSourcePath))
+                .filter { file -> captured.sources[file]?.hash != active.fileHashes[file] }
+                .toSet()
+        }
+        val effectiveChanged = changedJava + capturedChanged
+
+        if (active != null && effectiveChanged.isEmpty() && changedFiles.any { !isJavaSourcePath(it) }) {
+            return mergeStructuralNodes(
+                active.copy(
+                    id = snapshotHash(active.analysisEngine, captured.sources.mapValues { it.value.hash }),
+                    generatedAt = Instant.now().toString(),
+                    sourceIndex = captured.paths,
+                    fileHashes = captured.sources.mapValues { it.value.hash },
+                    sourceFiles = captured.sources,
+                    omittedFileCount = captured.omittedFileCount,
+                    sourceDiagnostics = captured.diagnostics,
+                    recomputeMode = "structural",
+                ),
+                captured,
+            )
+        }
 
         if (active != null &&
             active.analysisEngine == "fallback-parser" &&
-            changedJava.isNotEmpty() &&
-            changedJava.size <= incrementalFileThreshold
+            effectiveChanged.isNotEmpty() &&
+            effectiveChanged.size <= incrementalFileThreshold
         ) {
-            return buildSnapshotLegacyIncremental(active, changedJava, elapsedMs(buildStart))
+            return mergeStructuralNodes(buildSnapshotLegacyIncremental(active, effectiveChanged, captured, elapsedMs(buildStart)), captured)
         }
 
-        val javaFiles = Files.walk(projectRoot).use { paths ->
-            paths.filter { Files.isRegularFile(it) && it.extension == "java" }
-                .asSequence()
-                .toList()
-        }
-
-        val joernInstallation = detectJoernInstallation()
+        val joernInstallation = if (useJoern) detectJoernInstallation() else null
         val joernSnapshot = joernInstallation?.let { joern ->
-            runCatching { buildSnapshotWithJoern(javaFiles, joern, elapsedMs(buildStart)) }
+            runCatching { buildSnapshotWithJoern(captured, joern, elapsedMs(buildStart)) }
                 .getOrElse { err ->
                     if (requireJoern) {
                         throw IllegalStateException("Joern backend required but failed: ${err.message}", err)
@@ -267,17 +560,108 @@ class SnapshotManager(private val projectRoot: Path) {
                 }
         }
         if (joernSnapshot != null) {
-            return joernSnapshot
+            return mergeStructuralNodes(joernSnapshot, captured)
         }
         if (requireJoern) {
             error("Joern backend is required (GRAPHHARNESS_REQUIRE_JOERN=true) but no usable Joern installation was found")
         }
 
-        return buildSnapshotLegacy(javaFiles, elapsedMs(buildStart))
+        return mergeStructuralNodes(buildSnapshotLegacy(captured, elapsedMs(buildStart)), captured)
     }
 
-    private fun buildSnapshotLegacy(javaFiles: List<Path>, buildDurationMs: Long): Snapshot {
-        val parsedFiles = javaFiles.map { path -> path to parseJavaFile(path, projectRoot) }.toMap()
+    private fun mergeStructuralNodes(base: Snapshot, captured: CapturedSources): Snapshot {
+        structuralAdapters.retain(captured.sources)
+        val adapterDeadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(30)
+        val results = captured.sources.entries.mapNotNull { (file, source) ->
+            val language = StructuralAdapters.languageFor(file) ?: return@mapNotNull null
+            if (System.nanoTime() >= adapterDeadline) {
+                StructuralFileResult(file, language, if (language == "python") "python-ast" else "typescript-compiler-api", null, false,
+                    listOf("Structural analysis exceeded its 30-second build budget; definitions were omitted."), emptyList())
+            } else structuralAdapters.analyze(file, source)
+        }
+        val structuralNodes = linkedMapOf<String, NodeSummary>()
+        val identities = linkedMapOf<String, String>()
+        val fileNodes = linkedMapOf<String, String>()
+        results.forEach { result ->
+            val nodeId = "${result.language}:file:${result.file}"
+            fileNodes["${result.language}:${result.file}"] = nodeId
+            structuralNodes[nodeId] = NodeSummary(
+                id = nodeId,
+                kind = "file",
+                name = result.file.substringAfterLast('/'),
+                file = result.file,
+                line_range = SourceRange(1, captured.sources[result.file]?.text()?.count { it == '\n' }?.plus(1) ?: 1),
+                file_hash = captured.sources[result.file]?.hash,
+                language = result.language,
+                qualified_name = result.file,
+                provenance = result.parser,
+                byte_span = captured.sources[result.file]?.let { ByteSpan(0, it.size) },
+            )
+        }
+        results.forEach { result ->
+            result.definitions.forEach { definition ->
+                val nodeId = "${result.language}:${definition.identity}"
+                identities["${result.language}:${definition.identity}"] = nodeId
+            }
+        }
+        results.forEach { result ->
+            result.definitions.forEach { definition ->
+                val nodeId = identities.getValue("${result.language}:${definition.identity}")
+                val path = result.file
+                structuralNodes[nodeId] = NodeSummary(
+                    id = nodeId,
+                    kind = definition.kind,
+                    name = definition.name,
+                    file = path,
+                    line_range = SourceRange(definition.startLine, definition.endLine),
+                    file_hash = captured.sources[path]?.hash,
+                    language = result.language,
+                    qualified_name = definition.qualifiedName,
+                    parent = definition.parentIdentity?.let { identities["${result.language}:$it"] }
+                        ?: fileNodes["${result.language}:${result.file}"],
+                    byte_span = ByteSpan(definition.startByte, definition.endByte),
+                    provenance = result.parser,
+                )
+            }
+        }
+        val containmentEdges = results.flatMap { result ->
+            result.definitions.mapNotNull { definition ->
+                val parent = definition.parentIdentity?.let { identities["${result.language}:$it"] }
+                    ?: fileNodes["${result.language}:${result.file}"]
+                    ?: return@mapNotNull null
+                val child = identities["${result.language}:${definition.identity}"] ?: return@mapNotNull null
+                EdgeSummary(parent, child, "contains", result.file, definition.startLine, "parser_observed", "exact")
+            }
+        }
+        val javaInfo = LanguageAdapterInfo(
+            language = "java",
+            parser = if (base.analysisEngine == "joern") "joern" else "fallback-parser",
+            version = base.engineVersion,
+            available = true,
+            capabilities = listOf("search", "source", "node_detail", "context", "calls", "type_hierarchy", "dependencies"),
+        )
+        val allNodes = base.nodeSummaries.filterValues { it.language == "java" } + structuralNodes
+        val allEdges = base.edges.filter { edge ->
+            base.nodeSummaries[edge.from]?.language == "java" && base.nodeSummaries[edge.to]?.language == "java"
+        } + containmentEdges
+        val info = linkedMapOf<String, LanguageAdapterInfo>("java" to javaInfo)
+        info.putAll(structuralAdapters.adapterInfo(results))
+        return enrichJavaStructure(base.copy(
+            id = snapshotHash(base.analysisEngine, captured.sources.mapValues { it.value.hash }),
+            nodeSummaries = allNodes,
+            edges = allEdges.distinct(),
+            adapterInfo = info,
+            omittedFileCount = base.omittedFileCount + results.count { !it.available },
+            sourceDiagnostics = base.sourceDiagnostics + results.flatMap { result -> result.diagnostics.map { SourceAdmissionDiagnostic(result.file, it) } },
+        ))
+    }
+
+    private fun snapshotHash(engine: String, hashes: Map<String, String>): String = MessageDigest.getInstance("SHA-256")
+        .digest(buildString { append(engine); hashes.toSortedMap().forEach { (file, hash) -> append(file).append(hash) } }.toByteArray())
+        .joinToString("") { "%02x".format(it) }.take(16)
+
+    private fun buildSnapshotLegacy(captured: CapturedSources, buildDurationMs: Long): Snapshot {
+        val parsedFiles = captured.paths.filterKeys(::isJavaSourcePath).mapValues { (file, path) -> parseJavaFile(path, captured.root, captured.sources.getValue(file).text()) }
         val rawTypeInfos = parsedFiles.values.flatMap { it.types }.associateBy { it.id }
         val rawMethodInfos = parsedFiles.values.flatMap { it.methods }.associateBy { it.id }
         val (typeInfos, methodInfos) = stabilizeNodeIds(activeSnapshot.get(), rawTypeInfos, rawMethodInfos)
@@ -286,22 +670,21 @@ class SnapshotManager(private val projectRoot: Path) {
         val methodsBySimpleName = methodInfos.values.groupBy { it.simpleName }
         val typeByQualifiedName = typeInfos.values.associateBy { it.qualifiedName }
 
-        val nodeSummaries = buildNodeSummaries(typeInfos, methodInfos)
+        val fileHashes = captured.sources.mapValues { it.value.hash }
+        val nodeSummaries = buildNodeSummaries(typeInfos, methodInfos, fileHashes)
         val callEdges = buildCallEdges(methodInfos, methodsBySimpleName)
         val typeEdges = buildTypeEdges(typeInfos, typeByQualifiedName, typesBySimpleName)
         val dependencyEdges = buildDependencyEdges(methodInfos, typeInfos, typesBySimpleName)
         val edges = (callEdges + typeEdges + dependencyEdges).distinct()
         val clusters = buildClusters(typeInfos, methodInfos, edges, nodeSummaries, clusterStrategy)
         val clusterProvenance = clusterProvenanceForStrategy(clusterStrategy)
-        val sourceIndex = javaFiles.associateBy { normalize(projectRoot.relativize(it).invariantSeparatorsPathString) }
-        val fileHashes = sourceIndex.mapValues { (_, path) -> sha256(readPathText(path)) }
+        val sourceIndex = captured.paths
         val generatedAt = Instant.now().toString()
 
         val hash = MessageDigest.getInstance("SHA-256")
             .digest(
                 buildString {
-                    append(generatedAt)
-                    javaFiles.sortedBy { it.toString() }.forEach { append(it.toString()) }
+                    fileHashes.toSortedMap().forEach { (file, hash) -> append(file).append(hash) }
                 }.toByteArray()
             )
             .joinToString("") { "%02x".format(it) }
@@ -309,7 +692,7 @@ class SnapshotManager(private val projectRoot: Path) {
         return Snapshot(
             id = hash.take(16),
             generatedAt = generatedAt,
-            root = projectRoot,
+            root = captured.root,
             analysisEngine = "fallback-parser",
             engineVersion = null,
             buildDurationMs = buildDurationMs,
@@ -321,6 +704,9 @@ class SnapshotManager(private val projectRoot: Path) {
             methodInfos = methodInfos,
             sourceIndex = sourceIndex,
             fileHashes = fileHashes,
+            sourceFiles = captured.sources,
+            omittedFileCount = captured.omittedFileCount,
+            sourceDiagnostics = captured.diagnostics,
             packageCount = typeInfos.values.map { it.packageName }.filter { it.isNotBlank() }.toSet().size,
             clusterStrategy = clusterStrategy,
             clusterProvenance = clusterProvenance,
@@ -331,29 +717,30 @@ class SnapshotManager(private val projectRoot: Path) {
     private fun buildSnapshotLegacyIncremental(
         previous: Snapshot,
         changedFiles: Set<String>,
+        captured: CapturedSources,
         buildDurationMs: Long,
     ): Snapshot {
         val rawTypeInfos = previous.typeInfos.toMutableMap()
         val rawMethodInfos = previous.methodInfos.toMutableMap()
-        val sourceIndex = previous.sourceIndex.toMutableMap()
-        val fileHashes = previous.fileHashes.toMutableMap()
+        // Reconcile from a single immutable capture. Incremental graph recomputation remains, but
+        // no snapshot combines parse text from one file version with a hash from another.
+        val sourceIndex = captured.paths.toMutableMap()
+        val fileHashes = captured.sources.mapValues { it.value.hash }.toMutableMap()
 
         changedFiles.forEach { relative ->
-            val absPath = projectRoot.resolve(relative).normalize()
             rawTypeInfos.entries.removeIf { it.value.file == relative }
             rawMethodInfos.entries.removeIf { it.value.file == relative }
 
-            if (!Files.exists(absPath) || !Files.isRegularFile(absPath) || absPath.extension != "java") {
-                sourceIndex.remove(relative)
-                fileHashes.remove(relative)
+            if (!isJavaSourcePath(relative)) return@forEach
+            val path = captured.paths[relative]
+            val source = captured.sources[relative]
+            if (path == null || source == null) {
                 return@forEach
             }
 
-            val parsed = parseJavaFile(absPath, projectRoot)
+            val parsed = parseJavaFile(path, captured.root, source.text())
             parsed.types.forEach { rawTypeInfos[it.id] = it }
             parsed.methods.forEach { rawMethodInfos[it.id] = it }
-            sourceIndex[relative] = absPath
-            fileHashes[relative] = sha256(readPathText(absPath))
         }
 
         val (typeInfos, methodInfos) = stabilizeNodeIds(previous, rawTypeInfos, rawMethodInfos)
@@ -361,7 +748,7 @@ class SnapshotManager(private val projectRoot: Path) {
         val typesBySimpleName = typeInfos.values.groupBy { it.simpleName }
         val methodsBySimpleName = methodInfos.values.groupBy { it.simpleName }
         val typeByQualifiedName = typeInfos.values.associateBy { it.qualifiedName }
-        val nodeSummaries = buildNodeSummaries(typeInfos, methodInfos)
+        val nodeSummaries = buildNodeSummaries(typeInfos, methodInfos, fileHashes)
         val callEdges = buildCallEdges(methodInfos, methodsBySimpleName)
         val typeEdges = buildTypeEdges(typeInfos, typeByQualifiedName, typesBySimpleName)
         val dependencyEdges = buildDependencyEdges(methodInfos, typeInfos, typesBySimpleName)
@@ -372,9 +759,8 @@ class SnapshotManager(private val projectRoot: Path) {
         val hash = MessageDigest.getInstance("SHA-256")
             .digest(
                 buildString {
-                    append("fallback-incremental")
-                    append(generatedAt)
-                    changedFiles.sorted().forEach { append(it) }
+                    append("fallback")
+                    fileHashes.toSortedMap().forEach { (file, hash) -> append(file).append(hash) }
                 }.toByteArray()
             )
             .joinToString("") { "%02x".format(it) }
@@ -382,7 +768,7 @@ class SnapshotManager(private val projectRoot: Path) {
         return Snapshot(
             id = hash.take(16),
             generatedAt = generatedAt,
-            root = projectRoot,
+            root = captured.root,
             analysisEngine = "fallback-parser",
             engineVersion = null,
             buildDurationMs = buildDurationMs,
@@ -394,6 +780,9 @@ class SnapshotManager(private val projectRoot: Path) {
             methodInfos = methodInfos,
             sourceIndex = sourceIndex,
             fileHashes = fileHashes,
+            sourceFiles = captured.sources,
+            omittedFileCount = captured.omittedFileCount,
+            sourceDiagnostics = captured.diagnostics,
             packageCount = typeInfos.values.map { it.packageName }.filter { it.isNotBlank() }.toSet().size,
             clusterStrategy = clusterStrategy,
             clusterProvenance = clusterProvenance,
@@ -401,24 +790,34 @@ class SnapshotManager(private val projectRoot: Path) {
         )
     }
 
-    private fun buildSnapshotWithJoern(javaFiles: List<Path>, joern: JoernInstallation, buildDurationMs: Long): Snapshot {
-        val graph = joern.exportGraph(projectRoot)
+    private fun buildSnapshotWithJoern(captured: CapturedSources, joern: JoernInstallation, buildDurationMs: Long): Snapshot {
+        val stagingRoot = Files.createTempDirectory("graphharness-joern-stage")
+        val graph = try {
+            captured.sources.filterKeys(::isJavaSourcePath).forEach { (relative, source) ->
+                val destination = stagingRoot.resolve(relative).normalize()
+                require(destination.startsWith(stagingRoot)) { "staging path escapes root: $relative" }
+                destination.parent?.createDirectories()
+                Files.write(destination, source.bytes())
+            }
+            remapJoernFiles(joern.exportGraph(stagingRoot), stagingRoot)
+        } finally {
+            deleteRecursively(stagingRoot)
+        }
         val rawTypeInfos = graph.types.associateBy { it.id }
         val rawMethodInfos = graph.methods.associateBy { it.id }
         val (typeInfos, methodInfos) = stabilizeNodeIds(activeSnapshot.get(), rawTypeInfos, rawMethodInfos)
-        val nodeSummaries = buildNodeSummaries(typeInfos, methodInfos)
+        val fileHashes = captured.sources.mapValues { it.value.hash }
+        val nodeSummaries = buildNodeSummaries(typeInfos, methodInfos, fileHashes)
         val graphEdges = (graph.callEdges + graph.typeEdges + graph.dependencyEdges).distinct()
         val clusters = buildClusters(typeInfos, methodInfos, graphEdges, nodeSummaries, clusterStrategy)
         val clusterProvenance = clusterProvenanceForStrategy(clusterStrategy)
-        val sourceIndex = javaFiles.associateBy { normalize(projectRoot.relativize(it).invariantSeparatorsPathString) }
-        val fileHashes = sourceIndex.mapValues { (_, path) -> sha256(readPathText(path)) }
+        val sourceIndex = captured.paths
         val generatedAt = Instant.now().toString()
         val hash = MessageDigest.getInstance("SHA-256")
             .digest(
                 buildString {
                     append("joern")
-                    append(generatedAt)
-                    javaFiles.sortedBy { it.toString() }.forEach { append(it.toString()) }
+                    fileHashes.toSortedMap().forEach { (file, hash) -> append(file).append(hash) }
                 }.toByteArray()
             )
             .joinToString("") { "%02x".format(it) }
@@ -426,7 +825,7 @@ class SnapshotManager(private val projectRoot: Path) {
         return Snapshot(
             id = hash.take(16),
             generatedAt = generatedAt,
-            root = projectRoot,
+            root = captured.root,
             analysisEngine = "joern",
             engineVersion = joern.version,
             buildDurationMs = buildDurationMs,
@@ -438,6 +837,9 @@ class SnapshotManager(private val projectRoot: Path) {
             methodInfos = methodInfos,
             sourceIndex = sourceIndex,
             fileHashes = fileHashes,
+            sourceFiles = captured.sources,
+            omittedFileCount = captured.omittedFileCount,
+            sourceDiagnostics = captured.diagnostics,
             packageCount = typeInfos.values.map { it.packageName }.filter { it.isNotBlank() }.toSet().size,
             clusterStrategy = clusterStrategy,
             clusterProvenance = clusterProvenance,
@@ -445,9 +847,28 @@ class SnapshotManager(private val projectRoot: Path) {
         )
     }
 
+    private fun remapJoernFiles(graph: JoernGraphData, stagingRoot: Path): JoernGraphData {
+        fun relative(file: String): String {
+            val path = runCatching { Path.of(file) }.getOrNull() ?: return normalize(file)
+            return if (path.isAbsolute && path.startsWith(stagingRoot)) {
+                normalize(stagingRoot.relativize(path).invariantSeparatorsPathString)
+            } else {
+                normalize(file)
+            }
+        }
+        return graph.copy(
+            types = graph.types.map { it.copy(file = relative(it.file)) },
+            methods = graph.methods.map { it.copy(file = relative(it.file)) },
+            callEdges = graph.callEdges.map { edge -> edge.copy(file = edge.file?.let(::relative)) },
+            typeEdges = graph.typeEdges.map { edge -> edge.copy(file = edge.file?.let(::relative)) },
+            dependencyEdges = graph.dependencyEdges.map { edge -> edge.copy(file = edge.file?.let(::relative)) },
+        )
+    }
+
     private fun buildNodeSummaries(
         typeInfos: Map<String, TypeInfo>,
         methodInfos: Map<String, MethodInfo>,
+        fileHashes: Map<String, String> = emptyMap(),
     ): Map<String, NodeSummary> {
         val result = linkedMapOf<String, NodeSummary>()
         typeInfos.values.forEach { type ->
@@ -459,6 +880,9 @@ class SnapshotManager(private val projectRoot: Path) {
                 line_range = type.lineRange,
                 visibility = type.visibility,
                 annotations = type.annotations,
+                file_hash = fileHashes[type.file],
+                language = "java",
+                qualified_name = type.qualifiedName,
             )
         }
         methodInfos.values.forEach { method ->
@@ -473,6 +897,10 @@ class SnapshotManager(private val projectRoot: Path) {
                 annotations = method.annotations,
                 complexity = method.complexity,
                 loc = method.loc,
+                file_hash = fileHashes[method.file],
+                language = "java",
+                qualified_name = method.qualifiedName,
+                parent = method.parentTypeId,
             )
         }
         return result
@@ -549,7 +977,7 @@ class SnapshotManager(private val projectRoot: Path) {
             ).joinToString("|"),
         )
 
-    private fun normalizeMethodBodyFingerprint(body: String): String =
+private fun normalizeMethodBodyFingerprint(body: String): String =
         body.lineSequence()
             .map { it.trim() }
             .filter { it.isNotEmpty() }
@@ -775,6 +1203,7 @@ class SnapshotManager(private val projectRoot: Path) {
             project = ProjectSummary(
                 root = snapshot.root.toAbsolutePath().normalize().toString(),
                 total_files = snapshot.sourceIndex.size,
+                structural_nodes_by_language = snapshot.nodeSummaries.values.filter { it.kind != "file" }.groupingBy { it.language }.eachCount(),
                 total_packages = snapshot.packageCount,
                 total_types = snapshot.typeInfos.size,
                 total_methods = snapshot.methodInfos.size,
@@ -883,7 +1312,7 @@ class SnapshotManager(private val projectRoot: Path) {
         val graphAgeMs = runCatching {
             Duration.between(Instant.parse(snapshot.generatedAt), Instant.now()).toMillis().coerceAtLeast(0)
         }.getOrDefault(0)
-        val dirty = dirtyFiles.toList().sorted()
+        val dirty = dirtyFiles.keys.toList().sorted()
         val dirtyNodeEstimate = if (dirty.isEmpty()) 0 else snapshot.nodeSummaries.values.count { it.file in dirty }
         return SnapshotRuntimeState(
             snapshot_epoch = snapshot.epoch,
@@ -952,6 +1381,17 @@ class SnapshotManager(private val projectRoot: Path) {
         }
     }
 
+    private fun requireJavaSemantic(nodeId: String, operation: String, snapshot: Snapshot) {
+        val node = snapshot.nodeSummaries[nodeId] ?: error("Unknown node_id: $nodeId")
+        if (node.language != "java") {
+            throw LiveFailure(
+                "unsupported_operation",
+                422,
+                "$operation is unavailable for ${node.language}; this adapter provides structural containment only.",
+            )
+        }
+    }
+
     fun capabilities(snapshot: Snapshot = current()): CapabilitiesResult {
         val isApproximate = isApproximateBackend(snapshot)
         val disabledTools = if (isApproximate) listOf("get_call_paths", "get_implementations", "get_impact") else emptyList()
@@ -1003,7 +1443,8 @@ class SnapshotManager(private val projectRoot: Path) {
             put("get_implementations", if (isApproximate) "disabled" else "best_effort")
         }
         return CapabilitiesResult(
-            languages = listOf("java"),
+            languages = snapshot.adapterInfo.filterValues { it.available }.keys.sorted(),
+            language_adapters = snapshot.adapterInfo,
             analysis_engine = snapshot.analysisEngine,
             backend_mode = if (isApproximate) "heuristic" else "joern",
             semantic_level = semanticLevelFor(snapshot),
@@ -1161,24 +1602,39 @@ class SnapshotManager(private val projectRoot: Path) {
             val cluster = snapshot.clusters.firstOrNull { chosenNode.id in snapshot.clusterNodes[it.cluster_id].orEmpty() }
             if (cluster != null) clusters += cluster
 
-            val detail = nodeDetail(chosenNode.id, snapshot)
-            (listOf(chosenNode) + detail.callers.take(2).map { it.node } + detail.callees.take(3).map { it.node } + detail.implementations.take(2))
-                .forEach { node ->
-                    if (node.id != chosenNode.id && focusIds.add(node.id)) {
-                        focusNodes += node
-                    }
-                }
-            relationships += snapshot.edges
-                .filter { it.from in focusIds && it.to in focusIds }
-                .filter { it.relationship in setOf("calls", "implements", "extends", "uses_type") }
-                .take(12)
-            val impact = runCatching { impact(chosenNode.id, 2, snapshot) }.getOrNull()
-            impactFiles += impact?.affected_files.orEmpty().take(6)
             notes += "chosen_node=${chosenNode.name}"
-            if (impact != null) {
-                notes += "impact_basis=${impact.analysis_basis.joinToString(",")}"
+            if (chosenNode.language != "java") {
+                snapshot.edges
+                    .filter { (it.from == chosenNode.id || it.to == chosenNode.id) && it.relationship == "contains" }
+                    .forEach { edge ->
+                        val relatedId = if (edge.from == chosenNode.id) edge.to else edge.from
+                        snapshot.nodeSummaries[relatedId]?.let { related ->
+                            if (focusIds.add(related.id)) focusNodes += related
+                        }
+                    }
+                relationships += snapshot.edges
+                    .filter { it.from in focusIds && it.to in focusIds && it.relationship == "contains" }
+                    .take(12)
+                notes += "structural_context_only"
             } else {
-                notes += "impact_basis=unavailable_for_backend"
+                val detail = nodeDetail(chosenNode.id, snapshot)
+                (listOf(chosenNode) + detail.callers.take(2).map { it.node } + detail.callees.take(3).map { it.node } + detail.implementations.take(2))
+                    .forEach { node ->
+                        if (node.id != chosenNode.id && focusIds.add(node.id)) {
+                            focusNodes += node
+                        }
+                    }
+                relationships += snapshot.edges
+                    .filter { it.from in focusIds && it.to in focusIds }
+                    .filter { it.relationship in setOf("calls", "implements", "extends", "uses_type") }
+                    .take(12)
+                val impact = runCatching { impact(chosenNode.id, 2, snapshot) }.getOrNull()
+                impactFiles += impact?.affected_files.orEmpty().take(6)
+                if (impact != null) {
+                    notes += "impact_basis=${impact.analysis_basis.joinToString(",")}"
+                } else {
+                    notes += "impact_basis=unavailable_for_backend"
+                }
             }
         } else {
             notes += "no_node_resolved"
@@ -1209,7 +1665,16 @@ class SnapshotManager(private val projectRoot: Path) {
             val tokens = estimateTextTokens(source.source) + 24
             if (sourceSlices.isNotEmpty() && consumed + tokens > sourceBudget) return@forEach
             consumed += tokens
-            sourceSlices += SourceBatchItem(id, source.source, source.file, source.line_range)
+            sourceSlices += SourceBatchItem(
+                id,
+                source.source,
+                source.file,
+                source.line_range,
+                source.file_hash,
+                source.language,
+                source.provenance,
+                source.byte_span,
+            )
         }
         if (sourceSlices.size < orderedSourceIds.size) {
             notes += "source_slices_truncated_for_budget"
@@ -1870,6 +2335,8 @@ class SnapshotManager(private val projectRoot: Path) {
         targetNodeId: String? = null,
         snapshot: Snapshot = current(),
     ): CallPathsResult {
+        requireJavaSemantic(nodeId, "get_call_paths", snapshot)
+        targetNodeId?.let { requireJavaSemantic(it, "get_call_paths", snapshot) }
         requireDeterministicTool("get_call_paths", snapshot)
         val start = System.nanoTime()
         require(nodeId in snapshot.nodeSummaries) { "Unknown node_id: $nodeId" }
@@ -1949,11 +2416,15 @@ class SnapshotManager(private val projectRoot: Path) {
         )
     }
 
-    fun callers(nodeId: String, depth: Int, snapshot: Snapshot = current()): TraversalResult =
-        traverse(nodeId, depth, snapshot, incoming = true, relationship = "calls")
+    fun callers(nodeId: String, depth: Int, snapshot: Snapshot = current()): TraversalResult {
+        requireJavaSemantic(nodeId, "get_callers", snapshot)
+        return traverse(nodeId, depth, snapshot, incoming = true, relationship = "calls")
+    }
 
-    fun callees(nodeId: String, depth: Int, snapshot: Snapshot = current()): TraversalResult =
-        traverse(nodeId, depth, snapshot, incoming = false, relationship = "calls")
+    fun callees(nodeId: String, depth: Int, snapshot: Snapshot = current()): TraversalResult {
+        requireJavaSemantic(nodeId, "get_callees", snapshot)
+        return traverse(nodeId, depth, snapshot, incoming = false, relationship = "calls")
+    }
 
     private fun traverse(
         nodeId: String,
@@ -2007,6 +2478,7 @@ class SnapshotManager(private val projectRoot: Path) {
     }
 
     fun implementations(nodeId: String, snapshot: Snapshot = current()): TraversalResult {
+        requireJavaSemantic(nodeId, "get_implementations", snapshot)
         requireDeterministicTool("get_implementations", snapshot)
         val start = System.nanoTime()
         require(nodeId in snapshot.nodeSummaries) { "Unknown node_id: $nodeId" }
@@ -2029,6 +2501,7 @@ class SnapshotManager(private val projectRoot: Path) {
     }
 
     fun typeHierarchy(nodeId: String, direction: String, snapshot: Snapshot = current()): TypeHierarchyResult {
+        requireJavaSemantic(nodeId, "get_type_hierarchy", snapshot)
         val type = snapshot.typeInfos[nodeId] ?: error("Type hierarchy requires a class or interface node_id")
         val ancestors = mutableListOf<NodeSummary>()
         val descendants = mutableListOf<NodeSummary>()
@@ -2056,6 +2529,7 @@ class SnapshotManager(private val projectRoot: Path) {
     }
 
     fun dependencies(nodeId: String, direction: String, snapshot: Snapshot = current()): DependencyResult {
+        requireJavaSemantic(nodeId, "get_dependencies", snapshot)
         val start = System.nanoTime()
         val edges = snapshot.edges.filter {
             when (direction) {
@@ -2085,6 +2559,7 @@ class SnapshotManager(private val projectRoot: Path) {
     }
 
     fun impact(nodeId: String, maxDepth: Int, snapshot: Snapshot = current()): ImpactResult {
+        requireJavaSemantic(nodeId, "get_impact", snapshot)
         requireDeterministicTool("get_impact", snapshot)
         val start = System.nanoTime()
         val depth = maxDepth.coerceIn(1, 6)
@@ -2135,28 +2610,62 @@ class SnapshotManager(private val projectRoot: Path) {
     fun source(nodeId: String, includeContext: Int, snapshot: Snapshot = current()): SourceResult {
         val node = snapshot.nodeSummaries[nodeId] ?: error("Unknown node_id: $nodeId")
         val path = snapshot.sourceIndex[node.file] ?: error("Missing file for node_id: $nodeId")
-        val lines = Files.readAllLines(path)
+        val retained = snapshot.sourceFiles[node.file]
+            ?: error("Missing retained source for node_id: $nodeId")
+        val current = runCatching { readCurrentSource(snapshot, path) }.getOrElse {
+            markDirty(node.file)
+            pendingRebuild.set(true)
+            rebuildExecutor.schedule({ rebuildFromDirty() }, 0, TimeUnit.MILLISECONDS)
+            error("stale_source: ${node.file} is no longer readable")
+        }
+        if (!retained.hasSameBytes(current.bytes())) {
+            markDirty(node.file)
+            pendingRebuild.set(true)
+            rebuildExecutor.schedule({ rebuildFromDirty() }, 0, TimeUnit.MILLISECONDS)
+            error("stale_source: ${node.file} changed after snapshot ${snapshot.id}")
+        }
+        val sourceText = retained.text()
+        val lineCount = sourceText.count { it == '\n' } + 1
         val startLine = (node.line_range.start - includeContext).coerceAtLeast(1)
-        val endLine = (node.line_range.end + includeContext).coerceAtMost(lines.size)
-        val source = lines.subList(startLine - 1, endLine).joinToString("\n")
+        val endLine = (node.line_range.end + includeContext).coerceAtMost(lineCount)
+        val source = if (includeContext == 0 && node.byte_span != null) {
+            val bytes = retained.bytes()
+            val span = node.byte_span
+            if (span.start < 0 || span.end > bytes.size || span.start > span.end) {
+                error("stale_source: stored byte span is invalid for ${node.file}")
+            }
+            bytes.copyOfRange(span.start, span.end).toString(Charsets.UTF_8)
+        } else {
+            sourceSlice(sourceText, SourceRange(startLine, endLine))
+        }
         return SourceResult(
             source = source,
             file = node.file,
             line_range = SourceRange(startLine, endLine),
-            analysis_engine = snapshot.analysisEngine,
-            engine_version = snapshot.engineVersion,
+            analysis_engine = node.provenance ?: snapshot.analysisEngine,
+            engine_version = if (node.language == "java") snapshot.engineVersion else snapshot.adapterInfo[node.language]?.version,
             build_duration_ms = snapshot.buildDurationMs,
-            semantic_level = semanticLevelFor(snapshot),
+            semantic_level = if (node.language == "java") semanticLevelFor(snapshot) else "structural",
             snapshot_state = snapshotRuntimeState(snapshot),
             snapshot_id = snapshot.id,
             generated_at = snapshot.generatedAt,
+            file_hash = retained.hash,
+            language = node.language,
+            provenance = node.provenance,
+            byte_span = node.byte_span,
         )
+    }
+
+    private fun readCurrentSource(snapshot: Snapshot, path: Path): RetainedSource {
+        val canonical = path.toRealPath()
+        require(canonical.startsWith(snapshot.root)) { "source path escaped configured root" }
+        return readRetainedUtf8(canonical, sourceAdmissionLimits.maxFileBytes)
     }
 
     fun sourceBatch(nodeIds: List<String>, snapshot: Snapshot = current()): SourceBatchResult {
         val items = nodeIds.map { nodeId ->
             val item = source(nodeId, 0, snapshot)
-            SourceBatchItem(nodeId, item.source, item.file, item.line_range)
+            SourceBatchItem(nodeId, item.source, item.file, item.line_range, item.file_hash, item.language, item.provenance, item.byte_span)
         }
         return SourceBatchResult(
             sources = items,
@@ -2285,7 +2794,20 @@ class SnapshotManager(private val projectRoot: Path) {
 
         val targetMethod = method!!
         val path = snapshot.sourceIndex[targetMethod.file] ?: error("Missing file for node_id: $targetNodeId")
-        val fileSource = readPathText(path)
+        val retained = snapshot.sourceFiles[targetMethod.file] ?: error("Missing retained source for node_id: $targetNodeId")
+        val currentBytes = runCatching { readCurrentSource(snapshot, path).bytes() }.getOrElse {
+            markDirty(targetMethod.file)
+            pendingRebuild.set(true)
+            rebuildExecutor.schedule({ rebuildFromDirty() }, 0, TimeUnit.MILLISECONDS)
+            error("stale_source: ${targetMethod.file} is no longer readable")
+        }
+        if (!retained.hasSameBytes(currentBytes)) {
+            markDirty(targetMethod.file)
+            pendingRebuild.set(true)
+            rebuildExecutor.schedule({ rebuildFromDirty() }, 0, TimeUnit.MILLISECONDS)
+            error("stale_source: ${targetMethod.file} changed after snapshot ${snapshot.id}")
+        }
+        val fileSource = retained.text()
         val bodyRange = methodBodyRange(fileSource, targetMethod.lineRange.start, targetMethod.lineRange.end)
         if (bodyRange == null) {
             return EditPlanResult(
@@ -2476,6 +2998,7 @@ class SnapshotManager(private val projectRoot: Path) {
         )
     }
 
+    @Synchronized
     fun applyEdit(editId: String): EditApplyResult {
         val snapshot = current()
         val pending = pendingEdits[editId]
@@ -2546,8 +3069,18 @@ class SnapshotManager(private val projectRoot: Path) {
             val path = snapshot.sourceIndex[fileEdit.file] ?: projectRoot.resolve(fileEdit.file).normalize()
             Files.writeString(path, fileEdit.newFileContent)
         }
-        val refreshed = buildSnapshot()
-        installSnapshot(refreshed)
+        val committedGenerations = pending.fileEdits.associate { fileEdit ->
+            normalize(fileEdit.file) to markDirty(fileEdit.file)
+        }
+        val refreshed = synchronized(publicationLock) {
+            val rebuilt = buildSnapshot()
+            installSnapshot(rebuilt, committedGenerations)
+            rebuilt
+        }
+        if (dirtyFiles.isNotEmpty()) {
+            pendingRebuild.set(true)
+            rebuildExecutor.schedule({ rebuildFromDirty() }, 0, TimeUnit.MILLISECONDS)
+        }
         pendingEdits[editId] = pending.copy(applied = true)
 
         return EditApplyResult(
@@ -3264,95 +3797,8 @@ class SnapshotManager(private val projectRoot: Path) {
         }
     }
 
-    private fun parseJavaFile(path: Path, root: Path): FileParseResult {
-        val lines = Files.readAllLines(path)
-        val source = lines.joinToString("\n")
-        val file = normalize(root.relativize(path).invariantSeparatorsPathString)
-        val packageName = Regex("""(?m)^\s*package\s+([a-zA-Z0-9_.]+)\s*;""")
-            .find(source)?.groupValues?.get(1).orEmpty()
-
-        val typePattern = Regex(
-            """(?m)^(\s*(?:@\w+(?:\([^)]*\))?\s*)*)(?:public|protected|private)?\s*(abstract\s+)?(class|interface|enum)\s+([A-Za-z_]\w*)(?:\s+extends\s+([A-Za-z0-9_$.]+))?(?:\s+implements\s+([A-Za-z0-9_$.,\s]+))?""",
-        )
-
-        val methodPattern = Regex(
-            """(?m)^(\s*(?:@\w+(?:\([^)]*\))?\s*)*)(\s*(?:public|protected|private))?\s*(?:static\s+|final\s+|abstract\s+|synchronized\s+)*([A-Za-z0-9_<>\[\].?]+)\s+([A-Za-z_]\w*)\s*\(([^)]*)\)\s*(?:throws\s+[A-Za-z0-9_.,\s]+)?\s*\{""",
-        )
-
-        val types = mutableListOf<TypeInfo>()
-        val methods = mutableListOf<MethodInfo>()
-
-        typePattern.findAll(source).forEach { match ->
-            val typeStart = source.substring(0, match.range.first).count { it == '\n' } + 1
-            val openBraceIdx = source.indexOf('{', match.range.last)
-            val endLine = if (openBraceIdx >= 0) closingLine(source, openBraceIdx) else typeStart
-            val annotations = extractAnnotations(match.groupValues[1])
-            val kind = match.groupValues[3]
-            val simpleName = match.groupValues[4]
-            val qualifiedName = listOf(packageName, simpleName).filter { it.isNotBlank() }.joinToString(".")
-            types += TypeInfo(
-                id = "type:$qualifiedName",
-                kind = kind,
-                packageName = packageName,
-                simpleName = simpleName,
-                qualifiedName = qualifiedName,
-                file = file,
-                lineRange = SourceRange(typeStart, endLine),
-                visibility = extractVisibility(match.value),
-                annotations = annotations,
-                extendsType = match.groupValues[5].ifBlank { null },
-                implementsTypes = match.groupValues[6].split(",").map { it.trim() }.filter { it.isNotBlank() },
-            )
-        }
-
-        val type = types.firstOrNull()
-        methodPattern.findAll(source).forEach { match ->
-            val methodStart = source.substring(0, match.range.first).count { it == '\n' } + 1
-            val openBraceIdx = source.indexOf('{', match.range.last)
-            if (openBraceIdx < 0) return@forEach
-            val closeLine = closingLine(source, openBraceIdx)
-            val body = source.lines().subList(methodStart - 1, closeLine).joinToString("\n")
-            val annotations = extractAnnotations(match.groupValues[1])
-            val visibility = extractVisibility(match.value)
-            val returnType = match.groupValues[3]
-            val name = match.groupValues[4]
-            val parameters = match.groupValues[5]
-            val parameterTypes = parameters.split(",").mapNotNull { param ->
-                val parts = param.trim().split(Regex("""\s+"""))
-                if (parts.size >= 2) parts.dropLast(1).joinToString(" ") else null
-            }
-            val parentType = type ?: return@forEach
-            val qualifiedName = "${parentType.qualifiedName}.$name"
-            val callTokens = callPattern.findAll(body).map { token ->
-                val tokenLine = body.substring(0, token.range.first).count { it == '\n' } + methodStart
-                token.groupValues[1] to tokenLine
-            }.filterNot { it.first in JAVA_KEYWORDS || it.first == name }.toList()
-            val typeRefs = (parameterTypes + listOf(returnType) + bodyTypePattern.findAll(body).map { it.groupValues[1] }.toList())
-                .filter { it.isNotBlank() && it.first().isUpperCase() }
-                .toSet()
-            methods += MethodInfo(
-                id = "method:$qualifiedName:${signatureOf(parameterTypes, returnType)}",
-                parentTypeId = parentType.id,
-                parentQualifiedName = parentType.qualifiedName,
-                simpleName = name,
-                qualifiedName = qualifiedName,
-                signature = "(${parameterTypes.joinToString(", ")}) -> ${returnType.ifBlank { "void" }}",
-                file = file,
-                lineRange = SourceRange(methodStart, closeLine),
-                visibility = visibility,
-                annotations = annotations,
-                complexity = computeComplexity(body),
-                loc = closeLine - methodStart + 1,
-                returnType = returnType,
-                parameterTypes = parameterTypes,
-                body = body,
-                callTokens = callTokens,
-                typeRefs = typeRefs,
-            )
-        }
-
-        return FileParseResult(types, methods)
-    }
+    private fun parseJavaFile(path: Path, root: Path, source: String): FileParseResult =
+        parseJavaDeclarations(normalize(root.relativize(path).invariantSeparatorsPathString), source)
 
     private fun resolvedImplementationMatches(nodeId: String, snapshot: Snapshot): List<MethodImplementationMatch> {
         val target = snapshot.methodInfos[nodeId] ?: return emptyList()

@@ -2,6 +2,17 @@ package graphharness
 
 data class SourceRange(val start: Int, val end: Int)
 
+data class ByteSpan(val start: Int, val end: Int)
+
+data class LanguageAdapterInfo(
+    val language: String,
+    val parser: String,
+    val version: String? = null,
+    val available: Boolean,
+    val capabilities: List<String>,
+    val diagnostics: List<String> = emptyList(),
+)
+
 data class NodeSummary(
     val id: String,
     val kind: String,
@@ -13,6 +24,12 @@ data class NodeSummary(
     val annotations: List<String> = emptyList(),
     val complexity: Int? = null,
     val loc: Int? = null,
+    val file_hash: String? = null,
+    val language: String = "java",
+    val qualified_name: String = name,
+    val parent: String? = null,
+    val byte_span: ByteSpan? = null,
+    val provenance: String? = null,
 )
 
 data class EdgeSummary(
@@ -21,6 +38,8 @@ data class EdgeSummary(
     val relationship: String,
     val file: String? = null,
     val line: Int? = null,
+    val provenance: String? = null,
+    val resolution: String? = null,
 )
 
 data class ClusterSummary(
@@ -56,6 +75,8 @@ data class ProjectSummary(
     val build_duration_ms: Long,
     val snapshot_id: String,
     val generated_at: String,
+    val structural_nodes_by_language: Map<String, Int> = emptyMap(),
+    val semantic_summary_scope: String = "Java package/type/method totals, clusters, entrypoints and hotspots; structural counts cover all parsed languages.",
 )
 
 data class OrientationNode(
@@ -172,6 +193,10 @@ data class SourceResult(
     val snapshot_state: SnapshotRuntimeState? = null,
     val snapshot_id: String,
     val generated_at: String,
+    val file_hash: String? = null,
+    val language: String = "java",
+    val provenance: String? = null,
+    val byte_span: ByteSpan? = null,
 )
 
 data class SourceBatchItem(
@@ -179,6 +204,10 @@ data class SourceBatchItem(
     val source: String,
     val file: String,
     val line_range: SourceRange,
+    val file_hash: String? = null,
+    val language: String = "java",
+    val provenance: String? = null,
+    val byte_span: ByteSpan? = null,
 )
 
 data class SourceBatchResult(
@@ -407,6 +436,7 @@ data class ValidationTargetsResult(
 
 data class CapabilitiesResult(
     val languages: List<String>,
+    val language_adapters: Map<String, LanguageAdapterInfo> = emptyMap(),
     val analysis_engine: String,
     val backend_mode: String,
     val semantic_level: String,

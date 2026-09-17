@@ -77,6 +77,7 @@ fun JoernInstallation.exportGraph(projectRoot: Path): JoernGraphData {
     val cpgFile = workDir.resolve("cpg.bin")
     val queryFile = workDir.resolve("snapshot.sc")
     val outputFile = workDir.resolve("snapshot.tsv")
+    try {
     Files.writeString(queryFile, JOERN_SNAPSHOT_SCRIPT)
 
     runCommand(
@@ -103,17 +104,45 @@ fun JoernInstallation.exportGraph(projectRoot: Path): JoernGraphData {
         workDir,
     )
     return parseJoernSnapshot(outputFile, projectRoot)
+    } finally {
+        Files.walk(workDir).use { paths -> paths.sorted(Comparator.reverseOrder()).forEach { runCatching { Files.deleteIfExists(it) } } }
+    }
 }
 
-fun runCommand(command: List<String>, workDir: Path) {
+fun runCommand(command: List<String>, workDir: Path, timeoutMillis: Long = 120_000) {
     val process = ProcessBuilder(command)
         .directory(workDir.toFile())
         .redirectErrorStream(true)
         .start()
-    val output = process.inputStream.bufferedReader().readText()
-    val exit = process.waitFor()
-    require(exit == 0) {
-        "Command failed (${command.joinToString(" ")}): $output"
+    process.outputStream.close()
+    val output = java.io.ByteArrayOutputStream()
+    val reader = Thread({
+        runCatching {
+            process.inputStream.use { stream ->
+                val buffer = ByteArray(8192)
+                while (true) {
+                    val size = stream.read(buffer)
+                    if (size < 0) break
+                    synchronized(output) { output.write(buffer, 0, minOf(size, 1024 * 1024 - output.size())) }
+                }
+            }
+        }
+    }, "graphharness-analysis-output").apply { isDaemon = true; start() }
+    try {
+        check(process.waitFor(timeoutMillis, java.util.concurrent.TimeUnit.MILLISECONDS)) { "Analysis process exceeded its time limit." }
+        reader.join(1000)
+        require(process.exitValue() == 0) {
+            "Analysis process failed (${process.exitValue()}): ${synchronized(output) { output.toString(Charsets.UTF_8) }}"
+        }
+    } catch (interrupted: InterruptedException) {
+        Thread.currentThread().interrupt()
+        throw interrupted
+    } finally {
+        if (process.isAlive) {
+            process.descendants().forEach { it.destroyForcibly() }
+            process.destroyForcibly()
+        }
+        runCatching { process.inputStream.close() }
     }
 }
 
@@ -304,7 +333,7 @@ def encList(values: Iterable[String]): String =
   }
 
   cpg.method.filterNot(_.isExternal).l.foreach { m =>
-    val parent = Option(m.typeDecl.fullName).map(_.toString).getOrElse("")
+    val parent = m.typeDecl.fullName.headOption.getOrElse("")
     val fullName = Option(m.fullName).map(_.toString).getOrElse("")
     val methodName = Option(m.name).map(_.toString).getOrElse("")
     val visibility = m.modifier.modifierType.l.find(Set("PUBLIC", "PROTECTED", "PRIVATE")).map(_.toLowerCase).getOrElse("package")
@@ -326,7 +355,7 @@ def encList(values: Iterable[String]): String =
         enc(signature),
         enc(Option(m.filename).map(_.toString).getOrElse("")),
         m.lineNumber.getOrElse(1).toString,
-        m.ast.lineNumber.l.maxOption.getOrElse(m.lineNumber.getOrElse(1)).toString,
+        m.lineNumberEnd.getOrElse(m.ast.lineNumber.l.maxOption.getOrElse(m.lineNumber.getOrElse(1))).toString,
         enc(visibility),
         encList(annotations),
         complexity.toString,

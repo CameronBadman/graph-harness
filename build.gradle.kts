@@ -22,6 +22,17 @@ application {
     mainClass = "graphharness.MainKt"
 }
 
+distributions {
+    main {
+        contents {
+            from("parsers") {
+                into("parsers")
+                exclude("tests/**", "fixtures/**", "__pycache__/**", "**/*.pyc")
+            }
+        }
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
 }
