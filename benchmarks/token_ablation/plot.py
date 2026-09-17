@@ -17,7 +17,9 @@ def plot(directory):
     labels = ["Native Codex", "Full harness", "Lean harness", "Without bundles"]
     keys = ["native", "full", "lean", "no_bundle"]
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.5), layout="constrained")
-    fig.suptitle("Codex token ablation: three small tasks, two repetitions", fontsize=14)
+    frozen = json.loads((directory / "frozen.json").read_text())
+    repetitions = len({row["repetition"] for row in frozen["schedule"]})
+    fig.suptitle(f"Codex token ablation: three small tasks, {repetitions} repetition(s)", fontsize=14)
     for axis, metric, subset, title in (
         (axes[0], "input_tokens", "cached_input_tokens", "Input tokens (cached included)"),
         (axes[1], "output_tokens", "reasoning_output_tokens", "Output tokens (reasoning included)"),
