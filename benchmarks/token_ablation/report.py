@@ -35,7 +35,9 @@ def collect(base):
         if row["fixture_sha256"] != spec["manifest_sha256"] or row["workspace_before_sha256"] != spec["manifest_sha256"]:
             raise ValueError("fixture differs from registered corpus")
         events_file = base / row["id"] / "events.jsonl"
-        if events_file.exists():
+        if row.get("raw_events_sha256") and not events_file.is_file():
+            raise ValueError("raw evidence missing")
+        if events_file.is_file():
             raw_events = events_file.read_bytes()
             if digest(raw_events) != row["raw_events_sha256"]:
                 raise ValueError("raw evidence changed")
@@ -44,7 +46,8 @@ def collect(base):
                 if parse_usage(events) != row["usage"]:
                     raise ValueError("usage summary differs from raw counters")
         review = reviews.get(row["id"], {})
-        audited = (review.get("passed") is True and review.get("raw_events_sha256") == row.get("raw_events_sha256"))
+        audited = (review.get("passed") is True and review.get("raw_events_sha256") == row.get("raw_events_sha256")
+                   and bool(review.get("auditor")) and bool(review.get("method")) and not review.get("violations"))
         row["access_audit"] = review or {"status": "pending"}
         row["valid_measurement"] = bool(audited and row.get("instrumentation_valid"))
         rows.append(row)
@@ -112,12 +115,17 @@ def render(frozen, rows, summary, output):
                              **{key: (row.get("usage") or {}).get(key) for key in METRICS},
                              "correct": row["correctness"]["passed"], "valid": row["valid_measurement"],
                              "retrieval_used": row.get("diagnostics", {}).get("retrieval_used")})
-    lines = ["# Codex token ablation pilot", "",
+    guided = frozen.get("experiment") == "guided-workflow-follow-up"
+    repetitions = len({row["repetition"] for row in frozen["schedule"]})
+    title = "Guided Codex workflow follow-up" if guided else "Codex tool-availability pilot"
+    lines = ["# " + title, "",
              f"{len(rows)} of {len(frozen['schedule'])} planned scored invocations recorded. "
              f"{sum(row['valid_measurement'] for row in rows)} passed instrumentation and transcript-access review.", "",
              f"Configured model: `{frozen['model']}`, reasoning `{frozen['reasoning_effort']}`; "
              f"client `{frozen['codex_version']}`. These are CLI-reported invocation counters.", "",
-             "Input includes cached input; output includes reasoning. No dollar-cost or subscription-quota claim.", "",
+             "Input includes cached input; output includes reasoning. No dollar-cost or subscription-quota claim. "
+             "Aggregate totals cover valid runs only; do not compare totals with unequal valid counts. "
+             "Use the matched-correct comparisons below.", "",
              "| Configuration | Correct / valid / attempted | Input total | Uncached input | Output total | MCP retrieval among correct |",
              "| --- | --- | ---: | ---: | ---: | ---: |"]
     for name, arm in summary["arms"].items():
@@ -151,14 +159,18 @@ def render(frozen, rows, summary, output):
                      f"{min(inputs):+.1f}% to {max(inputs):+.1f}% | {statistics.median(outputs):+.1f}% | "
                      f"{min(outputs):+.1f}% to {max(outputs):+.1f}% |")
     lines += ["", "## Boundaries", "",
-              "This is a small generated-fixture pilot: two repetitions of three tasks. Java reasoning and "
+              f"This is a small generated-fixture pilot: {repetitions} repetition(s) of three tasks. Java reasoning and "
               "repair share the same source corpus, so there are only two distinct source corpora. "
               "There is no significance or general-product savings claim. Provider caching is uncontrolled; "
               "the randomized schedule and cached/uncached counts are preserved. Configured model identity "
               "is not independently attested. Calibration is excluded.", "",
+              ("Identical conditional guidance requests bundle-first or search/source-first inspection where available. "
+               "The tasks reuse development fixtures; this is exploratory, not independent confirmation. "
+               if guided else "Agents freely choose inspection tools; the experiment measures tool availability. ") +
               "All configurations permit native tools; actual MCP-use subgroups are observational. Full versus "
               "lean changes feature availability as well as schema size. Lean versus no_bundle changes bundle "
-              "availability and its schema. The pilot does not test leases, multiple agents, browser utility, "
+              "availability and its schema" + (", plus prescribed routing policy" if guided else "") +
+              ". The pilot does not test leases, multiple agents, browser utility, "
               "large repositories or long conversations. Outside-workspace inspection is prohibited and "
               "transcripts are reviewed, but the filesystem is not a sealed evaluation vault.", "",
               "Raw transcripts are retained privately outside Git. `runs.json` binds usage to their digests, "

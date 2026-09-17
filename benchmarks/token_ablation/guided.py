@@ -25,7 +25,15 @@ def prepare(original, target, launcher, codex):
     records = json.loads((original / "results.json").read_text())
     if len(records) != len(frozen["schedule"]):
         raise ValueError("finish the original schedule before the follow-up")
-    eligible = [row for row in records if row["arm"] != "native" and row["correctness"]["passed"]]
+    reviews = json.loads((original / "access-review.json").read_text())
+    for row in records:
+        review = reviews.get(row["id"], {})
+        if (review.get("raw_events_sha256") != row["raw_events_sha256"]
+                or type(review.get("passed")) is not bool or not review.get("auditor") or not review.get("method")):
+            raise ValueError("every original attempt requires a bound access adjudication")
+    eligible = [row for row in records if row["arm"] != "native" and row["correctness"]["passed"]
+                and row.get("instrumentation_valid") and reviews[row["id"]]["passed"]
+                and not reviews[row["id"]].get("violations")]
     if not eligible or sum(row["diagnostics"]["retrieval_used"] for row in eligible) >= len(eligible) / 2:
         raise ValueError("predeclared low-adoption trigger not met")
     if target.exists() and any(target.iterdir()):
@@ -51,7 +59,6 @@ def prepare(original, target, launcher, codex):
     frozen["schedule"] = schedule
     run.write_json(target / "frozen.json", frozen)
     calibration = json.loads((original / "calibration.json").read_text())
-    reviews = json.loads((original / "access-review.json").read_text())
     for row in calibration:
         source = original / row["id"]
         destination = target / row["id"]

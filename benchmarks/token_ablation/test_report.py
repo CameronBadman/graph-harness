@@ -1,9 +1,12 @@
 import sys
 from pathlib import Path
 import unittest
+import json
+import tempfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from report import summarize
+from report import collect, summarize
+from run import digest
 
 
 def row(arm, input_tokens, output_tokens, correct=True, valid=True):
@@ -36,6 +39,23 @@ class ReportTests(unittest.TestCase):
         record["usage"]["reasoning_output_tokens"] = 15
         result = summarize([record])
         self.assertEqual(result["arms"]["native"]["totals"]["total_tokens"], 120)
+
+    def test_missing_raw_evidence_cannot_be_authorized_by_receipt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            base = Path(directory)
+            frozen = {"schedule": [{"id": "one", "task": "task", "arm": "native", "repetition": 1}],
+                      "tasks": {"task": {"prompt": "task", "manifest_sha256": "fixture"}}}
+            (base / "frozen.json").write_text(json.dumps(frozen))
+            record = {**row("native", 100, 20), "id": "one", "raw_events_sha256": "missing-evidence",
+                      "frozen_sha256": digest((base / "frozen.json").read_bytes()),
+                      "prompt_sha256": digest(b"task"), "fixture_sha256": "fixture",
+                      "workspace_before_sha256": "fixture", "instrumentation_valid": True}
+            (base / "results.json").write_text(json.dumps([record]))
+            (base / "access-review.json").write_text(json.dumps({"one": {
+                "passed": True, "raw_events_sha256": "missing-evidence", "auditor": "test reviewer",
+                "method": "unit fixture", "violations": []}}))
+            with self.assertRaisesRegex(ValueError, "raw evidence missing"):
+                collect(base)
 
 
 if __name__ == "__main__":
