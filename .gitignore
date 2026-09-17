@@ -1,0 +1,12 @@
+.gradle/
+.kotlin/
+build/
+result
+result-*
+*.jar
+ui/node_modules/
+parsers/node_modules/
+ui/dist/
+__pycache__/
+*.pyc
+artifacts/
