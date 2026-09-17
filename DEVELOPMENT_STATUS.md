@@ -2,6 +2,20 @@
 
 Updated 2026-09-18. Local implementation and verification; nothing pushed, deployed or submitted. Scores below evaluate planning, not software quality or competition prospects.
 
+## Codex token-efficiency pilot
+
+The [token-ablation findings](reviews/token-ablation/FINDINGS.md) record 36 actual
+Codex task runs and four separate integration calibrations. All tasks passed their
+external checks; 35 runs passed independent access review, with one retained
+exclusion. The product was frozen throughout. Twelve benchmark unit tests pass.
+
+This pilot does **not** establish token savings. Default MCP adoption was 0/18;
+conditional graph-first guidance produced only 2/9 uses, both followed by shell
+fallback after wrong/empty bundles. Routing and task-to-symbol selection are the
+next efficiency priorities. Cached input is reported separately; these counters
+are not a monetary-cost or subscription-quota estimate. The generated fixtures
+are small development cases, not large-repository or multi-agent evidence.
+
 ## Completion ledger
 
 | Milestone | State | Evidence and limits |

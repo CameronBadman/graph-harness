@@ -1,0 +1,570 @@
+{
+  "arms": {
+    "native": {
+      "attempts": 3,
+      "valid": 3,
+      "correct": 3,
+      "correct_with_retrieval": 0,
+      "retrieval_interpretation": "not applicable",
+      "totals": {
+        "input_tokens": 151730,
+        "cached_input_tokens": 86272,
+        "uncached_input_tokens": 65458,
+        "output_tokens": 1560,
+        "reasoning_output_tokens": 611,
+        "total_tokens": 153290
+      },
+      "median": {
+        "input_tokens": 52399,
+        "cached_input_tokens": 36096,
+        "uncached_input_tokens": 16303,
+        "output_tokens": 379,
+        "reasoning_output_tokens": 59,
+        "total_tokens": 52778
+      },
+      "range": {
+        "input_tokens": [
+          28133,
+          71198
+        ],
+        "cached_input_tokens": [
+          12032,
+          38144
+        ],
+        "uncached_input_tokens": [
+          16101,
+          33054
+        ],
+        "output_tokens": [
+          199,
+          982
+        ],
+        "reasoning_output_tokens": [
+          47,
+          505
+        ],
+        "total_tokens": [
+          28332,
+          72180
+        ]
+      },
+      "tool_calls": {
+        "shell": 7
+      },
+      "elapsed_seconds": 51.825,
+      "setup_seconds": 0
+    },
+    "full": {
+      "attempts": 3,
+      "valid": 3,
+      "correct": 3,
+      "correct_with_retrieval": 1,
+      "retrieval_interpretation": "inconclusive about retrieval efficiency: fewer than half used MCP retrieval",
+      "totals": {
+        "input_tokens": 223335,
+        "cached_input_tokens": 195840,
+        "uncached_input_tokens": 27495,
+        "output_tokens": 2103,
+        "reasoning_output_tokens": 698,
+        "total_tokens": 225438
+      },
+      "median": {
+        "input_tokens": 72637,
+        "cached_input_tokens": 66304,
+        "uncached_input_tokens": 6333,
+        "output_tokens": 514,
+        "reasoning_output_tokens": 165,
+        "total_tokens": 73151
+      },
+      "range": {
+        "input_tokens": [
+          42221,
+          108477
+        ],
+        "cached_input_tokens": [
+          36096,
+          93440
+        ],
+        "uncached_input_tokens": [
+          6125,
+          15037
+        ],
+        "output_tokens": [
+          375,
+          1214
+        ],
+        "reasoning_output_tokens": [
+          135,
+          398
+        ],
+        "total_tokens": [
+          42596,
+          109691
+        ]
+      },
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "mcp:search_graph": 1,
+        "shell": 7
+      },
+      "elapsed_seconds": 68.204,
+      "setup_seconds": 20.137
+    },
+    "lean": {
+      "attempts": 3,
+      "valid": 3,
+      "correct": 3,
+      "correct_with_retrieval": 1,
+      "retrieval_interpretation": "inconclusive about retrieval efficiency: fewer than half used MCP retrieval",
+      "totals": {
+        "input_tokens": 205383,
+        "cached_input_tokens": 167936,
+        "uncached_input_tokens": 37447,
+        "output_tokens": 2408,
+        "reasoning_output_tokens": 1001,
+        "total_tokens": 207791
+      },
+      "median": {
+        "input_tokens": 42478,
+        "cached_input_tokens": 25088,
+        "uncached_input_tokens": 15393,
+        "output_tokens": 318,
+        "reasoning_output_tokens": 96,
+        "total_tokens": 42796
+      },
+      "range": {
+        "input_tokens": [
+          29752,
+          133153
+        ],
+        "cached_input_tokens": [
+          25088,
+          117760
+        ],
+        "uncached_input_tokens": [
+          4664,
+          17390
+        ],
+        "output_tokens": [
+          240,
+          1850
+        ],
+        "reasoning_output_tokens": [
+          55,
+          850
+        ],
+        "total_tokens": [
+          29992,
+          135003
+        ]
+      },
+      "tool_calls": {
+        "shell": 6,
+        "mcp:build_context_bundle": 1
+      },
+      "elapsed_seconds": 69.801,
+      "setup_seconds": 20.043
+    },
+    "no_bundle": {
+      "attempts": 3,
+      "valid": 3,
+      "correct": 3,
+      "correct_with_retrieval": 0,
+      "retrieval_interpretation": "inconclusive about retrieval efficiency: fewer than half used MCP retrieval",
+      "totals": {
+        "input_tokens": 162416,
+        "cached_input_tokens": 138496,
+        "uncached_input_tokens": 23920,
+        "output_tokens": 1449,
+        "reasoning_output_tokens": 429,
+        "total_tokens": 163865
+      },
+      "median": {
+        "input_tokens": 41424,
+        "cached_input_tokens": 37120,
+        "uncached_input_tokens": 4606,
+        "output_tokens": 369,
+        "reasoning_output_tokens": 91,
+        "total_tokens": 41793
+      },
+      "range": {
+        "input_tokens": [
+          29694,
+          91298
+        ],
+        "cached_input_tokens": [
+          25088,
+          76288
+        ],
+        "uncached_input_tokens": [
+          4304,
+          15010
+        ],
+        "output_tokens": [
+          212,
+          868
+        ],
+        "reasoning_output_tokens": [
+          65,
+          273
+        ],
+        "total_tokens": [
+          29906,
+          92166
+        ]
+      },
+      "tool_calls": {
+        "shell": 6
+      },
+      "elapsed_seconds": 48.216,
+      "setup_seconds": 20.343
+    }
+  },
+  "pairs": [
+    {
+      "task": "java_chain",
+      "repetition": 1,
+      "baseline": "native",
+      "treatment": "full",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": -10178,
+        "cached_input_tokens": 0,
+        "uncached_input_tokens": -10178,
+        "output_tokens": -4,
+        "reasoning_output_tokens": 88,
+        "total_tokens": -10182
+      },
+      "percent_change": {
+        "input_tokens": -19.42403480982462,
+        "cached_input_tokens": 0.0,
+        "uncached_input_tokens": -62.430227565478745,
+        "output_tokens": -1.055408970976257,
+        "reasoning_output_tokens": 187.2340425531915,
+        "total_tokens": -19.2921292962977
+      }
+    },
+    {
+      "task": "java_chain",
+      "repetition": 1,
+      "baseline": "native",
+      "treatment": "lean",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": -9921,
+        "cached_input_tokens": -11008,
+        "uncached_input_tokens": 1087,
+        "output_tokens": -61,
+        "reasoning_output_tokens": 8,
+        "total_tokens": -9982
+      },
+      "percent_change": {
+        "input_tokens": -18.933567434493025,
+        "cached_input_tokens": -30.49645390070922,
+        "uncached_input_tokens": 6.66748451205299,
+        "output_tokens": -16.09498680738787,
+        "reasoning_output_tokens": 17.021276595744684,
+        "total_tokens": -18.913183523437795
+      }
+    },
+    {
+      "task": "java_chain",
+      "repetition": 1,
+      "baseline": "native",
+      "treatment": "no_bundle",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": -10975,
+        "cached_input_tokens": 1024,
+        "uncached_input_tokens": -11999,
+        "output_tokens": -10,
+        "reasoning_output_tokens": 44,
+        "total_tokens": -10985
+      },
+      "percent_change": {
+        "input_tokens": -20.945056203362654,
+        "cached_input_tokens": 2.8368794326241176,
+        "uncached_input_tokens": -73.59995092927683,
+        "output_tokens": -2.638522427440637,
+        "reasoning_output_tokens": 93.61702127659575,
+        "total_tokens": -20.81359657433022
+      }
+    },
+    {
+      "task": "java_chain",
+      "repetition": 1,
+      "baseline": "full",
+      "treatment": "lean",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": 257,
+        "cached_input_tokens": -11008,
+        "uncached_input_tokens": 11265,
+        "output_tokens": -57,
+        "reasoning_output_tokens": -80,
+        "total_tokens": 200
+      },
+      "percent_change": {
+        "input_tokens": 0.608701830842473,
+        "cached_input_tokens": -30.49645390070922,
+        "uncached_input_tokens": 183.91836734693877,
+        "output_tokens": -15.200000000000003,
+        "reasoning_output_tokens": -59.25925925925925,
+        "total_tokens": 0.46952765517889183
+      }
+    },
+    {
+      "task": "java_chain",
+      "repetition": 1,
+      "baseline": "no_bundle",
+      "treatment": "lean",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": 1054,
+        "cached_input_tokens": -12032,
+        "uncached_input_tokens": 13086,
+        "output_tokens": -51,
+        "reasoning_output_tokens": -36,
+        "total_tokens": 1003
+      },
+      "percent_change": {
+        "input_tokens": 2.5444186944766356,
+        "cached_input_tokens": -32.41379310344827,
+        "uncached_input_tokens": 304.042750929368,
+        "output_tokens": -13.821138211382111,
+        "reasoning_output_tokens": -39.56043956043956,
+        "total_tokens": 2.3999234321537166
+      }
+    },
+    {
+      "task": "java_repair",
+      "repetition": 1,
+      "baseline": "native",
+      "treatment": "full",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": 37279,
+        "cached_input_tokens": 55296,
+        "uncached_input_tokens": -18017,
+        "output_tokens": 232,
+        "reasoning_output_tokens": -107,
+        "total_tokens": 37511
+      },
+      "percent_change": {
+        "input_tokens": 52.359616843169746,
+        "cached_input_tokens": 144.96644295302013,
+        "uncached_input_tokens": -54.507775155805646,
+        "output_tokens": 23.62525458248472,
+        "reasoning_output_tokens": -21.188118811881186,
+        "total_tokens": 51.96868938764201
+      }
+    },
+    {
+      "task": "java_repair",
+      "repetition": 1,
+      "baseline": "native",
+      "treatment": "lean",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": 61955,
+        "cached_input_tokens": 79616,
+        "uncached_input_tokens": -17661,
+        "output_tokens": 868,
+        "reasoning_output_tokens": 345,
+        "total_tokens": 62823
+      },
+      "percent_change": {
+        "input_tokens": 87.0178937610607,
+        "cached_input_tokens": 208.7248322147651,
+        "uncached_input_tokens": -53.43074968233799,
+        "output_tokens": 88.39103869653768,
+        "reasoning_output_tokens": 68.31683168316832,
+        "total_tokens": 87.03657522859518
+      }
+    },
+    {
+      "task": "java_repair",
+      "repetition": 1,
+      "baseline": "native",
+      "treatment": "no_bundle",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": 20100,
+        "cached_input_tokens": 38144,
+        "uncached_input_tokens": -18044,
+        "output_tokens": -114,
+        "reasoning_output_tokens": -232,
+        "total_tokens": 19986
+      },
+      "percent_change": {
+        "input_tokens": 28.231130087923816,
+        "cached_input_tokens": 100.0,
+        "uncached_input_tokens": -54.5894596720518,
+        "output_tokens": -11.608961303462317,
+        "reasoning_output_tokens": -45.94059405940594,
+        "total_tokens": 27.68911055694099
+      }
+    },
+    {
+      "task": "java_repair",
+      "repetition": 1,
+      "baseline": "full",
+      "treatment": "lean",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": 24676,
+        "cached_input_tokens": 24320,
+        "uncached_input_tokens": 356,
+        "output_tokens": 636,
+        "reasoning_output_tokens": 452,
+        "total_tokens": 25312
+      },
+      "percent_change": {
+        "input_tokens": 22.747679231542172,
+        "cached_input_tokens": 26.027397260273965,
+        "uncached_input_tokens": 2.3674935159938792,
+        "output_tokens": 52.38879736408566,
+        "reasoning_output_tokens": 113.56783919597989,
+        "total_tokens": 23.075730916848247
+      }
+    },
+    {
+      "task": "java_repair",
+      "repetition": 1,
+      "baseline": "no_bundle",
+      "treatment": "lean",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": 41855,
+        "cached_input_tokens": 41472,
+        "uncached_input_tokens": 383,
+        "output_tokens": 982,
+        "reasoning_output_tokens": 577,
+        "total_tokens": 42837
+      },
+      "percent_change": {
+        "input_tokens": 45.84437775197705,
+        "cached_input_tokens": 54.36241610738255,
+        "uncached_input_tokens": 2.551632245169877,
+        "output_tokens": 113.13364055299537,
+        "reasoning_output_tokens": 211.35531135531136,
+        "total_tokens": 46.478093874096736
+      }
+    },
+    {
+      "task": "polyglot_lookup",
+      "repetition": 1,
+      "baseline": "native",
+      "treatment": "full",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": 44504,
+        "cached_input_tokens": 54272,
+        "uncached_input_tokens": -9768,
+        "output_tokens": 315,
+        "reasoning_output_tokens": 106,
+        "total_tokens": 44819
+      },
+      "percent_change": {
+        "input_tokens": 158.1914477659688,
+        "cached_input_tokens": 451.063829787234,
+        "uncached_input_tokens": -60.667039314328306,
+        "output_tokens": 158.29145728643215,
+        "reasoning_output_tokens": 179.66101694915255,
+        "total_tokens": 158.19215021883383
+      }
+    },
+    {
+      "task": "polyglot_lookup",
+      "repetition": 1,
+      "baseline": "native",
+      "treatment": "lean",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": 1619,
+        "cached_input_tokens": 13056,
+        "uncached_input_tokens": -11437,
+        "output_tokens": 41,
+        "reasoning_output_tokens": 37,
+        "total_tokens": 1660
+      },
+      "percent_change": {
+        "input_tokens": 5.754807521416128,
+        "cached_input_tokens": 108.51063829787235,
+        "uncached_input_tokens": -71.03285510216757,
+        "output_tokens": 20.603015075376874,
+        "reasoning_output_tokens": 62.71186440677967,
+        "total_tokens": 5.859099251729494
+      }
+    },
+    {
+      "task": "polyglot_lookup",
+      "repetition": 1,
+      "baseline": "native",
+      "treatment": "no_bundle",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": 1561,
+        "cached_input_tokens": 13056,
+        "uncached_input_tokens": -11495,
+        "output_tokens": 13,
+        "reasoning_output_tokens": 6,
+        "total_tokens": 1574
+      },
+      "percent_change": {
+        "input_tokens": 5.548643941278919,
+        "cached_input_tokens": 108.51063829787235,
+        "uncached_input_tokens": -71.3930811750823,
+        "output_tokens": 6.5326633165829096,
+        "reasoning_output_tokens": 10.169491525423723,
+        "total_tokens": 5.555555555555558
+      }
+    },
+    {
+      "task": "polyglot_lookup",
+      "repetition": 1,
+      "baseline": "full",
+      "treatment": "lean",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": -42885,
+        "cached_input_tokens": -41216,
+        "uncached_input_tokens": -1669,
+        "output_tokens": -274,
+        "reasoning_output_tokens": -69,
+        "total_tokens": -43159
+      },
+      "percent_change": {
+        "input_tokens": -59.04015859685835,
+        "cached_input_tokens": -62.16216216216216,
+        "uncached_input_tokens": -26.354018632559605,
+        "output_tokens": -53.30739299610895,
+        "reasoning_output_tokens": -41.81818181818182,
+        "total_tokens": -58.99987696682205
+      }
+    },
+    {
+      "task": "polyglot_lookup",
+      "repetition": 1,
+      "baseline": "no_bundle",
+      "treatment": "lean",
+      "both_correct": true,
+      "difference": {
+        "input_tokens": 58,
+        "cached_input_tokens": 0,
+        "uncached_input_tokens": 58,
+        "output_tokens": 28,
+        "reasoning_output_tokens": 31,
+        "total_tokens": 86
+      },
+      "percent_change": {
+        "input_tokens": 0.19532565501447774,
+        "cached_input_tokens": 0.0,
+        "uncached_input_tokens": 1.2592270950933626,
+        "output_tokens": 13.207547169811317,
+        "reasoning_output_tokens": 47.6923076923077,
+        "total_tokens": 0.2875677121647824
+      }
+    }
+  ]
+}

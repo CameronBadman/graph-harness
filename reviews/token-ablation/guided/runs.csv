@@ -1,0 +1,13 @@
+id,task,repetition,arm,correct,valid,input_tokens,cached_input_tokens,uncached_input_tokens,output_tokens,reasoning_output_tokens,total_tokens,elapsed_seconds,setup_seconds,retrieval_used
+polyglot_lookup-1-no_bundle,polyglot_lookup,1,no_bundle,True,True,29694,25088,4606,212,65,29906,8.727,7.05,False
+polyglot_lookup-1-full,polyglot_lookup,1,full,True,True,72637,66304,6333,514,165,73151,17.792,6.949,True
+polyglot_lookup-1-native,polyglot_lookup,1,native,True,True,28133,12032,16101,199,59,28332,8.227,0,False
+polyglot_lookup-1-lean,polyglot_lookup,1,lean,True,True,29752,25088,4664,240,96,29992,9.83,6.846,False
+java_chain-1-native,java_chain,1,native,True,True,52399,36096,16303,379,47,52778,17.043,0,False
+java_chain-1-full,java_chain,1,full,True,True,42221,36096,6125,375,135,42596,15.487,6.544,False
+java_chain-1-lean,java_chain,1,lean,True,True,42478,25088,17390,318,55,42796,12.783,6.55,False
+java_chain-1-no_bundle,java_chain,1,no_bundle,True,True,41424,37120,4304,369,91,41793,12.883,6.744,False
+java_repair-1-lean,java_repair,1,lean,True,True,133153,117760,15393,1850,850,135003,47.188,6.647,True
+java_repair-1-full,java_repair,1,full,True,True,108477,93440,15037,1214,398,109691,34.925,6.644,False
+java_repair-1-no_bundle,java_repair,1,no_bundle,True,True,91298,76288,15010,868,273,92166,26.606,6.549,False
+java_repair-1-native,java_repair,1,native,True,True,71198,38144,33054,982,505,72180,26.555,0,False

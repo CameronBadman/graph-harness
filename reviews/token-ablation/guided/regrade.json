@@ -1,0 +1,19 @@
+{
+  "check": "Re-executed frozen evaluator on every retained workspace and answer; compared complete correctness object",
+  "matched": [
+    "polyglot_lookup-1-no_bundle",
+    "polyglot_lookup-1-full",
+    "polyglot_lookup-1-native",
+    "polyglot_lookup-1-lean",
+    "java_chain-1-native",
+    "java_chain-1-full",
+    "java_chain-1-lean",
+    "java_chain-1-no_bundle",
+    "java_repair-1-lean",
+    "java_repair-1-full",
+    "java_repair-1-no_bundle",
+    "java_repair-1-native"
+  ],
+  "frozen_sha256": "282e6337c81429fc3de08e6a20aaf9bb4bb12d3dec4325fa0a2a4bcb1a4a8228",
+  "product_and_runner_identity_unchanged": true
+}

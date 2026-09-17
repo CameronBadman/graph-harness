@@ -1,0 +1,16 @@
+{
+  "benchmark_unit_tests": {
+    "command": "python3 -m unittest discover -s benchmarks/token_ablation -p 'test_*.py' -v",
+    "tests": 12,
+    "failures": 0,
+    "errors": 0,
+    "observation": "Executed by integrator; passing output observed in tool transcript."
+  },
+  "task_outcomes_reexecuted": 36,
+  "access_reviewed_transcripts": 40,
+  "scored_attempts": 36,
+  "unscored_calibrations": 4,
+  "valid_scored_measurements": 35,
+  "product_modified_during_measurement": false,
+  "pushed": false
+}

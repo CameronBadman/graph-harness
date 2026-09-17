@@ -1,0 +1,61 @@
+{
+  "scope": "All two MCP-using scored runs in the guided experiment, not a selected success subset. Byte counts are diagnostics, not model tokens.",
+  "observations": [
+    {
+      "run": "polyglot_lookup-1-full",
+      "raw_events_sha256": "51e08f81b5d217b465b01ef66fa53382851c575a07e842954e397ba2354339da",
+      "tool": "build_context_bundle",
+      "arguments": {
+        "task": "Find the TypeScript and Python functions that return \"settled\" for a non-cancelled payment starting at attempt two, \"retry\" before that, and \"cancel\" for cancelled payments regardless of attempt count. Several modules have the same function names. Return each as relative/path:symbol.",
+        "token_budget": 1800
+      },
+      "serialized_result_bytes": 1959,
+      "result_sha256": "639781c5a410254f1740ca020dd433990f3919c75e445d3192db0a773b010323",
+      "chosen_node_id": null,
+      "notes": [
+        "bundle_resolution=resolve_edit_target_ambiguous",
+        "no_node_resolved"
+      ],
+      "source_slice_count": 0,
+      "source_characters": 0,
+      "search_result_count": null
+    },
+    {
+      "run": "polyglot_lookup-1-full",
+      "raw_events_sha256": "51e08f81b5d217b465b01ef66fa53382851c575a07e842954e397ba2354339da",
+      "tool": "search_graph",
+      "arguments": {
+        "query": "payment",
+        "kind": "function"
+      },
+      "serialized_result_bytes": 889,
+      "result_sha256": "41e2a1f69f90e45565e6687640b4f9dd94ff5745c16f3caf6378bda092301ea7",
+      "chosen_node_id": null,
+      "notes": null,
+      "source_slice_count": 0,
+      "source_characters": 0,
+      "search_result_count": 0
+    },
+    {
+      "run": "java_repair-1-lean",
+      "raw_events_sha256": "8453c089f36f71c7ed77e68f16bd7d7bd0a6dc8a38c5a365ca62d8eee3183986",
+      "tool": "build_context_bundle",
+      "arguments": {
+        "task": "Fix the boundary defect in CouponPolicy.discount: a subtotal exactly at the minimum qualifying amount must receive the configured discount. Preserve other behavior, including invalid inputs and large subtotals. Modify only CouponPolicy.java.",
+        "token_budget": 1800
+      },
+      "serialized_result_bytes": 6924,
+      "result_sha256": "fbea11f4c2a3a9b99743db151cc676fc9acf7fae100a2afc7d676d943b323ee9",
+      "chosen_node_id": "method:CouponPolicy.<init>::void",
+      "notes": [
+        "bundle_resolution=resolve_edit_target_ambiguous",
+        "bundle_resolution=search_graph:CouponPolicy",
+        "chosen_node=CouponPolicy.<init>",
+        "impact_basis=incoming_calls,method_implementations"
+      ],
+      "source_slice_count": 2,
+      "source_characters": 111,
+      "search_result_count": null
+    }
+  ]
+}

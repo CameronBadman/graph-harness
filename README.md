@@ -8,6 +8,8 @@ The local daemon provides **Java, TypeScript, JavaScript and Python structural n
 
 The recording uses two actual Codex clients configured with `gpt-5.6-terra`, deliberate reservation timing, and the public fixture. Playback is 1.1×. The journal and expected-failure/passing-test evidence are in [the recording report](reviews/recorded-demo-evidence.json).
 
+**Token efficiency remains unproven.** A [36-run Codex pilot](reviews/token-ablation/FINDINGS.md) found low tool adoption and two unhelpful context bundles. It preserves actual input/output counters, cached input, correctness checks and an independently reviewed exclusion. The next efficiency priorities are reliable routing, correct symbol selection and compact retrieval; fewer tokens are not yet an established benefit.
+
 ## Build and run
 
 The supported live environment is Linux with a local POSIX filesystem, JDK 21, Gradle 8, Node.js 20.19+ or 22.12+, npm, and Python 3.11+. The checked-in Nix development shell supplies the JVM tools; Node/npm must also be available.

@@ -28,8 +28,10 @@ def plot(directory):
               for key in keys}
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.5), layout="constrained")
     frozen = json.loads((directory / "frozen.json").read_text())
-    repetitions = len({row["repetition"] for row in frozen["schedule"]})
-    phase = "Guided workflow" if frozen.get("experiment") else "Tools available; no graph retrieval used"
+    equipped = [row for row in rows if row["arm"] != "native"]
+    uses = sum(row.get("diagnostics", {}).get("retrieval_used", False) for row in equipped)
+    phase = (f"Conditional guidance; graph used in {uses}/{len(equipped)} equipped runs"
+             if frozen.get("experiment") else "Tools available; no graph retrieval used")
     fig.suptitle(f"{phase}\n{len(matched)} matched correct task/repetition cells per configuration", fontsize=13)
     for axis, metric, subset, title in (
         (axes[0], "input_tokens", "cached_input_tokens", "Input tokens (cached included)"),
