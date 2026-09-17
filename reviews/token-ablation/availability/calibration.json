@@ -1,0 +1,129 @@
+[
+  {
+    "id": "calibration-native",
+    "arm": "native",
+    "usage": {
+      "input_tokens": 24591,
+      "cached_input_tokens": 12032,
+      "output_tokens": 178,
+      "reasoning_output_tokens": 29,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 12559,
+      "total_tokens": 24769
+    },
+    "instrumentation_valid": true,
+    "correctness": {
+      "passed": true,
+      "details": "correct source value and required calibration route"
+    },
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 1
+      },
+      "shell_output_bytes": 70,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "raw_events_sha256": "548d846302681aaca3c988c5a5101bf0cca3cc735ebf4917e8de4cccf7e032a3",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed"
+  },
+  {
+    "id": "calibration-full",
+    "arm": "full",
+    "usage": {
+      "input_tokens": 54536,
+      "cached_input_tokens": 38144,
+      "output_tokens": 198,
+      "reasoning_output_tokens": 26,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 16392,
+      "total_tokens": 54734
+    },
+    "instrumentation_valid": true,
+    "correctness": {
+      "passed": true,
+      "details": "correct source value and required calibration route"
+    },
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:search_graph": 1,
+        "mcp:get_source": 1
+      },
+      "shell_output_bytes": 0,
+      "mcp_result_json_bytes": 3226,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "raw_events_sha256": "ba2b7f8ee16fbaae3dfe66e81cf24882fb0afbda3f70132dc3ec7720fb00435f",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed"
+  },
+  {
+    "id": "calibration-lean",
+    "arm": "lean",
+    "usage": {
+      "input_tokens": 55102,
+      "cached_input_tokens": 38144,
+      "output_tokens": 257,
+      "reasoning_output_tokens": 81,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 16958,
+      "total_tokens": 55359
+    },
+    "instrumentation_valid": true,
+    "correctness": {
+      "passed": true,
+      "details": "correct source value and required calibration route"
+    },
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:search_graph": 1,
+        "mcp:get_source": 1
+      },
+      "shell_output_bytes": 0,
+      "mcp_result_json_bytes": 3226,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "raw_events_sha256": "bacd5a6947db1ba172ff3cc52213a86d74e658930f9f2ab67a32e6e0eca375da",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed"
+  },
+  {
+    "id": "calibration-no_bundle",
+    "arm": "no_bundle",
+    "usage": {
+      "input_tokens": 54325,
+      "cached_input_tokens": 26112,
+      "output_tokens": 199,
+      "reasoning_output_tokens": 47,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 28213,
+      "total_tokens": 54524
+    },
+    "instrumentation_valid": true,
+    "correctness": {
+      "passed": true,
+      "details": "correct source value and required calibration route"
+    },
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:search_graph": 1,
+        "mcp:get_source": 1
+      },
+      "shell_output_bytes": 0,
+      "mcp_result_json_bytes": 3226,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "raw_events_sha256": "b84aa59fdee8abd23c1a1d7faaf7f20079601c6c7569d1a590471ad2dee7775f",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed"
+  }
+]

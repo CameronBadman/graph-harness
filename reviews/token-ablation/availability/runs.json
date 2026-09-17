@@ -1,0 +1,2750 @@
+[
+  {
+    "id": "polyglot_lookup-2-native",
+    "task": "polyglot_lookup",
+    "repetition": 2,
+    "arm": "native",
+    "prompt_sha256": "76aafed3b99a4189150f1849c3afd8b2fee83788cb8ecdd9d9ea838cedd58f18",
+    "schema_sha256": "d9a538f12b7ecd11838cbc55522d6802be23b4a7d1af9a4bcc659229098611fd",
+    "fixture_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "started_at": "2026-09-17T20:42:04Z",
+    "usage": {
+      "input_tokens": 41396,
+      "cached_input_tokens": 26112,
+      "output_tokens": 313,
+      "reasoning_output_tokens": 91,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 15284,
+      "total_tokens": 41709
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact file/symbol check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 0,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "access_audit": {
+      "raw_events_sha256": "fa8414e2a52efb9d4492784c136d2b0dee9926a910707c82db0f7939052a872b",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [],
+    "tool_schema_json_bytes": 0,
+    "tool_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "timed_out": false,
+    "elapsed_seconds": 13.636,
+    "exit_code": 0,
+    "raw_events_sha256": "fa8414e2a52efb9d4492784c136d2b0dee9926a910707c82db0f7939052a872b",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 2
+      },
+      "shell_output_bytes": 7378,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "636c6f45a968c9cd762d24059e54dd0dfcd65a20caed026ddcc5a16131a90a58",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "workspace_file_hashes_after": {
+      "TASK.md": "98ba3aaa1e78e88cf312db37e836d7b1629ada198533353d213adabd6a55e047",
+      "ops/batch.py": "eba811e31ff353acd299af4198e3a991350c425fe235bee96c0cc46f88c31f33",
+      "ops/invoices.py": "507d98f2ec77a6a63eb22b60ee046966f01a34ce717dd465096fa958e670541b",
+      "ops/notifications.py": "37e9094b10b6f1867356df644a78bb9c32f83a6daf826ca3eeb26a0dc9623adf",
+      "ops/payments.py": "452e1748431667fa49ebb239c5de239d7dc1554ad4a98082170807ea6a67adc6",
+      "ops/refunds.py": "b705eccc7310d7bd126d6e1cb7960fb0353a192bb128138cf503cabd0c404184",
+      "ops/reservations.py": "8866d458c31fde97d334b548c6fcc06a0239092f13b7b273ef48cd18550e82bf",
+      "ops/shipments.py": "11a502a6b94ed7b3ef1b1c7a1357d444b865327e424f378ddcd60ccd788f1781",
+      "web/checkout.ts": "a2c53a77680c7b93a26d22be033014716c63daeeb84dffb67c396df10f2036d6",
+      "web/invoices.ts": "4958b4af3369a85ab06e3ee23a2104f95c41c99175f6195a1e6b36c102ed5fd7",
+      "web/notifications.ts": "42d04490a9c67d59aa051077ab144fc07d0c5382c591b9a4fac9adfc93e1719a",
+      "web/payments.ts": "218fd7245b2f1f757ba22cec3098d0e9aa6155eb3143095439c9a38ba79b387c",
+      "web/refunds.ts": "ebd4494d6da96dd4253e698f4b4cf1b76f32065cf1d86b2d7c7edf5dd825427a",
+      "web/reservations.ts": "6699e9f4ecc3eea7e5de9f9b34990ad44e982bd877bbeb08c0b52de9b5d6ab55",
+      "web/shipments.ts": "92338b54e786fe03a4d493e124069ef3bf95cc58f34370e9686608ab3de0eb51"
+    }
+  },
+  {
+    "id": "polyglot_lookup-2-full",
+    "task": "polyglot_lookup",
+    "repetition": 2,
+    "arm": "full",
+    "prompt_sha256": "76aafed3b99a4189150f1849c3afd8b2fee83788cb8ecdd9d9ea838cedd58f18",
+    "schema_sha256": "d9a538f12b7ecd11838cbc55522d6802be23b4a7d1af9a4bcc659229098611fd",
+    "fixture_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "started_at": "2026-09-17T20:42:18Z",
+    "usage": {
+      "input_tokens": 29518,
+      "cached_input_tokens": 12032,
+      "output_tokens": 186,
+      "reasoning_output_tokens": 40,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 17486,
+      "total_tokens": 29704
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact file/symbol check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 7.05,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "access_audit": {
+      "raw_events_sha256": "13b44aa7f34fa3a84d50d4e688937286dcc087053ebeb1ba8d67f69451f1d102",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "build_context_bundle",
+      "get_snapshot_delta",
+      "get_summary_map",
+      "get_cluster_detail",
+      "get_node_detail",
+      "get_call_paths",
+      "search_graph",
+      "get_callers",
+      "get_callees",
+      "get_implementations",
+      "get_type_hierarchy",
+      "get_dependencies",
+      "get_impact",
+      "get_source",
+      "get_source_batch"
+    ],
+    "tool_schema_sha256": "afa48321c729e01dbaff10f81642c840877d2bd3ad999122ae82de75ce348114",
+    "tool_schema_json_bytes": 5638,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java",
+        "python",
+        "typescript"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "python": {
+          "language": "python",
+          "parser": "python-ast",
+          "version": "python-ast/3.13.12",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "typescript": {
+          "language": "typescript",
+          "parser": "typescript-compiler-api",
+          "version": "typescript/5.9.2",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 9.128,
+    "exit_code": 0,
+    "raw_events_sha256": "13b44aa7f34fa3a84d50d4e688937286dcc087053ebeb1ba8d67f69451f1d102",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 1
+      },
+      "shell_output_bytes": 11074,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "636c6f45a968c9cd762d24059e54dd0dfcd65a20caed026ddcc5a16131a90a58",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "workspace_file_hashes_after": {
+      "TASK.md": "98ba3aaa1e78e88cf312db37e836d7b1629ada198533353d213adabd6a55e047",
+      "ops/batch.py": "eba811e31ff353acd299af4198e3a991350c425fe235bee96c0cc46f88c31f33",
+      "ops/invoices.py": "507d98f2ec77a6a63eb22b60ee046966f01a34ce717dd465096fa958e670541b",
+      "ops/notifications.py": "37e9094b10b6f1867356df644a78bb9c32f83a6daf826ca3eeb26a0dc9623adf",
+      "ops/payments.py": "452e1748431667fa49ebb239c5de239d7dc1554ad4a98082170807ea6a67adc6",
+      "ops/refunds.py": "b705eccc7310d7bd126d6e1cb7960fb0353a192bb128138cf503cabd0c404184",
+      "ops/reservations.py": "8866d458c31fde97d334b548c6fcc06a0239092f13b7b273ef48cd18550e82bf",
+      "ops/shipments.py": "11a502a6b94ed7b3ef1b1c7a1357d444b865327e424f378ddcd60ccd788f1781",
+      "web/checkout.ts": "a2c53a77680c7b93a26d22be033014716c63daeeb84dffb67c396df10f2036d6",
+      "web/invoices.ts": "4958b4af3369a85ab06e3ee23a2104f95c41c99175f6195a1e6b36c102ed5fd7",
+      "web/notifications.ts": "42d04490a9c67d59aa051077ab144fc07d0c5382c591b9a4fac9adfc93e1719a",
+      "web/payments.ts": "218fd7245b2f1f757ba22cec3098d0e9aa6155eb3143095439c9a38ba79b387c",
+      "web/refunds.ts": "ebd4494d6da96dd4253e698f4b4cf1b76f32065cf1d86b2d7c7edf5dd825427a",
+      "web/reservations.ts": "6699e9f4ecc3eea7e5de9f9b34990ad44e982bd877bbeb08c0b52de9b5d6ab55",
+      "web/shipments.ts": "92338b54e786fe03a4d493e124069ef3bf95cc58f34370e9686608ab3de0eb51"
+    }
+  },
+  {
+    "id": "polyglot_lookup-2-no_bundle",
+    "task": "polyglot_lookup",
+    "repetition": 2,
+    "arm": "no_bundle",
+    "prompt_sha256": "76aafed3b99a4189150f1849c3afd8b2fee83788cb8ecdd9d9ea838cedd58f18",
+    "schema_sha256": "d9a538f12b7ecd11838cbc55522d6802be23b4a7d1af9a4bcc659229098611fd",
+    "fixture_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "started_at": "2026-09-17T20:42:34Z",
+    "usage": {
+      "input_tokens": 43917,
+      "cached_input_tokens": 26112,
+      "output_tokens": 313,
+      "reasoning_output_tokens": 75,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 17805,
+      "total_tokens": 44230
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact file/symbol check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 7.152,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "access_audit": {
+      "raw_events_sha256": "4f0fbe06c8841cc165a002abee111fd279ec439c449f4ae71087c4070106970f",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "get_node_detail",
+      "search_graph",
+      "get_source"
+    ],
+    "tool_schema_sha256": "7e3e16c79b111f50a45d2f22f52f6a830f05c4115059271e9242b7c095408bc5",
+    "tool_schema_json_bytes": 1518,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java",
+        "python",
+        "typescript"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "python": {
+          "language": "python",
+          "parser": "python-ast",
+          "version": "python-ast/3.13.12",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "typescript": {
+          "language": "typescript",
+          "parser": "typescript-compiler-api",
+          "version": "typescript/5.9.2",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 12.583,
+    "exit_code": 0,
+    "raw_events_sha256": "4f0fbe06c8841cc165a002abee111fd279ec439c449f4ae71087c4070106970f",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 2
+      },
+      "shell_output_bytes": 7767,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "636c6f45a968c9cd762d24059e54dd0dfcd65a20caed026ddcc5a16131a90a58",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "workspace_file_hashes_after": {
+      "TASK.md": "98ba3aaa1e78e88cf312db37e836d7b1629ada198533353d213adabd6a55e047",
+      "ops/batch.py": "eba811e31ff353acd299af4198e3a991350c425fe235bee96c0cc46f88c31f33",
+      "ops/invoices.py": "507d98f2ec77a6a63eb22b60ee046966f01a34ce717dd465096fa958e670541b",
+      "ops/notifications.py": "37e9094b10b6f1867356df644a78bb9c32f83a6daf826ca3eeb26a0dc9623adf",
+      "ops/payments.py": "452e1748431667fa49ebb239c5de239d7dc1554ad4a98082170807ea6a67adc6",
+      "ops/refunds.py": "b705eccc7310d7bd126d6e1cb7960fb0353a192bb128138cf503cabd0c404184",
+      "ops/reservations.py": "8866d458c31fde97d334b548c6fcc06a0239092f13b7b273ef48cd18550e82bf",
+      "ops/shipments.py": "11a502a6b94ed7b3ef1b1c7a1357d444b865327e424f378ddcd60ccd788f1781",
+      "web/checkout.ts": "a2c53a77680c7b93a26d22be033014716c63daeeb84dffb67c396df10f2036d6",
+      "web/invoices.ts": "4958b4af3369a85ab06e3ee23a2104f95c41c99175f6195a1e6b36c102ed5fd7",
+      "web/notifications.ts": "42d04490a9c67d59aa051077ab144fc07d0c5382c591b9a4fac9adfc93e1719a",
+      "web/payments.ts": "218fd7245b2f1f757ba22cec3098d0e9aa6155eb3143095439c9a38ba79b387c",
+      "web/refunds.ts": "ebd4494d6da96dd4253e698f4b4cf1b76f32065cf1d86b2d7c7edf5dd825427a",
+      "web/reservations.ts": "6699e9f4ecc3eea7e5de9f9b34990ad44e982bd877bbeb08c0b52de9b5d6ab55",
+      "web/shipments.ts": "92338b54e786fe03a4d493e124069ef3bf95cc58f34370e9686608ab3de0eb51"
+    }
+  },
+  {
+    "id": "polyglot_lookup-2-lean",
+    "task": "polyglot_lookup",
+    "repetition": 2,
+    "arm": "lean",
+    "prompt_sha256": "76aafed3b99a4189150f1849c3afd8b2fee83788cb8ecdd9d9ea838cedd58f18",
+    "schema_sha256": "d9a538f12b7ecd11838cbc55522d6802be23b4a7d1af9a4bcc659229098611fd",
+    "fixture_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "started_at": "2026-09-17T20:42:54Z",
+    "usage": {
+      "input_tokens": 28945,
+      "cached_input_tokens": 12032,
+      "output_tokens": 229,
+      "reasoning_output_tokens": 60,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 16913,
+      "total_tokens": 29174
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact file/symbol check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 6.947,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "access_audit": {
+      "raw_events_sha256": "8b64cd30f42cf87d78cdb7753b5bc20351ae01f69cb3109a730516a69c928929",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "build_context_bundle",
+      "get_node_detail",
+      "search_graph",
+      "get_source"
+    ],
+    "tool_schema_sha256": "be69ddd2c4b65fe597ec686aa74e745e395c8340bf1aeea488a52c4f4e7ef999",
+    "tool_schema_json_bytes": 2052,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java",
+        "python",
+        "typescript"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "python": {
+          "language": "python",
+          "parser": "python-ast",
+          "version": "python-ast/3.13.12",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "typescript": {
+          "language": "typescript",
+          "parser": "typescript-compiler-api",
+          "version": "typescript/5.9.2",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 10.979,
+    "exit_code": 0,
+    "raw_events_sha256": "8b64cd30f42cf87d78cdb7753b5bc20351ae01f69cb3109a730516a69c928929",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 1
+      },
+      "shell_output_bytes": 9205,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "636c6f45a968c9cd762d24059e54dd0dfcd65a20caed026ddcc5a16131a90a58",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "workspace_file_hashes_after": {
+      "TASK.md": "98ba3aaa1e78e88cf312db37e836d7b1629ada198533353d213adabd6a55e047",
+      "ops/batch.py": "eba811e31ff353acd299af4198e3a991350c425fe235bee96c0cc46f88c31f33",
+      "ops/invoices.py": "507d98f2ec77a6a63eb22b60ee046966f01a34ce717dd465096fa958e670541b",
+      "ops/notifications.py": "37e9094b10b6f1867356df644a78bb9c32f83a6daf826ca3eeb26a0dc9623adf",
+      "ops/payments.py": "452e1748431667fa49ebb239c5de239d7dc1554ad4a98082170807ea6a67adc6",
+      "ops/refunds.py": "b705eccc7310d7bd126d6e1cb7960fb0353a192bb128138cf503cabd0c404184",
+      "ops/reservations.py": "8866d458c31fde97d334b548c6fcc06a0239092f13b7b273ef48cd18550e82bf",
+      "ops/shipments.py": "11a502a6b94ed7b3ef1b1c7a1357d444b865327e424f378ddcd60ccd788f1781",
+      "web/checkout.ts": "a2c53a77680c7b93a26d22be033014716c63daeeb84dffb67c396df10f2036d6",
+      "web/invoices.ts": "4958b4af3369a85ab06e3ee23a2104f95c41c99175f6195a1e6b36c102ed5fd7",
+      "web/notifications.ts": "42d04490a9c67d59aa051077ab144fc07d0c5382c591b9a4fac9adfc93e1719a",
+      "web/payments.ts": "218fd7245b2f1f757ba22cec3098d0e9aa6155eb3143095439c9a38ba79b387c",
+      "web/refunds.ts": "ebd4494d6da96dd4253e698f4b4cf1b76f32065cf1d86b2d7c7edf5dd825427a",
+      "web/reservations.ts": "6699e9f4ecc3eea7e5de9f9b34990ad44e982bd877bbeb08c0b52de9b5d6ab55",
+      "web/shipments.ts": "92338b54e786fe03a4d493e124069ef3bf95cc58f34370e9686608ab3de0eb51"
+    }
+  },
+  {
+    "id": "java_repair-1-lean",
+    "task": "java_repair",
+    "repetition": 1,
+    "arm": "lean",
+    "prompt_sha256": "97af333c7d486b8579b7435c30120b94fc6023849258c1ba85b7196c7be82a63",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "fixture_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "started_at": "2026-09-17T20:43:12Z",
+    "usage": {
+      "input_tokens": 108025,
+      "cached_input_tokens": 88576,
+      "output_tokens": 1404,
+      "reasoning_output_tokens": 701,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 19449,
+      "total_tokens": 109429
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external compile and 14 behavior assertions",
+      "changed_files": [
+        "CouponPolicy.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "test_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diff_sha256": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6"
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 6.644,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "access_audit": {
+      "raw_events_sha256": "bee1505761ad9b191a3af611947585453827591b9f5b4cb6c7dacd8cb8ffcd3e",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "build_context_bundle",
+      "get_node_detail",
+      "search_graph",
+      "get_source"
+    ],
+    "tool_schema_sha256": "be69ddd2c4b65fe597ec686aa74e745e395c8340bf1aeea488a52c4f4e7ef999",
+    "tool_schema_json_bytes": 2052,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 35.869,
+    "exit_code": 0,
+    "raw_events_sha256": "bee1505761ad9b191a3af611947585453827591b9f5b4cb6c7dacd8cb8ffcd3e",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 4
+      },
+      "shell_output_bytes": 8629,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 1,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "ea1c7f5dcd3642ca66f2295e5ce6b077a29d4ee4fd242bce36433769706cc65b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "f1d40c04eb2007f0075e22049a95a9cdbae604dac7d3d6ac681b35f4a614c397",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "7121cc14790566aafeab0b837950a5b801bbca2c45d92305491919e5376aa2a0",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_repair-1-native",
+    "task": "java_repair",
+    "repetition": 1,
+    "arm": "native",
+    "prompt_sha256": "97af333c7d486b8579b7435c30120b94fc6023849258c1ba85b7196c7be82a63",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "fixture_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "started_at": "2026-09-17T20:43:55Z",
+    "usage": {
+      "input_tokens": 174211,
+      "cached_input_tokens": 150016,
+      "output_tokens": 2390,
+      "reasoning_output_tokens": 935,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 24195,
+      "total_tokens": 176601
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external compile and 14 behavior assertions",
+      "changed_files": [
+        "CouponPolicy.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "test_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diff_sha256": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6"
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 0,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "access_audit": {
+      "raw_events_sha256": "6a2375122e7ab6745663596a8e4689343548a2e586c8bdb1c3484c10b8542480",
+      "passed": false,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": [
+        "A compiled source artifact was written outside the generated workspace at /tmp/CouponPolicy.class before being deleted."
+      ]
+    },
+    "tools": [],
+    "tool_schema_json_bytes": 0,
+    "tool_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "timed_out": false,
+    "elapsed_seconds": 91.008,
+    "exit_code": 0,
+    "raw_events_sha256": "6a2375122e7ab6745663596a8e4689343548a2e586c8bdb1c3484c10b8542480",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 7
+      },
+      "shell_output_bytes": 9602,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 4,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "ea1c7f5dcd3642ca66f2295e5ce6b077a29d4ee4fd242bce36433769706cc65b",
+    "instrumentation_valid": true,
+    "valid_measurement": false,
+    "workspace_after_sha256": "f1d40c04eb2007f0075e22049a95a9cdbae604dac7d3d6ac681b35f4a614c397",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "7121cc14790566aafeab0b837950a5b801bbca2c45d92305491919e5376aa2a0",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_repair-1-no_bundle",
+    "task": "java_repair",
+    "repetition": 1,
+    "arm": "no_bundle",
+    "prompt_sha256": "97af333c7d486b8579b7435c30120b94fc6023849258c1ba85b7196c7be82a63",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "fixture_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "started_at": "2026-09-17T20:45:26Z",
+    "usage": {
+      "input_tokens": 83702,
+      "cached_input_tokens": 66304,
+      "output_tokens": 844,
+      "reasoning_output_tokens": 272,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 17398,
+      "total_tokens": 84546
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external compile and 14 behavior assertions",
+      "changed_files": [
+        "CouponPolicy.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "test_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diff_sha256": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6"
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 6.644,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "access_audit": {
+      "raw_events_sha256": "86aaedf3447fcee71856670642c02afbcb9ad6a5b05ab66de809a20c5e73285a",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "get_node_detail",
+      "search_graph",
+      "get_source"
+    ],
+    "tool_schema_sha256": "7e3e16c79b111f50a45d2f22f52f6a830f05c4115059271e9242b7c095408bc5",
+    "tool_schema_json_bytes": 1518,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 28.859,
+    "exit_code": 0,
+    "raw_events_sha256": "86aaedf3447fcee71856670642c02afbcb9ad6a5b05ab66de809a20c5e73285a",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 4
+      },
+      "shell_output_bytes": 1267,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 1,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "ea1c7f5dcd3642ca66f2295e5ce6b077a29d4ee4fd242bce36433769706cc65b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "f1d40c04eb2007f0075e22049a95a9cdbae604dac7d3d6ac681b35f4a614c397",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "7121cc14790566aafeab0b837950a5b801bbca2c45d92305491919e5376aa2a0",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_repair-1-full",
+    "task": "java_repair",
+    "repetition": 1,
+    "arm": "full",
+    "prompt_sha256": "97af333c7d486b8579b7435c30120b94fc6023849258c1ba85b7196c7be82a63",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "fixture_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "started_at": "2026-09-17T20:46:02Z",
+    "usage": {
+      "input_tokens": 73593,
+      "cached_input_tokens": 56320,
+      "output_tokens": 483,
+      "reasoning_output_tokens": 32,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 17273,
+      "total_tokens": 74076
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external compile and 14 behavior assertions",
+      "changed_files": [
+        "CouponPolicy.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "test_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diff_sha256": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6"
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 6.545,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "access_audit": {
+      "raw_events_sha256": "b5646680e21751a482fbe63f826f28d30d0d5fb41613a417dc6ba02f62914adc",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "build_context_bundle",
+      "get_snapshot_delta",
+      "get_summary_map",
+      "get_cluster_detail",
+      "get_node_detail",
+      "get_call_paths",
+      "search_graph",
+      "get_callers",
+      "get_callees",
+      "get_implementations",
+      "get_type_hierarchy",
+      "get_dependencies",
+      "get_impact",
+      "get_source",
+      "get_source_batch"
+    ],
+    "tool_schema_sha256": "afa48321c729e01dbaff10f81642c840877d2bd3ad999122ae82de75ce348114",
+    "tool_schema_json_bytes": 5638,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 18.844,
+    "exit_code": 0,
+    "raw_events_sha256": "b5646680e21751a482fbe63f826f28d30d0d5fb41613a417dc6ba02f62914adc",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 3
+      },
+      "shell_output_bytes": 8558,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 1,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "ea1c7f5dcd3642ca66f2295e5ce6b077a29d4ee4fd242bce36433769706cc65b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "f1d40c04eb2007f0075e22049a95a9cdbae604dac7d3d6ac681b35f4a614c397",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "7121cc14790566aafeab0b837950a5b801bbca2c45d92305491919e5376aa2a0",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_repair-2-full",
+    "task": "java_repair",
+    "repetition": 2,
+    "arm": "full",
+    "prompt_sha256": "97af333c7d486b8579b7435c30120b94fc6023849258c1ba85b7196c7be82a63",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "fixture_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "started_at": "2026-09-17T20:46:28Z",
+    "usage": {
+      "input_tokens": 73750,
+      "cached_input_tokens": 56320,
+      "output_tokens": 623,
+      "reasoning_output_tokens": 168,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 17430,
+      "total_tokens": 74373
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external compile and 14 behavior assertions",
+      "changed_files": [
+        "CouponPolicy.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "test_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diff_sha256": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6"
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 6.645,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "access_audit": {
+      "raw_events_sha256": "2ba026c4cea153626b6f9262bd4590bce4cb990b51cc40890c21e8a48e6e0065",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "build_context_bundle",
+      "get_snapshot_delta",
+      "get_summary_map",
+      "get_cluster_detail",
+      "get_node_detail",
+      "get_call_paths",
+      "search_graph",
+      "get_callers",
+      "get_callees",
+      "get_implementations",
+      "get_type_hierarchy",
+      "get_dependencies",
+      "get_impact",
+      "get_source",
+      "get_source_batch"
+    ],
+    "tool_schema_sha256": "afa48321c729e01dbaff10f81642c840877d2bd3ad999122ae82de75ce348114",
+    "tool_schema_json_bytes": 5638,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 22.047,
+    "exit_code": 0,
+    "raw_events_sha256": "2ba026c4cea153626b6f9262bd4590bce4cb990b51cc40890c21e8a48e6e0065",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 3
+      },
+      "shell_output_bytes": 8558,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 1,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "ea1c7f5dcd3642ca66f2295e5ce6b077a29d4ee4fd242bce36433769706cc65b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "f1d40c04eb2007f0075e22049a95a9cdbae604dac7d3d6ac681b35f4a614c397",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "7121cc14790566aafeab0b837950a5b801bbca2c45d92305491919e5376aa2a0",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_repair-2-no_bundle",
+    "task": "java_repair",
+    "repetition": 2,
+    "arm": "no_bundle",
+    "prompt_sha256": "97af333c7d486b8579b7435c30120b94fc6023849258c1ba85b7196c7be82a63",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "fixture_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "started_at": "2026-09-17T20:46:57Z",
+    "usage": {
+      "input_tokens": 86128,
+      "cached_input_tokens": 77312,
+      "output_tokens": 1360,
+      "reasoning_output_tokens": 599,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 8816,
+      "total_tokens": 87488
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external compile and 14 behavior assertions",
+      "changed_files": [
+        "CouponPolicy.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "test_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diff_sha256": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6"
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 6.643,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "access_audit": {
+      "raw_events_sha256": "90b38e814d6b5c7fcca960c60a7ceab4dda0830d5b8687cde66282874ded84ee",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "get_node_detail",
+      "search_graph",
+      "get_source"
+    ],
+    "tool_schema_sha256": "7e3e16c79b111f50a45d2f22f52f6a830f05c4115059271e9242b7c095408bc5",
+    "tool_schema_json_bytes": 1518,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 68.878,
+    "exit_code": 0,
+    "raw_events_sha256": "90b38e814d6b5c7fcca960c60a7ceab4dda0830d5b8687cde66282874ded84ee",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 2
+      },
+      "shell_output_bytes": 621,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 1,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "ea1c7f5dcd3642ca66f2295e5ce6b077a29d4ee4fd242bce36433769706cc65b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "f1d40c04eb2007f0075e22049a95a9cdbae604dac7d3d6ac681b35f4a614c397",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "7121cc14790566aafeab0b837950a5b801bbca2c45d92305491919e5376aa2a0",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_repair-2-native",
+    "task": "java_repair",
+    "repetition": 2,
+    "arm": "native",
+    "prompt_sha256": "97af333c7d486b8579b7435c30120b94fc6023849258c1ba85b7196c7be82a63",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "fixture_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "started_at": "2026-09-17T20:48:13Z",
+    "usage": {
+      "input_tokens": 56756,
+      "cached_input_tokens": 26112,
+      "output_tokens": 505,
+      "reasoning_output_tokens": 148,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 30644,
+      "total_tokens": 57261
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external compile and 14 behavior assertions",
+      "changed_files": [
+        "CouponPolicy.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "test_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diff_sha256": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6"
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 0,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "access_audit": {
+      "raw_events_sha256": "2ece93450f76bb4a7cc439382a769538c574fe3ff3ba7dace635893f7d9ff10c",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [],
+    "tool_schema_json_bytes": 0,
+    "tool_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "timed_out": false,
+    "elapsed_seconds": 17.59,
+    "exit_code": 0,
+    "raw_events_sha256": "2ece93450f76bb4a7cc439382a769538c574fe3ff3ba7dace635893f7d9ff10c",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 2
+      },
+      "shell_output_bytes": 8540,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 1,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "ea1c7f5dcd3642ca66f2295e5ce6b077a29d4ee4fd242bce36433769706cc65b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "f1d40c04eb2007f0075e22049a95a9cdbae604dac7d3d6ac681b35f4a614c397",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "7121cc14790566aafeab0b837950a5b801bbca2c45d92305491919e5376aa2a0",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_repair-2-lean",
+    "task": "java_repair",
+    "repetition": 2,
+    "arm": "lean",
+    "prompt_sha256": "97af333c7d486b8579b7435c30120b94fc6023849258c1ba85b7196c7be82a63",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "fixture_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "started_at": "2026-09-17T20:48:31Z",
+    "usage": {
+      "input_tokens": 91968,
+      "cached_input_tokens": 72448,
+      "output_tokens": 1467,
+      "reasoning_output_tokens": 780,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 19520,
+      "total_tokens": 93435
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external compile and 14 behavior assertions",
+      "changed_files": [
+        "CouponPolicy.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "test_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "diff_sha256": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6"
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 6.543,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+    "access_audit": {
+      "raw_events_sha256": "d3a67805c79ea1f520a465c7e47cfae20a49d218ddbfc140463296ee2e638591",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "build_context_bundle",
+      "get_node_detail",
+      "search_graph",
+      "get_source"
+    ],
+    "tool_schema_sha256": "be69ddd2c4b65fe597ec686aa74e745e395c8340bf1aeea488a52c4f4e7ef999",
+    "tool_schema_json_bytes": 2052,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 38.48,
+    "exit_code": 0,
+    "raw_events_sha256": "d3a67805c79ea1f520a465c7e47cfae20a49d218ddbfc140463296ee2e638591",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 3
+      },
+      "shell_output_bytes": 8430,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 1,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "ea1c7f5dcd3642ca66f2295e5ce6b077a29d4ee4fd242bce36433769706cc65b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "f1d40c04eb2007f0075e22049a95a9cdbae604dac7d3d6ac681b35f4a614c397",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "184521b7d8fa4052947d6a47aa6bc337f32e75fae4ea40f0b3d8a85e95caeeb6",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "7121cc14790566aafeab0b837950a5b801bbca2c45d92305491919e5376aa2a0",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_chain-1-no_bundle",
+    "task": "java_chain",
+    "repetition": 1,
+    "arm": "no_bundle",
+    "prompt_sha256": "b57dd6c7a0461bb790f6c6c0e6e8557c2e81109a681617799a1082f285149ed3",
+    "schema_sha256": "1eafd030c8832a21e5fe9c376d78b719e66d08fd797ef0d4fbf502280b9b5ebb",
+    "fixture_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "started_at": "2026-09-17T20:49:16Z",
+    "usage": {
+      "input_tokens": 55343,
+      "cached_input_tokens": 38144,
+      "output_tokens": 435,
+      "reasoning_output_tokens": 70,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 17199,
+      "total_tokens": 55778
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact branch/sink check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 6.646,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "access_audit": {
+      "raw_events_sha256": "23f4975a80dc2c504483e9194aca639df50fd7f1b9ac0bd7f8ee97a6533507b3",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "get_node_detail",
+      "search_graph",
+      "get_source"
+    ],
+    "tool_schema_sha256": "7e3e16c79b111f50a45d2f22f52f6a830f05c4115059271e9242b7c095408bc5",
+    "tool_schema_json_bytes": 1518,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 17.089,
+    "exit_code": 0,
+    "raw_events_sha256": "23f4975a80dc2c504483e9194aca639df50fd7f1b9ac0bd7f8ee97a6533507b3",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 3
+      },
+      "shell_output_bytes": 7676,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "93631a21534b36e6e4891e0546742fddbd5c9975ce9abce7d9ea99f370cc986b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "bfbbd5e2aba3d4c0fb93382885d8c82e515e89a3e2132c1f5bed13d7d7dab53d",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "11d42fd90b6ee7f688b5c62c2a0ef7c9e7d81702b30edadb466febc46956844c",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_chain-1-lean",
+    "task": "java_chain",
+    "repetition": 1,
+    "arm": "lean",
+    "prompt_sha256": "b57dd6c7a0461bb790f6c6c0e6e8557c2e81109a681617799a1082f285149ed3",
+    "schema_sha256": "1eafd030c8832a21e5fe9c376d78b719e66d08fd797ef0d4fbf502280b9b5ebb",
+    "fixture_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "started_at": "2026-09-17T20:49:40Z",
+    "usage": {
+      "input_tokens": 41326,
+      "cached_input_tokens": 25088,
+      "output_tokens": 314,
+      "reasoning_output_tokens": 70,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 16238,
+      "total_tokens": 41640
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact branch/sink check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 6.645,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "access_audit": {
+      "raw_events_sha256": "9c9cb90659c4a2c272d5f72972c7cda669447e36b652d884a906c73c0c33a8f0",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "build_context_bundle",
+      "get_node_detail",
+      "search_graph",
+      "get_source"
+    ],
+    "tool_schema_sha256": "be69ddd2c4b65fe597ec686aa74e745e395c8340bf1aeea488a52c4f4e7ef999",
+    "tool_schema_json_bytes": 2052,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 11.881,
+    "exit_code": 0,
+    "raw_events_sha256": "9c9cb90659c4a2c272d5f72972c7cda669447e36b652d884a906c73c0c33a8f0",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 2
+      },
+      "shell_output_bytes": 6739,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "93631a21534b36e6e4891e0546742fddbd5c9975ce9abce7d9ea99f370cc986b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "bfbbd5e2aba3d4c0fb93382885d8c82e515e89a3e2132c1f5bed13d7d7dab53d",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "11d42fd90b6ee7f688b5c62c2a0ef7c9e7d81702b30edadb466febc46956844c",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_chain-1-native",
+    "task": "java_chain",
+    "repetition": 1,
+    "arm": "native",
+    "prompt_sha256": "b57dd6c7a0461bb790f6c6c0e6e8557c2e81109a681617799a1082f285149ed3",
+    "schema_sha256": "1eafd030c8832a21e5fe9c376d78b719e66d08fd797ef0d4fbf502280b9b5ebb",
+    "fixture_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "started_at": "2026-09-17T20:49:59Z",
+    "usage": {
+      "input_tokens": 52264,
+      "cached_input_tokens": 24064,
+      "output_tokens": 384,
+      "reasoning_output_tokens": 62,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 28200,
+      "total_tokens": 52648
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact branch/sink check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 0,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "access_audit": {
+      "raw_events_sha256": "7753755fe90e894f703620e72d0c3d3d8911f1ba4de30bd0d98dc50f243685b6",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [],
+    "tool_schema_json_bytes": 0,
+    "tool_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "timed_out": false,
+    "elapsed_seconds": 13.636,
+    "exit_code": 0,
+    "raw_events_sha256": "7753755fe90e894f703620e72d0c3d3d8911f1ba4de30bd0d98dc50f243685b6",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 3
+      },
+      "shell_output_bytes": 7880,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "93631a21534b36e6e4891e0546742fddbd5c9975ce9abce7d9ea99f370cc986b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "bfbbd5e2aba3d4c0fb93382885d8c82e515e89a3e2132c1f5bed13d7d7dab53d",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "11d42fd90b6ee7f688b5c62c2a0ef7c9e7d81702b30edadb466febc46956844c",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_chain-1-full",
+    "task": "java_chain",
+    "repetition": 1,
+    "arm": "full",
+    "prompt_sha256": "b57dd6c7a0461bb790f6c6c0e6e8557c2e81109a681617799a1082f285149ed3",
+    "schema_sha256": "1eafd030c8832a21e5fe9c376d78b719e66d08fd797ef0d4fbf502280b9b5ebb",
+    "fixture_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "started_at": "2026-09-17T20:50:12Z",
+    "usage": {
+      "input_tokens": 55394,
+      "cached_input_tokens": 50176,
+      "output_tokens": 389,
+      "reasoning_output_tokens": 41,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 5218,
+      "total_tokens": 55783
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact branch/sink check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 6.645,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "access_audit": {
+      "raw_events_sha256": "8ba933becafcfc4d6eed42b427e930440559342d9750b3d2f9e9144db1ec3907",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "build_context_bundle",
+      "get_snapshot_delta",
+      "get_summary_map",
+      "get_cluster_detail",
+      "get_node_detail",
+      "get_call_paths",
+      "search_graph",
+      "get_callers",
+      "get_callees",
+      "get_implementations",
+      "get_type_hierarchy",
+      "get_dependencies",
+      "get_impact",
+      "get_source",
+      "get_source_batch"
+    ],
+    "tool_schema_sha256": "afa48321c729e01dbaff10f81642c840877d2bd3ad999122ae82de75ce348114",
+    "tool_schema_json_bytes": 5638,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 15.736,
+    "exit_code": 0,
+    "raw_events_sha256": "8ba933becafcfc4d6eed42b427e930440559342d9750b3d2f9e9144db1ec3907",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 3
+      },
+      "shell_output_bytes": 7880,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "93631a21534b36e6e4891e0546742fddbd5c9975ce9abce7d9ea99f370cc986b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "bfbbd5e2aba3d4c0fb93382885d8c82e515e89a3e2132c1f5bed13d7d7dab53d",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "11d42fd90b6ee7f688b5c62c2a0ef7c9e7d81702b30edadb466febc46956844c",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_chain-2-no_bundle",
+    "task": "java_chain",
+    "repetition": 2,
+    "arm": "no_bundle",
+    "prompt_sha256": "b57dd6c7a0461bb790f6c6c0e6e8557c2e81109a681617799a1082f285149ed3",
+    "schema_sha256": "1eafd030c8832a21e5fe9c376d78b719e66d08fd797ef0d4fbf502280b9b5ebb",
+    "fixture_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "started_at": "2026-09-17T20:50:35Z",
+    "usage": {
+      "input_tokens": 55313,
+      "cached_input_tokens": 38144,
+      "output_tokens": 395,
+      "reasoning_output_tokens": 38,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 17169,
+      "total_tokens": 55708
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact branch/sink check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 6.544,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "access_audit": {
+      "raw_events_sha256": "0df9a387dc69def4ddaeeb678eca5500003d151cd7e80673fd7e13f5ce65944c",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "get_node_detail",
+      "search_graph",
+      "get_source"
+    ],
+    "tool_schema_sha256": "7e3e16c79b111f50a45d2f22f52f6a830f05c4115059271e9242b7c095408bc5",
+    "tool_schema_json_bytes": 1518,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 13.583,
+    "exit_code": 0,
+    "raw_events_sha256": "0df9a387dc69def4ddaeeb678eca5500003d151cd7e80673fd7e13f5ce65944c",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 3
+      },
+      "shell_output_bytes": 6718,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "93631a21534b36e6e4891e0546742fddbd5c9975ce9abce7d9ea99f370cc986b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "bfbbd5e2aba3d4c0fb93382885d8c82e515e89a3e2132c1f5bed13d7d7dab53d",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "11d42fd90b6ee7f688b5c62c2a0ef7c9e7d81702b30edadb466febc46956844c",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_chain-2-full",
+    "task": "java_chain",
+    "repetition": 2,
+    "arm": "full",
+    "prompt_sha256": "b57dd6c7a0461bb790f6c6c0e6e8557c2e81109a681617799a1082f285149ed3",
+    "schema_sha256": "1eafd030c8832a21e5fe9c376d78b719e66d08fd797ef0d4fbf502280b9b5ebb",
+    "fixture_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "started_at": "2026-09-17T20:50:55Z",
+    "usage": {
+      "input_tokens": 41676,
+      "cached_input_tokens": 37120,
+      "output_tokens": 327,
+      "reasoning_output_tokens": 59,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 4556,
+      "total_tokens": 42003
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact branch/sink check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 6.543,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "access_audit": {
+      "raw_events_sha256": "c143b273c27fe3f836706ab18069b5f41b4dd9fff21db2114e8e34e0a1629f5f",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "build_context_bundle",
+      "get_snapshot_delta",
+      "get_summary_map",
+      "get_cluster_detail",
+      "get_node_detail",
+      "get_call_paths",
+      "search_graph",
+      "get_callers",
+      "get_callees",
+      "get_implementations",
+      "get_type_hierarchy",
+      "get_dependencies",
+      "get_impact",
+      "get_source",
+      "get_source_batch"
+    ],
+    "tool_schema_sha256": "afa48321c729e01dbaff10f81642c840877d2bd3ad999122ae82de75ce348114",
+    "tool_schema_json_bytes": 5638,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 11.631,
+    "exit_code": 0,
+    "raw_events_sha256": "c143b273c27fe3f836706ab18069b5f41b4dd9fff21db2114e8e34e0a1629f5f",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 2
+      },
+      "shell_output_bytes": 7965,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "93631a21534b36e6e4891e0546742fddbd5c9975ce9abce7d9ea99f370cc986b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "bfbbd5e2aba3d4c0fb93382885d8c82e515e89a3e2132c1f5bed13d7d7dab53d",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "11d42fd90b6ee7f688b5c62c2a0ef7c9e7d81702b30edadb466febc46956844c",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_chain-2-native",
+    "task": "java_chain",
+    "repetition": 2,
+    "arm": "native",
+    "prompt_sha256": "b57dd6c7a0461bb790f6c6c0e6e8557c2e81109a681617799a1082f285149ed3",
+    "schema_sha256": "1eafd030c8832a21e5fe9c376d78b719e66d08fd797ef0d4fbf502280b9b5ebb",
+    "fixture_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "started_at": "2026-09-17T20:51:13Z",
+    "usage": {
+      "input_tokens": 51891,
+      "cached_input_tokens": 41984,
+      "output_tokens": 401,
+      "reasoning_output_tokens": 64,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 9907,
+      "total_tokens": 52292
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact branch/sink check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 0,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "access_audit": {
+      "raw_events_sha256": "843124a69ae2afe46205c10a4d89d922bdd567a871768030786851b6b1135cd8",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [],
+    "tool_schema_json_bytes": 0,
+    "tool_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "timed_out": false,
+    "elapsed_seconds": 14.636,
+    "exit_code": 0,
+    "raw_events_sha256": "843124a69ae2afe46205c10a4d89d922bdd567a871768030786851b6b1135cd8",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 3
+      },
+      "shell_output_bytes": 6842,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "93631a21534b36e6e4891e0546742fddbd5c9975ce9abce7d9ea99f370cc986b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "bfbbd5e2aba3d4c0fb93382885d8c82e515e89a3e2132c1f5bed13d7d7dab53d",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "11d42fd90b6ee7f688b5c62c2a0ef7c9e7d81702b30edadb466febc46956844c",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "java_chain-2-lean",
+    "task": "java_chain",
+    "repetition": 2,
+    "arm": "lean",
+    "prompt_sha256": "b57dd6c7a0461bb790f6c6c0e6e8557c2e81109a681617799a1082f285149ed3",
+    "schema_sha256": "1eafd030c8832a21e5fe9c376d78b719e66d08fd797ef0d4fbf502280b9b5ebb",
+    "fixture_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "started_at": "2026-09-17T20:51:28Z",
+    "usage": {
+      "input_tokens": 42134,
+      "cached_input_tokens": 25088,
+      "output_tokens": 305,
+      "reasoning_output_tokens": 34,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 17046,
+      "total_tokens": 42439
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact branch/sink check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 6.645,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "access_audit": {
+      "raw_events_sha256": "54e9e0ecddd5c740a9021e966b7c39c30e2eec58ac1607372a299c9525cd6a2c",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "build_context_bundle",
+      "get_node_detail",
+      "search_graph",
+      "get_source"
+    ],
+    "tool_schema_sha256": "be69ddd2c4b65fe597ec686aa74e745e395c8340bf1aeea488a52c4f4e7ef999",
+    "tool_schema_json_bytes": 2052,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 11.631,
+    "exit_code": 0,
+    "raw_events_sha256": "54e9e0ecddd5c740a9021e966b7c39c30e2eec58ac1607372a299c9525cd6a2c",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 2
+      },
+      "shell_output_bytes": 9061,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "93631a21534b36e6e4891e0546742fddbd5c9975ce9abce7d9ea99f370cc986b",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "a4e5f660b4c2fa04b11ebb459ad2961ac420bdd1fa8c271db9ed632c1fd4c04e",
+    "workspace_file_hashes_after": {
+      "ApprovalService.java": "9c82e81e83d3eade02c108f8a4a9215081a64297528fc22658163591d36a75ea",
+      "AuditLedger.java": "a78cf9f74cac8c301de947d56f9eef9f912644212773b85b9f73a3fd75b8bc69",
+      "CancellationAudit.java": "162ef1eccc07eb87b0b6060669bb178a86d91ea857183291f1f56de78ab9ee6b",
+      "CapacityBook.java": "0ece3b951c7bc58db942c730ffafd3c6c945f08b9133030f00a07c565cb498ac",
+      "CouponPolicy.java": "bfbbd5e2aba3d4c0fb93382885d8c82e515e89a3e2132c1f5bed13d7d7dab53d",
+      "DeliveryAudit.java": "410c98eec80caff3fcab408ee2691f7c6cebea0dbcf639a16e7c5ce2c011d54c",
+      "EligibilityGate.java": "3c6274d794981a197f2359cb8f7e495e9f7b46d32d8dfa8b85499f6533348903",
+      "Invoice.java": "7765f8e1670aee8112e8074a1ab969a64cb3dfdb5c7f930f1fc7959114aec169",
+      "Order.java": "64bffc7dab51892dfa1beeb7c03450be07a638e17197bc07282e143c7e7b3c36",
+      "OrderRouter.java": "5e665f6f853b2caf6b6780d26ca1fe9d83940e170a11930ae432bbb032cc2c8c",
+      "PreviewRouter.java": "1df6088480f7a953abc44bed4bbba5206f82dbc899a68685c3d1faaf964d7fbf",
+      "PublicPolicy.java": "3f03d20b0851ef8427c5c8ac8dc7fd9c9ad6ace093b68df1ae38e3220807ca91",
+      "ReceiptFormatter.java": "f73db6c6320eb1c0b3a6330035babd2ac8a4ac9af5de895f72aa8facad0c6365",
+      "RefundPolicy.java": "56ab7bed3d849b2cef8616a0f099dbaeca7331280d80a5f9f6514b9428b62ddf",
+      "RejectionAudit.java": "6cee03aa379243a01494e3ac5ef87af0ebd51af1fec997a64477a93157e002b9",
+      "Submission.java": "7694ac1bf0003f53abef92eae131b50500de4d5808e739c6c9d4895ffe80aba9",
+      "TASK.md": "11d42fd90b6ee7f688b5c62c2a0ef7c9e7d81702b30edadb466febc46956844c",
+      "TierPolicy.java": "4f20c4ad8a8019a824bb6ba8cf1ea65ec9f2bdaab63d67e5705e50129508527a",
+      "WaitlistAudit.java": "1bc239ffd98dac33c794549ee797da7b22a6fdb0a4c4a38f3d31770d13948173"
+    }
+  },
+  {
+    "id": "polyglot_lookup-1-native",
+    "task": "polyglot_lookup",
+    "repetition": 1,
+    "arm": "native",
+    "prompt_sha256": "76aafed3b99a4189150f1849c3afd8b2fee83788cb8ecdd9d9ea838cedd58f18",
+    "schema_sha256": "d9a538f12b7ecd11838cbc55522d6802be23b4a7d1af9a4bcc659229098611fd",
+    "fixture_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "started_at": "2026-09-17T20:51:46Z",
+    "usage": {
+      "input_tokens": 41802,
+      "cached_input_tokens": 35072,
+      "output_tokens": 335,
+      "reasoning_output_tokens": 78,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 6730,
+      "total_tokens": 42137
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact file/symbol check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 0,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "access_audit": {
+      "raw_events_sha256": "51ad7c9402a118794efe1e7763223700bc73e4df055a487ff8bb71913b17381d",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [],
+    "tool_schema_json_bytes": 0,
+    "tool_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "timed_out": false,
+    "elapsed_seconds": 13.333,
+    "exit_code": 0,
+    "raw_events_sha256": "51ad7c9402a118794efe1e7763223700bc73e4df055a487ff8bb71913b17381d",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 2
+      },
+      "shell_output_bytes": 8607,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "636c6f45a968c9cd762d24059e54dd0dfcd65a20caed026ddcc5a16131a90a58",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "workspace_file_hashes_after": {
+      "TASK.md": "98ba3aaa1e78e88cf312db37e836d7b1629ada198533353d213adabd6a55e047",
+      "ops/batch.py": "eba811e31ff353acd299af4198e3a991350c425fe235bee96c0cc46f88c31f33",
+      "ops/invoices.py": "507d98f2ec77a6a63eb22b60ee046966f01a34ce717dd465096fa958e670541b",
+      "ops/notifications.py": "37e9094b10b6f1867356df644a78bb9c32f83a6daf826ca3eeb26a0dc9623adf",
+      "ops/payments.py": "452e1748431667fa49ebb239c5de239d7dc1554ad4a98082170807ea6a67adc6",
+      "ops/refunds.py": "b705eccc7310d7bd126d6e1cb7960fb0353a192bb128138cf503cabd0c404184",
+      "ops/reservations.py": "8866d458c31fde97d334b548c6fcc06a0239092f13b7b273ef48cd18550e82bf",
+      "ops/shipments.py": "11a502a6b94ed7b3ef1b1c7a1357d444b865327e424f378ddcd60ccd788f1781",
+      "web/checkout.ts": "a2c53a77680c7b93a26d22be033014716c63daeeb84dffb67c396df10f2036d6",
+      "web/invoices.ts": "4958b4af3369a85ab06e3ee23a2104f95c41c99175f6195a1e6b36c102ed5fd7",
+      "web/notifications.ts": "42d04490a9c67d59aa051077ab144fc07d0c5382c591b9a4fac9adfc93e1719a",
+      "web/payments.ts": "218fd7245b2f1f757ba22cec3098d0e9aa6155eb3143095439c9a38ba79b387c",
+      "web/refunds.ts": "ebd4494d6da96dd4253e698f4b4cf1b76f32065cf1d86b2d7c7edf5dd825427a",
+      "web/reservations.ts": "6699e9f4ecc3eea7e5de9f9b34990ad44e982bd877bbeb08c0b52de9b5d6ab55",
+      "web/shipments.ts": "92338b54e786fe03a4d493e124069ef3bf95cc58f34370e9686608ab3de0eb51"
+    }
+  },
+  {
+    "id": "polyglot_lookup-1-no_bundle",
+    "task": "polyglot_lookup",
+    "repetition": 1,
+    "arm": "no_bundle",
+    "prompt_sha256": "76aafed3b99a4189150f1849c3afd8b2fee83788cb8ecdd9d9ea838cedd58f18",
+    "schema_sha256": "d9a538f12b7ecd11838cbc55522d6802be23b4a7d1af9a4bcc659229098611fd",
+    "fixture_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "started_at": "2026-09-17T20:51:59Z",
+    "usage": {
+      "input_tokens": 28307,
+      "cached_input_tokens": 12032,
+      "output_tokens": 226,
+      "reasoning_output_tokens": 98,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 16275,
+      "total_tokens": 28533
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact file/symbol check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 7.15,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "access_audit": {
+      "raw_events_sha256": "c919fefed0887ab9d9558e46d50f2f87130fa53cf1fe05f3c8a8c43719a2f75c",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "get_node_detail",
+      "search_graph",
+      "get_source"
+    ],
+    "tool_schema_sha256": "7e3e16c79b111f50a45d2f22f52f6a830f05c4115059271e9242b7c095408bc5",
+    "tool_schema_json_bytes": 1518,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java",
+        "python",
+        "typescript"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "python": {
+          "language": "python",
+          "parser": "python-ast",
+          "version": "python-ast/3.13.12",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "typescript": {
+          "language": "typescript",
+          "parser": "typescript-compiler-api",
+          "version": "typescript/5.9.2",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 9.228,
+    "exit_code": 0,
+    "raw_events_sha256": "c919fefed0887ab9d9558e46d50f2f87130fa53cf1fe05f3c8a8c43719a2f75c",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 1
+      },
+      "shell_output_bytes": 6674,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "636c6f45a968c9cd762d24059e54dd0dfcd65a20caed026ddcc5a16131a90a58",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "workspace_file_hashes_after": {
+      "TASK.md": "98ba3aaa1e78e88cf312db37e836d7b1629ada198533353d213adabd6a55e047",
+      "ops/batch.py": "eba811e31ff353acd299af4198e3a991350c425fe235bee96c0cc46f88c31f33",
+      "ops/invoices.py": "507d98f2ec77a6a63eb22b60ee046966f01a34ce717dd465096fa958e670541b",
+      "ops/notifications.py": "37e9094b10b6f1867356df644a78bb9c32f83a6daf826ca3eeb26a0dc9623adf",
+      "ops/payments.py": "452e1748431667fa49ebb239c5de239d7dc1554ad4a98082170807ea6a67adc6",
+      "ops/refunds.py": "b705eccc7310d7bd126d6e1cb7960fb0353a192bb128138cf503cabd0c404184",
+      "ops/reservations.py": "8866d458c31fde97d334b548c6fcc06a0239092f13b7b273ef48cd18550e82bf",
+      "ops/shipments.py": "11a502a6b94ed7b3ef1b1c7a1357d444b865327e424f378ddcd60ccd788f1781",
+      "web/checkout.ts": "a2c53a77680c7b93a26d22be033014716c63daeeb84dffb67c396df10f2036d6",
+      "web/invoices.ts": "4958b4af3369a85ab06e3ee23a2104f95c41c99175f6195a1e6b36c102ed5fd7",
+      "web/notifications.ts": "42d04490a9c67d59aa051077ab144fc07d0c5382c591b9a4fac9adfc93e1719a",
+      "web/payments.ts": "218fd7245b2f1f757ba22cec3098d0e9aa6155eb3143095439c9a38ba79b387c",
+      "web/refunds.ts": "ebd4494d6da96dd4253e698f4b4cf1b76f32065cf1d86b2d7c7edf5dd825427a",
+      "web/reservations.ts": "6699e9f4ecc3eea7e5de9f9b34990ad44e982bd877bbeb08c0b52de9b5d6ab55",
+      "web/shipments.ts": "92338b54e786fe03a4d493e124069ef3bf95cc58f34370e9686608ab3de0eb51"
+    }
+  },
+  {
+    "id": "polyglot_lookup-1-lean",
+    "task": "polyglot_lookup",
+    "repetition": 1,
+    "arm": "lean",
+    "prompt_sha256": "76aafed3b99a4189150f1849c3afd8b2fee83788cb8ecdd9d9ea838cedd58f18",
+    "schema_sha256": "d9a538f12b7ecd11838cbc55522d6802be23b4a7d1af9a4bcc659229098611fd",
+    "fixture_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "started_at": "2026-09-17T20:52:16Z",
+    "usage": {
+      "input_tokens": 28321,
+      "cached_input_tokens": 12032,
+      "output_tokens": 225,
+      "reasoning_output_tokens": 80,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 16289,
+      "total_tokens": 28546
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact file/symbol check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 7.049,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "access_audit": {
+      "raw_events_sha256": "d8b1ccdc2588f20fb95b252ac4e8c24cd8f9c5660c55750dd125c24d27e3e230",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "build_context_bundle",
+      "get_node_detail",
+      "search_graph",
+      "get_source"
+    ],
+    "tool_schema_sha256": "be69ddd2c4b65fe597ec686aa74e745e395c8340bf1aeea488a52c4f4e7ef999",
+    "tool_schema_json_bytes": 2052,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java",
+        "python",
+        "typescript"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "python": {
+          "language": "python",
+          "parser": "python-ast",
+          "version": "python-ast/3.13.12",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "typescript": {
+          "language": "typescript",
+          "parser": "typescript-compiler-api",
+          "version": "typescript/5.9.2",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 9.277,
+    "exit_code": 0,
+    "raw_events_sha256": "d8b1ccdc2588f20fb95b252ac4e8c24cd8f9c5660c55750dd125c24d27e3e230",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 1
+      },
+      "shell_output_bytes": 6674,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "636c6f45a968c9cd762d24059e54dd0dfcd65a20caed026ddcc5a16131a90a58",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "workspace_file_hashes_after": {
+      "TASK.md": "98ba3aaa1e78e88cf312db37e836d7b1629ada198533353d213adabd6a55e047",
+      "ops/batch.py": "eba811e31ff353acd299af4198e3a991350c425fe235bee96c0cc46f88c31f33",
+      "ops/invoices.py": "507d98f2ec77a6a63eb22b60ee046966f01a34ce717dd465096fa958e670541b",
+      "ops/notifications.py": "37e9094b10b6f1867356df644a78bb9c32f83a6daf826ca3eeb26a0dc9623adf",
+      "ops/payments.py": "452e1748431667fa49ebb239c5de239d7dc1554ad4a98082170807ea6a67adc6",
+      "ops/refunds.py": "b705eccc7310d7bd126d6e1cb7960fb0353a192bb128138cf503cabd0c404184",
+      "ops/reservations.py": "8866d458c31fde97d334b548c6fcc06a0239092f13b7b273ef48cd18550e82bf",
+      "ops/shipments.py": "11a502a6b94ed7b3ef1b1c7a1357d444b865327e424f378ddcd60ccd788f1781",
+      "web/checkout.ts": "a2c53a77680c7b93a26d22be033014716c63daeeb84dffb67c396df10f2036d6",
+      "web/invoices.ts": "4958b4af3369a85ab06e3ee23a2104f95c41c99175f6195a1e6b36c102ed5fd7",
+      "web/notifications.ts": "42d04490a9c67d59aa051077ab144fc07d0c5382c591b9a4fac9adfc93e1719a",
+      "web/payments.ts": "218fd7245b2f1f757ba22cec3098d0e9aa6155eb3143095439c9a38ba79b387c",
+      "web/refunds.ts": "ebd4494d6da96dd4253e698f4b4cf1b76f32065cf1d86b2d7c7edf5dd825427a",
+      "web/reservations.ts": "6699e9f4ecc3eea7e5de9f9b34990ad44e982bd877bbeb08c0b52de9b5d6ab55",
+      "web/shipments.ts": "92338b54e786fe03a4d493e124069ef3bf95cc58f34370e9686608ab3de0eb51"
+    }
+  },
+  {
+    "id": "polyglot_lookup-1-full",
+    "task": "polyglot_lookup",
+    "repetition": 1,
+    "arm": "full",
+    "prompt_sha256": "76aafed3b99a4189150f1849c3afd8b2fee83788cb8ecdd9d9ea838cedd58f18",
+    "schema_sha256": "d9a538f12b7ecd11838cbc55522d6802be23b4a7d1af9a4bcc659229098611fd",
+    "fixture_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "started_at": "2026-09-17T20:52:32Z",
+    "usage": {
+      "input_tokens": 28871,
+      "cached_input_tokens": 24064,
+      "output_tokens": 196,
+      "reasoning_output_tokens": 71,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 4807,
+      "total_tokens": 29067
+    },
+    "correctness": {
+      "passed": true,
+      "details": "exact file/symbol check",
+      "changed_files": []
+    },
+    "infrastructure_failure": false,
+    "setup_seconds": 7.048,
+    "evaluator_sha256": "1915e9a90982c30bf7cef7085bce1fb79226a3a9b72aa9b7caa669976b5eb446",
+    "frozen_sha256": "5e1d2ad23ebf0a8925ed06865c0f2cfd16c6ba9a2baa6b322be1bc9d956235ed",
+    "workspace_before_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "access_audit": {
+      "raw_events_sha256": "93ec99cb2c84a11cfd91a330dade00ccb823cb15116a7cb42bbb0bb6e8418669",
+      "passed": true,
+      "auditor": "independent-plan-critic",
+      "method": "reviewed completed shell commands and MCP arguments/results",
+      "violations": []
+    },
+    "tools": [
+      "get_capabilities",
+      "build_context_bundle",
+      "get_snapshot_delta",
+      "get_summary_map",
+      "get_cluster_detail",
+      "get_node_detail",
+      "get_call_paths",
+      "search_graph",
+      "get_callers",
+      "get_callees",
+      "get_implementations",
+      "get_type_hierarchy",
+      "get_dependencies",
+      "get_impact",
+      "get_source",
+      "get_source_batch"
+    ],
+    "tool_schema_sha256": "afa48321c729e01dbaff10f81642c840877d2bd3ad999122ae82de75ce348114",
+    "tool_schema_json_bytes": 5638,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java",
+        "python",
+        "typescript"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "python": {
+          "language": "python",
+          "parser": "python-ast",
+          "version": "python-ast/3.13.12",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        },
+        "typescript": {
+          "language": "typescript",
+          "parser": "typescript-compiler-api",
+          "version": "typescript/5.9.2",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "containment"
+          ],
+          "diagnostics": []
+        }
+      },
+      "semantic_level": "best_effort"
+    },
+    "timed_out": false,
+    "elapsed_seconds": 9.528,
+    "exit_code": 0,
+    "raw_events_sha256": "93ec99cb2c84a11cfd91a330dade00ccb823cb15116a7cb42bbb0bb6e8418669",
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 1
+      },
+      "shell_output_bytes": 9024,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 0,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens."
+    },
+    "answer_sha256": "636c6f45a968c9cd762d24059e54dd0dfcd65a20caed026ddcc5a16131a90a58",
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "workspace_after_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+    "workspace_file_hashes_after": {
+      "TASK.md": "98ba3aaa1e78e88cf312db37e836d7b1629ada198533353d213adabd6a55e047",
+      "ops/batch.py": "eba811e31ff353acd299af4198e3a991350c425fe235bee96c0cc46f88c31f33",
+      "ops/invoices.py": "507d98f2ec77a6a63eb22b60ee046966f01a34ce717dd465096fa958e670541b",
+      "ops/notifications.py": "37e9094b10b6f1867356df644a78bb9c32f83a6daf826ca3eeb26a0dc9623adf",
+      "ops/payments.py": "452e1748431667fa49ebb239c5de239d7dc1554ad4a98082170807ea6a67adc6",
+      "ops/refunds.py": "b705eccc7310d7bd126d6e1cb7960fb0353a192bb128138cf503cabd0c404184",
+      "ops/reservations.py": "8866d458c31fde97d334b548c6fcc06a0239092f13b7b273ef48cd18550e82bf",
+      "ops/shipments.py": "11a502a6b94ed7b3ef1b1c7a1357d444b865327e424f378ddcd60ccd788f1781",
+      "web/checkout.ts": "a2c53a77680c7b93a26d22be033014716c63daeeb84dffb67c396df10f2036d6",
+      "web/invoices.ts": "4958b4af3369a85ab06e3ee23a2104f95c41c99175f6195a1e6b36c102ed5fd7",
+      "web/notifications.ts": "42d04490a9c67d59aa051077ab144fc07d0c5382c591b9a4fac9adfc93e1719a",
+      "web/payments.ts": "218fd7245b2f1f757ba22cec3098d0e9aa6155eb3143095439c9a38ba79b387c",
+      "web/refunds.ts": "ebd4494d6da96dd4253e698f4b4cf1b76f32065cf1d86b2d7c7edf5dd825427a",
+      "web/reservations.ts": "6699e9f4ecc3eea7e5de9f9b34990ad44e982bd877bbeb08c0b52de9b5d6ab55",
+      "web/shipments.ts": "92338b54e786fe03a4d493e124069ef3bf95cc58f34370e9686608ab3de0eb51"
+    }
+  }
+]

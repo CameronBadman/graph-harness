@@ -108,7 +108,7 @@ def render(frozen, rows, summary, output):
     with (output / "runs.csv").open("w") as stream:
         fields = ["id", "task", "repetition", "arm", "correct", "valid", *METRICS,
                   "elapsed_seconds", "setup_seconds", "retrieval_used"]
-        writer = csv.DictWriter(stream, fieldnames=fields)
+        writer = csv.DictWriter(stream, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         for row in rows:
             writer.writerow({**{key: row.get(key) for key in fields if key in row},
@@ -132,6 +132,10 @@ def render(frozen, rows, summary, output):
         lines.append(f"| {name} | {arm['correct']} / {arm['valid']} / {arm['attempts']} | "
                      f"{arm['totals']['input_tokens']:,} | {arm['totals']['uncached_input_tokens']:,} | "
                      f"{arm['totals']['output_tokens']:,} | {arm['correct_with_retrieval']} / {arm['correct']} |")
+    if not any(row.get("diagnostics", {}).get("retrieval_used") for row in rows if row["arm"] != "native"):
+        lines += ["", "**No MCP-equipped run used GraphHarness retrieval.** This experiment is inconclusive "
+                  "about retrieval efficiency. Token differences here cannot be attributed to graph retrieval "
+                  "or context bundles; the agents used native tools."]
     lines += ["", "## Individual runs", "",
               "| Task | Rep | Configuration | Correct | Valid | Input | Cached | Output | Shell calls | MCP calls |",
               "| --- | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: |"]
