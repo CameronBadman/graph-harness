@@ -6,6 +6,12 @@ not a fresh holdout. The original evaluator and fixture bytes are unchanged.
 Native and all four graph controls run again: 30 scored invocations in total.
 Every arm receives the same compilation/behavior-check requirement.
 
+The [completed study](../../reviews/token-node-followup/FINDINGS.md) retained all
+30 attempts. Every repair passed and all 12 node-enabled runs used the editor, but
+every graph arm increased total input and output versus native. The full report
+includes paired percentages, cache subsets, formatting overhead and an independent
+audit. These results do not justify token-saving claims.
+
 Build and preserve the complete installed product before freezing. Run:
 
 ```sh

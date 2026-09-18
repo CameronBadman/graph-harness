@@ -160,3 +160,58 @@ support claims; both options remain experimental. The actual
 [checks](reviews/token-interface/checks.json), [eligibility evidence](reviews/token-interface/edit-eligibility.json)
 and [independent review](reviews/token-interface/INDEPENDENT_REVIEW.md) distinguish
 product verification from the unsuccessful efficiency goal.
+
+## Qualified Java matching and guided rerun, 2026-09-18
+
+The inherited custom-parameter mismatch is repaired in `9ce342a`. Java source
+enrichment and safe body editing share a resolver based on immutable snapshot
+declarations, lexical scope and explicit imports. Package identity, generic
+shape, array rank, overload uniqueness, owner/name/line identity, raw-byte hashes
+and edit boundaries remain checked. Unknown resolution fails closed; this does
+not add general semantic refactoring. The declaration inventory is bounded to
+512 Java files and 8 MiB. Unresolved wildcard/static imports, inherited names,
+erased generics and incomplete inventories can remain unsupported.
+
+Guidance commit `346d71b` discovers the editor explicitly, resolves overloads using
+the selected node_id argument and directs eligible edits through the advertised
+tool. It preserves native fallback and real commit/error distinctions. This is a
+different guided workflow from the previous availability-only study.
+
+The full build passed **132 JVM tests**, with zero failures/errors/skips. Six
+executable guidance tests and 42 benchmark tests passed; the 19 collector tests
+passed again after report metadata changed. Independent review checked the matcher,
+guidance and preflight gate. A parser worker's external API failure ended its
+turn after code/tests were saved; the integrator verified the saved source and
+completed the full build. No unverified worker completion claim was accepted.
+
+All three target families passed actual Joern-backed original-body planning and
+real one-call repairs on separate fresh copies. Independent behavior/scope checks
+and review passed, including the long and overloaded methods rejected previously.
+Known repairs are confined to non-model preflight. The scored rerun uses the same
+known development tasks and fresh runs of every control; it is not an unseen-task
+confirmation. The [registered protocol](benchmarks/token_node_followup/PROTOCOL.md)
+discloses the new guidance and equal compilation/behavior-check requirement.
+
+The [completed rerun](reviews/token-node-followup/FINDINGS.md) retained all 30
+attempts with no retries, exclusions, missing usage, timeouts or infrastructure
+failures. All were correct and independently access-valid. All 24 graph runs
+attempted retrieval; all 12 enabled runs used node editing, with 14 successful
+commits and no rejected node calls or native production-edit fallback. The
+independent reviewer regraded every outcome, checked 47 returned source slices,
+reconstructed all 14 node commits and reconciled eight aggregate contrasts plus
+48 paired comparisons from raw terminal counters.
+
+The token-saving goal still failed. Versus native, compact increased input/output
+by 45.8%/17.2%, source format by 76.0%/37.3%, node editing by 57.4%/45.0%, and combined
+by 52.7%/34.1%. Both enabled arms still made 22 shell calls, the same aggregate count
+as native, in addition to graph calls. Two node-only runs made whitespace-only
+follow-up commits; one long-method result retained excess indentation. Formatting
+quality remains outside the behavior/scope gate and is an unresolved limitation.
+Compact and combined had lower uncached input, but uncontrolled cache state and
+higher total input/output prevent a total-token or billing-saving claim.
+
+The historical failed study remains intact. The new study uses known development
+tasks and changed guidance/validation instructions, so it does not isolate the
+parser fix or establish unseen-task performance. The implementation fixes,
+protocol, preflight/evaluator and final evidence have separate milestone commits;
+no history was rewritten and nothing was pushed.

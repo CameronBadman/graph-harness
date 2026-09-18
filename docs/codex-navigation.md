@@ -92,7 +92,7 @@ MCP call is not automatically a replay of the original write.
 
 Both options are experimental and disabled by default. Smaller response bytes or
 fewer coordination calls alone do not establish lower total Codex token use. The
-[30-run comparison](../reviews/token-interface/FINDINGS.md) found 66.8% more input
+[earlier 30-run comparison](../reviews/token-interface/FINDINGS.md) found 66.8% more input
 and 77.6% more output with the new format than native Codex; the combined options
 used 58.4% more input and 58.3% more output. All tasks passed, but no scored run
 called the node editor. The experiment therefore does not establish the token
@@ -112,6 +112,14 @@ names. Ambiguous or unresolved wildcard/static imports, inherited type names and
 backend-erased generics can still be unsupported. The declaration inventory is
 bounded to 512 Java files and 8 MiB; an incomplete inventory or parse errors can
 prevent reference-type resolution. Primitive, exact qualified and locally declared
-cases can remain usable. The [guided rerun](../benchmarks/token_node_followup/PROTOCOL.md)
-requires successful real node commits for all three target families before model
-trials.
+cases can remain usable. The [guided rerun](../reviews/token-node-followup/FINDINGS.md)
+verified real Joern-backed commits for all three target families before launching
+models. All 12 node-enabled runs then used the tool, and all 30 repairs passed.
+Node-only increased total input/output by 57.4%/45.0% versus native; combined
+increased them by 52.7%/34.1%. No graph arm met the token-saving gate. These reused
+development tasks do not establish unfamiliar-repository performance.
+
+Body indentation can still introduce diff noise: two scored runs made an extra
+node commit solely to fix indentation, and one retained excess indentation inside
+the allowed method body. The behavior/scope gate does not grade formatting. Those
+costs and outcomes are retained in the report.

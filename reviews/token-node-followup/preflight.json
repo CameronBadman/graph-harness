@@ -1,0 +1,140 @@
+[
+  {
+    "task": "java_short",
+    "passed": true,
+    "committed": true,
+    "plan_created": true,
+    "file": "src/main/java/studio/DayWindow.java",
+    "node_id": "method:studio.DayWindow.contains:int|int|int:boolean",
+    "original_file_hash": "941342f5c4590b57a8ea725fac1d16e103cb3695ba7d36bf6677dfee8102d4e5",
+    "file_hash": "1a8e0d88b9d128d9d684bb18e9357be43b9b0397b4252708cc90c13f1382f147",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "f9850607f1310613946ef99f907f40d24fe4903519f7b91de4529cfc6dabd86e",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "1a8e0d88b9d128d9d684bb18e9357be43b9b0397b4252708cc90c13f1382f147"
+    },
+    "workspace_before_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_after_sha256": "bb2a9c6c61ff42c3241093413d16b2528dbe49a4ec4f694990febcff29e78ac9",
+    "frozen_sha256": "e04327702e0765ab25be5545c9e390653a6292c47346be626a3ec1bbc37c8ac2",
+    "evidence_sha256": {
+      "answer.json": "d6a95bcef08e82e56ac05e4e320151547ccb1ee622be749e7a3069a99fc5cdf0",
+      "capabilities.json": "a72db02e18fb612c86e7d0bd6e1c59a0728e45ff9c771d20c249ab3c3e252423",
+      "daemon-command.json": "cf63891ab6ecac6e91b80d95943d3e7667dceaafc7abf9b2262b04578a43003e",
+      "get_source-request.json": "ad4db1d2fe569be41454e4364d28b38648d2a5e32d4f85953785025cb61746d1",
+      "get_source-response.json": "1078dd7d627ead2533ca868f11dc0494b5efafe0f53c04a7900205a4eba9098a",
+      "plan_edit-request.json": "2842f08afa1fcfe3a0cc620536fab80d8195d5d0dace8839c1409f73b3c43b52",
+      "plan_edit-response.json": "5bd6243e6ae02872ec93927be1c9b80c53a3710924571ec5273c1cce1238465d",
+      "replace_node_body-request.json": "0c87e13478c57057b553f9fa408829a343e0617ba808d16d775314abdf5115d4",
+      "replace_node_body-response.json": "904f57067101d6952d99265537044ea4dd4382139a7702bc2497ee836db12da8",
+      "search_graph-request.json": "3943ebbe3c6774aacf61ee89c76e665d52b1ea97db9ace1ea08ae09bc4284d10",
+      "search_graph-response.json": "fd6d68ab04b7dafd2c8c7badbed993c9ce30111dbfd7650828b273ee13b4cb16",
+      "tool-definitions.json": "d9d31b36254179471136adb538589ef310dc68e5d21b485904e2f4370ac7a236"
+    }
+  },
+  {
+    "task": "java_long",
+    "passed": true,
+    "committed": true,
+    "plan_created": true,
+    "file": "src/main/java/studio/NoticeRenderer.java",
+    "node_id": "method:studio.NoticeRenderer.render:studio.Notice|studio.NoticeOptions:java.lang.String",
+    "original_file_hash": "f9e54904df74de1ec7eb21cc9e668d728edbff0c10e7a5e6f4ae69ea2dc9c589",
+    "file_hash": "ca239b2b7b5d38422712df6b57684a2b5162a81447987182f293dcb7f39d2097",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "1f1315082ed866fd303e6d2038f0e4ef8f15c54952e912027f95912f2d8e0cfa",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "ca239b2b7b5d38422712df6b57684a2b5162a81447987182f293dcb7f39d2097"
+    },
+    "workspace_before_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_after_sha256": "4212338f6760d35544c675fd4fb50820c9ec57be243d26479aa3038430d7db51",
+    "frozen_sha256": "e04327702e0765ab25be5545c9e390653a6292c47346be626a3ec1bbc37c8ac2",
+    "evidence_sha256": {
+      "answer.json": "8886135eac2c2d581fb92fe5582565088a14d6156a15a96a3c3deb09292d6cfb",
+      "capabilities.json": "f7677f3f2e98d50ef2319119b82d78854d26c9b29d76422f66ee0006bd45e336",
+      "daemon-command.json": "02bd0bd3fc7c6daf6e4c5f05ec46533a772d739cee58b047045bec6983118fb6",
+      "get_source-request.json": "7972cb81b8340082d994658cbac61b572c851539c960ec8b464af5af0627f247",
+      "get_source-response.json": "5eadd5a3101051393bdcd0fe2575f3ec8dc5c9e4215d69d12626d566285caa69",
+      "plan_edit-request.json": "6daefcf7542a3522e7dd7de1f306e4400ddbd3cec7d40e01ba5c4e03853c0125",
+      "plan_edit-response.json": "db081d3f7260abfa01b45bc489c4018d6208352b092424e36d0baca8f1c3350d",
+      "replace_node_body-request.json": "60fd7282ef5fad524844a065429626c5f1dfe27a197e9a264c1e369309e07ec9",
+      "replace_node_body-response.json": "84829ccd97005d8f4694cd8a5fd60cd6b4751e17885674c9fa857351d9e5bf01",
+      "search_graph-request.json": "2473bf8de13883552525a7e1a2d615313d3f6ec0d50c190039839acfe3cce091",
+      "search_graph-response.json": "a60beded3d93a1c5666f8a35e85f74c9a34d905e88aa54d5145d6368162faf34",
+      "tool-definitions.json": "d9d31b36254179471136adb538589ef310dc68e5d21b485904e2f4370ac7a236"
+    }
+  },
+  {
+    "task": "java_overload",
+    "passed": true,
+    "committed": true,
+    "plan_created": true,
+    "file": "src/main/java/studio/PermissionGate.java",
+    "node_id": "method:studio.PermissionGate.permits:studio.AccessRequest|studio.PermissionTable:boolean",
+    "original_file_hash": "37a42d2659a3bce8b37e71cf1b934751a16facc0e30627afc9ae2de89a8d736f",
+    "file_hash": "520e2ef208f231f8051655144841b574308010735cd51d96a67697b1f71ab774",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "4878382e1b89be0551abe38321d7dd54c9d365dfa4a497a09e931edbb58b36ab",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "520e2ef208f231f8051655144841b574308010735cd51d96a67697b1f71ab774"
+    },
+    "workspace_before_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_after_sha256": "4004c2248108a6bd2a14d6874761e5966b3f5cdf41c659922dd948d8d24d8870",
+    "frozen_sha256": "e04327702e0765ab25be5545c9e390653a6292c47346be626a3ec1bbc37c8ac2",
+    "evidence_sha256": {
+      "answer.json": "123eeaedfacfde52a241224b23d58b603b0f4146a6b8a9e463ab28136c705035",
+      "capabilities.json": "50451c20618e6b8994fc24689f91036419ed55109f10b558390d2a57da6ac75b",
+      "daemon-command.json": "69c2cded5051ebfe2c22e8f22685d12ac748e748dc631ddb7acc2e5751ddd923",
+      "get_source-request.json": "0b39d816d4ff9c91fbf7270859a3663e3b034d6d1097cd25035c3c4b3b2202d2",
+      "get_source-response.json": "39bcaa7a2e6f5f6f959f3d34e36d9152ca3059daeccecb73e819214cd245d9a9",
+      "plan_edit-request.json": "4e7df7869873181d4d461a65c46bac6ee370a68ad49336ed05cf0bbafd9efa4c",
+      "plan_edit-response.json": "2e86582d460140cf756434c1b0b68dd9b83de3ff13d4495b45c4f03d378009f8",
+      "replace_node_body-request.json": "baeac6e5864f852f2a26ac51e1934603d22048828ae702dedd2fe9a1b17124d3",
+      "replace_node_body-response.json": "999c8858763cb11b0a56b584737e4ca8220090d113d09d50f14bfbdf6902c9cd",
+      "search_graph-request.json": "127f8ab788d26723a204af91b57f8320020c650511fba48032ac341d93e9f1b1",
+      "search_graph-response.json": "27b0c19b5557f36498633fb18c74f0dfebc450f75409934d36d641fc9aa0d090",
+      "tool-definitions.json": "d9d31b36254179471136adb538589ef310dc68e5d21b485904e2f4370ac7a236"
+    }
+  }
+]

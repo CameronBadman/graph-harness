@@ -17,7 +17,7 @@ def render(directory):
     comparisons = [row for row in summary["comparisons"] if row["baseline"] == "native"]
     if len(comparisons) != 4 or not summary["common_cells"]:
         raise ValueError("four configurations and common valid/correct cells are required")
-    labels = {"compact": "Current compact", "slim": "Source format", "node": "Node tool offered", "combined": "Format + tool offered"}
+    labels = {"compact": "Current compact", "slim": "Source format", "node": "Node tool enabled", "combined": "Format + tool enabled"}
     plt.rcParams.update({"font.family": "DejaVu Sans", "svg.hashsalt": "graphharness-token-interface"})
     fig, axes = plt.subplots(1, 2, figsize=(11, 5.2), layout="constrained")
     for axis, metric, title in zip(axes, ("input_tokens", "output_tokens"), ("Input tokens", "Output tokens")):
@@ -38,7 +38,7 @@ def render(directory):
     enabled = [summary["arms"][arm] for arm in ("node", "combined")]
     used = sum(arm["node_edit_committed_runs"] for arm in enabled)
     attempts = sum(arm["attempts"] for arm in enabled)
-    fig.suptitle(f"Actual Codex usage · {count} matched correct task/repetition cells\n"
+    fig.suptitle(f"Codex usage · reused development tasks · {count} matched cells\n"
                  f"Negative percentages mean MORE tokens · node commits in {used}/{attempts} enabled runs", fontsize=13)
     fig.savefig(directory / "token-change.png", dpi=170)
     svg_path = directory / "token-change.svg"

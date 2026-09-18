@@ -196,3 +196,83 @@ source slices matched their original file hashes and byte spans or literal line
 ranges. Known private evidence is retained under rehashed archives; public reports
 omit prompts, credentials and machine paths. No further product optimization was
 performed on the fresh tasks after their results became known.
+
+## Guided node-edit development rerun, 2026-09-18
+
+The user authorized fixing the identified eligibility/adoption issues and rerunning
+the experiment. The [new protocol](benchmarks/token_node_followup/PROTOCOL.md)
+reuses all three known task families and the exact prior evaluator. Those cases
+are development data: repair authors may inspect them, and the rerun cannot be
+described as independent confirmation on unseen tasks. All five configurations
+receive fresh runs; no previous native result is reused as the denominator.
+
+The parser repair resolves qualified parameter identities using retained snapshot
+declarations, lexical scope and explicit imports while preserving owner/name/line,
+arity, array rank, generic structure and uniqueness checks. Unsafe short-name
+matching is not used. Review caught an overly strict rejection of exact qualified
+types in classes with superclasses; the fix and regression test preceded freeze.
+Unresolved imports, inherited names, erased generics and incomplete declaration
+inventories can still fail closed. The full build passed 132 JVM tests, six
+executable guidance tests passed, and the benchmark passed 42 tests. A later
+report-only change passed the 19 collector tests again.
+
+The new shared graph guidance explicitly discovers the node editor, resolves
+overloads through a node_id argument, and directs eligible advertised body edits
+through that tool. Before any new model result, the protocol also added one
+identical compilation/behavior-check requirement to every arm to avoid unequal
+validation demand. These are disclosed workflow changes, not isolated measures of
+the parser repair. The same cache, host-context and configured-model limitations
+apply as in the previous study.
+
+The new preflight gate uses the actual frozen Joern backend and separate fresh
+copies of every task. It confirms original-body planning, performs a real node
+repair using a known verified test fixture, then checks independent behavior and
+unchanged scope. Every target passed, including both previously rejected custom
+parameter types. The independent reviewer inspected the actual requests, source
+spans and commit receipts and regraded the resulting workspaces. These non-model
+checks contain known repair data, stay outside scored workspaces, and do not enter
+token totals. Complete evidence keys, source/target/body identity, raw hashes,
+backend, command, operation correlation and final correctness are reverified
+before model launch. Scored records also bind the preflight digest.
+
+Product commits are `9ce342a` (matcher) and `346d71b` (guidance); evaluation freeze
+is `4751583`. The first freeze digest is
+`e04327702e0765ab25be5545c9e390653a6292c47346be626a3ec1bbc37c8ac2`.
+Prior datasets, negative outcomes and calibration mistakes remain unchanged.
+
+All 30 scored attempts completed without retry, exclusion, missing usage, timeout
+or infrastructure failure. All passed repeated external behavior/scope grading
+and independent access review. All 24 graph runs attempted retrieval; all 12
+enabled runs committed through the node editor. Fourteen calls produced 14 actual
+commits: both overloaded node-only runs added a whitespace correction after the
+first body already passed behavior checks. A long-method node-only result retained
+extra indentation. These costs and final formatting are preserved; correctness
+does not establish formatting quality or efficiency.
+
+The primary result remains negative. Against fresh native runs, input/output
+increased by 45.8%/17.2% for compact, 76.0%/37.3% for source format, 57.4%/45.0% for
+node editing and 52.7%/34.1% for combined. All six task/repetition cells are common,
+correct and valid across the five arms. The independent reviewer reconciled all
+raw terminal counters, five totals, eight aggregate contrasts and 48 paired rows,
+checked 47 returned source slices and reconstructed every node commit. No observed
+evaluator access, exploit or source-provenance mismatch was found. This remains
+an audited development rerun, not proof that every possible leakage path is absent.
+
+Counterevidence is retained: compact and combined used 14.9% and 25.3% less uncached
+input than native. Cache state was uncontrolled; those subsets do not meet the
+total-input/output objective or establish billing savings. Native and both enabled
+arms each made 22 observed shell calls; graph calls, full-body payloads, scratch
+test mistakes and formatting follow-ups are recorded descriptively without
+inventing a causal token allocation. Runtime/tool errors are distinguished from
+final repair failure and from expected no-match results.
+
+Prior lessons about treatment eligibility, actual adoption, semantic calibration,
+and frozen artifacts were applied as explicit launch/reporting gates. A new
+generalized global lesson records unequal explicit validation requirements in
+the earlier workflow, their pre-launch correction here, and the absence of an
+isolated estimate of that asymmetry's effect. The old result remains valid for its
+offered workflow; it was not retroactively reinterpreted as a clean tool-only
+effect. Further tuning on these known tasks cannot become unseen-task evidence.
+See [findings](reviews/token-node-followup/FINDINGS.md),
+[checks](reviews/token-node-followup/checks.json) and the
+[independent review](reviews/token-node-followup/INDEPENDENT_REVIEW.md).

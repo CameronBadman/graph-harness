@@ -1,0 +1,1161 @@
+{
+  "freeze_sha256": "e04327702e0765ab25be5545c9e390653a6292c47346be626a3ec1bbc37c8ac2",
+  "method": "Independent scan of completed raw JSONL events; final changes, intermediate node writes and scratch probes manually inspected. Counts describe observable events, not code-mode discovery/wrapper calls. Node new_body UTF-8 bytes exclude JSON escaping/metadata and are not tokens. File-change events omit shell-authored scratch writes. Target-source command counts are a lower bound: command output containing the literal target method declaration, not every partial reread. Nonzero shell events include expected no-match results; inner errors may also occur in a zero-exit compound command. Post-commit means after the first successful node commit; it is chronological, not causal.",
+  "totals": {
+    "native": {
+      "commands": 22,
+      "file_change_events": 13,
+      "production_file_change_events": 6,
+      "bundles": 0,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 14,
+      "target_source_after_commit": 0,
+      "node_committed_runs": 0,
+      "node_new_body_utf8_bytes": 0,
+      "nonzero_shell_events": 7,
+      "nonzero_categories": {
+        "git_nonrepository": 6,
+        "scratch_probe_assertion": 1
+      },
+      "zero_exit_with_observed_error": 0
+    },
+    "compact": {
+      "commands": 22,
+      "file_change_events": 12,
+      "production_file_change_events": 6,
+      "bundles": 8,
+      "ambiguous_bundles": 2,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 10,
+      "target_source_after_commit": 0,
+      "node_committed_runs": 0,
+      "node_new_body_utf8_bytes": 0,
+      "nonzero_shell_events": 7,
+      "nonzero_categories": {
+        "git_nonrepository": 5,
+        "search_missing_path": 2
+      },
+      "zero_exit_with_observed_error": 2
+    },
+    "slim": {
+      "commands": 28,
+      "file_change_events": 17,
+      "production_file_change_events": 6,
+      "bundles": 7,
+      "ambiguous_bundles": 2,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 6,
+      "target_source_after_commit": 0,
+      "node_committed_runs": 0,
+      "node_new_body_utf8_bytes": 0,
+      "nonzero_shell_events": 13,
+      "nonzero_categories": {
+        "git_nonrepository": 6,
+        "scratch_probe_assertion": 3,
+        "scratch_probe_compilation": 2,
+        "search_missing_path": 1,
+        "jshell_socket": 1
+      },
+      "zero_exit_with_observed_error": 1
+    },
+    "node": {
+      "commands": 22,
+      "file_change_events": 5,
+      "production_file_change_events": 0,
+      "bundles": 10,
+      "ambiguous_bundles": 2,
+      "get_source": 0,
+      "node_calls": 8,
+      "node_commits": 8,
+      "mcp_after_commit": 4,
+      "commands_after_commit": 19,
+      "target_source_command_results": 9,
+      "target_source_after_commit": 7,
+      "node_committed_runs": 6,
+      "node_new_body_utf8_bytes": 5899,
+      "nonzero_shell_events": 10,
+      "nonzero_categories": {
+        "git_nonrepository": 5,
+        "search_no_matching_build_or_test_files": 4,
+        "expected_old_code_absence_check": 1
+      },
+      "zero_exit_with_observed_error": 0
+    },
+    "combined": {
+      "commands": 22,
+      "file_change_events": 8,
+      "production_file_change_events": 0,
+      "bundles": 8,
+      "ambiguous_bundles": 2,
+      "get_source": 0,
+      "node_calls": 6,
+      "node_commits": 6,
+      "mcp_after_commit": 0,
+      "commands_after_commit": 18,
+      "target_source_command_results": 5,
+      "target_source_after_commit": 2,
+      "node_committed_runs": 6,
+      "node_new_body_utf8_bytes": 4908,
+      "nonzero_shell_events": 10,
+      "nonzero_categories": {
+        "git_nonrepository": 6,
+        "scratch_probe_compilation": 1,
+        "search_no_matching_build_or_test_files": 1,
+        "scratch_probe_assertion": 1,
+        "jshell_socket": 1
+      },
+      "zero_exit_with_observed_error": 0
+    }
+  },
+  "runs": [
+    {
+      "id": "java_long-1-combined",
+      "arm": "combined",
+      "commands": 3,
+      "file_change_events": 1,
+      "production_file_change_events": 0,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 1,
+      "node_commits": 1,
+      "node_body_bytes": [
+        1894
+      ],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 3,
+      "target_source_command_results": 1,
+      "target_source_after_commit": 1,
+      "failed_commands": [
+        {
+          "id": "item_4",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "fba12e3215ad0a4c0cd55abbbc698929e84fe8db61652ade326dadf7bde04712",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_long-1-compact",
+      "arm": "compact",
+      "commands": 5,
+      "file_change_events": 2,
+      "production_file_change_events": 1,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 2,
+      "target_source_after_commit": 0,
+      "failed_commands": [],
+      "raw_events_sha256": "f95be4164de58da79cdd3a38d1b28f71a8a8608d547574f8d44948f467c0a515",
+      "observed_errors_in_zero_exit_commands": [
+        {
+          "id": "item_2",
+          "categories": [
+            "search_missing_path"
+          ]
+        },
+        {
+          "id": "item_5",
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "java_long-1-native",
+      "arm": "native",
+      "commands": 5,
+      "file_change_events": 2,
+      "production_file_change_events": 1,
+      "bundles": 0,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 2,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_2",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "5c3c3841ef5f01b08e24ef8b8faceda8621c1d6e310f64ddba2309b82063e379",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_long-1-node",
+      "arm": "node",
+      "commands": 3,
+      "file_change_events": 1,
+      "production_file_change_events": 0,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 1,
+      "node_commits": 1,
+      "node_body_bytes": [
+        2270
+      ],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 3,
+      "target_source_command_results": 1,
+      "target_source_after_commit": 1,
+      "failed_commands": [
+        {
+          "id": "item_7",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        },
+        {
+          "id": "item_8",
+          "exit_code": 1,
+          "categories": [
+            "search_no_matching_build_or_test_files"
+          ]
+        }
+      ],
+      "raw_events_sha256": "c117d2c4325494034b22b36621a129e561e37717de52272988b050422146b667",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_long-1-slim",
+      "arm": "slim",
+      "commands": 5,
+      "file_change_events": 3,
+      "production_file_change_events": 1,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 1,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_6",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        },
+        {
+          "id": "item_8",
+          "exit_code": 1,
+          "categories": [
+            "scratch_probe_assertion"
+          ]
+        }
+      ],
+      "raw_events_sha256": "ed35afda182c46097485bad1efeb2f8a2cb91995745500cf85d9c490bf9ec7e8",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_long-2-combined",
+      "arm": "combined",
+      "commands": 5,
+      "file_change_events": 2,
+      "production_file_change_events": 0,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 1,
+      "node_commits": 1,
+      "node_body_bytes": [
+        1894
+      ],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 5,
+      "target_source_command_results": 0,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_4",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        },
+        {
+          "id": "item_7",
+          "exit_code": 1,
+          "categories": [
+            "scratch_probe_compilation"
+          ]
+        }
+      ],
+      "raw_events_sha256": "6133510f406657702f690b7dcf25e082b62ad151f2aa3951e2915bee886a25ec",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_long-2-compact",
+      "arm": "compact",
+      "commands": 4,
+      "file_change_events": 2,
+      "production_file_change_events": 1,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 2,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_5",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "a22071d4dd26c08a6a2f3195543e9140ba57ea57525703deae034c5a9d553ff7",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_long-2-native",
+      "arm": "native",
+      "commands": 5,
+      "file_change_events": 3,
+      "production_file_change_events": 1,
+      "bundles": 0,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 3,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_5",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        },
+        {
+          "id": "item_7",
+          "exit_code": 1,
+          "categories": [
+            "scratch_probe_assertion"
+          ]
+        }
+      ],
+      "raw_events_sha256": "e486d9abfa052c5dc352f97ed7ca9d9820412bd92c50c9356b094aa7dc1ff2d6",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_long-2-node",
+      "arm": "node",
+      "commands": 4,
+      "file_change_events": 1,
+      "production_file_change_events": 0,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 1,
+      "node_commits": 1,
+      "node_body_bytes": [
+        1894
+      ],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 4,
+      "target_source_command_results": 1,
+      "target_source_after_commit": 1,
+      "failed_commands": [
+        {
+          "id": "item_6",
+          "exit_code": 1,
+          "categories": [
+            "search_no_matching_build_or_test_files"
+          ]
+        },
+        {
+          "id": "item_8",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        },
+        {
+          "id": "item_10",
+          "exit_code": 1,
+          "categories": [
+            "expected_old_code_absence_check"
+          ]
+        }
+      ],
+      "raw_events_sha256": "a4a2e2ef235ca4a27ee2046092b89920d3dfcb654a8dcee869935a744734f228",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_long-2-slim",
+      "arm": "slim",
+      "commands": 6,
+      "file_change_events": 3,
+      "production_file_change_events": 1,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 0,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_7",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        },
+        {
+          "id": "item_9",
+          "exit_code": 1,
+          "categories": [
+            "scratch_probe_compilation"
+          ]
+        }
+      ],
+      "raw_events_sha256": "1287692babd22008771ff331527955c2b75bfe4e037c10324a6ff0cfd1e199a1",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_overload-1-combined",
+      "arm": "combined",
+      "commands": 5,
+      "file_change_events": 2,
+      "production_file_change_events": 0,
+      "bundles": 2,
+      "ambiguous_bundles": 1,
+      "get_source": 0,
+      "node_calls": 1,
+      "node_commits": 1,
+      "node_body_bytes": [
+        277
+      ],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 3,
+      "target_source_command_results": 2,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_5",
+          "exit_code": 1,
+          "categories": [
+            "search_no_matching_build_or_test_files"
+          ]
+        },
+        {
+          "id": "item_9",
+          "exit_code": 1,
+          "categories": [
+            "scratch_probe_assertion"
+          ]
+        },
+        {
+          "id": "item_11",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "a87cb1299b5cf2bd48dfbdd1554cd56d8fdf54bacb1ac9a1906ee8034c070431",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_overload-1-compact",
+      "arm": "compact",
+      "commands": 3,
+      "file_change_events": 2,
+      "production_file_change_events": 1,
+      "bundles": 2,
+      "ambiguous_bundles": 1,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 2,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_6",
+          "exit_code": 2,
+          "categories": [
+            "search_missing_path"
+          ]
+        },
+        {
+          "id": "item_10",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "d8a874d3e6858614e14704910655fc257bb2f81c00307990f1b6ba47600c7ab7",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_overload-1-native",
+      "arm": "native",
+      "commands": 4,
+      "file_change_events": 2,
+      "production_file_change_events": 1,
+      "bundles": 0,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 3,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_5",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "0aa8356227aaf2b5a6e33bf7eb7cc3a0d2358e9d8f1f943560721286f91d6a9c",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_overload-1-node",
+      "arm": "node",
+      "commands": 6,
+      "file_change_events": 1,
+      "production_file_change_events": 0,
+      "bundles": 3,
+      "ambiguous_bundles": 1,
+      "get_source": 0,
+      "node_calls": 2,
+      "node_commits": 2,
+      "node_body_bytes": [
+        309,
+        277
+      ],
+      "mcp_after_commit": 2,
+      "commands_after_commit": 4,
+      "target_source_command_results": 3,
+      "target_source_after_commit": 2,
+      "failed_commands": [
+        {
+          "id": "item_4",
+          "exit_code": 1,
+          "categories": [
+            "search_no_matching_build_or_test_files"
+          ]
+        },
+        {
+          "id": "item_8",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "e4b1b26975390f6ab47b2abfa3fa45799487b933dd6953c64ccf84b49ab17bb4",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_overload-1-slim",
+      "arm": "slim",
+      "commands": 4,
+      "file_change_events": 3,
+      "production_file_change_events": 1,
+      "bundles": 2,
+      "ambiguous_bundles": 1,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 1,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_7",
+          "exit_code": 1,
+          "categories": [
+            "scratch_probe_assertion"
+          ]
+        },
+        {
+          "id": "item_9",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "7a5f2337eadc4d1e47aa962f59a51089835ecb91ce9cf87bcb22a0982289e5e7",
+      "observed_errors_in_zero_exit_commands": [
+        {
+          "id": "item_3",
+          "categories": [
+            "search_missing_path"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "java_overload-2-combined",
+      "arm": "combined",
+      "commands": 4,
+      "file_change_events": 1,
+      "production_file_change_events": 0,
+      "bundles": 2,
+      "ambiguous_bundles": 1,
+      "get_source": 0,
+      "node_calls": 1,
+      "node_commits": 1,
+      "node_body_bytes": [
+        277
+      ],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 2,
+      "target_source_command_results": 2,
+      "target_source_after_commit": 1,
+      "failed_commands": [
+        {
+          "id": "item_8",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "a040eb63418e6366577ea2e458b2518fea4297318fb51ebc524bf3af7fff7f9a",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_overload-2-compact",
+      "arm": "compact",
+      "commands": 4,
+      "file_change_events": 2,
+      "production_file_change_events": 1,
+      "bundles": 2,
+      "ambiguous_bundles": 1,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 2,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_4",
+          "exit_code": 128,
+          "categories": [
+            "git_nonrepository"
+          ]
+        },
+        {
+          "id": "item_5",
+          "exit_code": 2,
+          "categories": [
+            "search_missing_path"
+          ]
+        }
+      ],
+      "raw_events_sha256": "ec0eff3f5501bb2c1eebb791c53663eee9d77011c1cd9f082dfd18e1f5ceba2c",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_overload-2-native",
+      "arm": "native",
+      "commands": 3,
+      "file_change_events": 2,
+      "production_file_change_events": 1,
+      "bundles": 0,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 2,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_3",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "5bca62fc3bdf654b9067d26a4833e3363695159cc7520fca9ccbfcaa85c57854",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_overload-2-node",
+      "arm": "node",
+      "commands": 5,
+      "file_change_events": 1,
+      "production_file_change_events": 0,
+      "bundles": 3,
+      "ambiguous_bundles": 1,
+      "get_source": 0,
+      "node_calls": 2,
+      "node_commits": 2,
+      "node_body_bytes": [
+        309,
+        277
+      ],
+      "mcp_after_commit": 2,
+      "commands_after_commit": 4,
+      "target_source_command_results": 3,
+      "target_source_after_commit": 2,
+      "failed_commands": [
+        {
+          "id": "item_4",
+          "exit_code": 1,
+          "categories": [
+            "search_no_matching_build_or_test_files"
+          ]
+        },
+        {
+          "id": "item_6",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "84bb0a89e6ef6accef6e1159edeb7b90b945f41d98c0537db95510cf7abf1da2",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_overload-2-slim",
+      "arm": "slim",
+      "commands": 7,
+      "file_change_events": 4,
+      "production_file_change_events": 1,
+      "bundles": 1,
+      "ambiguous_bundles": 1,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 3,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_3",
+          "exit_code": 2,
+          "categories": [
+            "search_missing_path"
+          ]
+        },
+        {
+          "id": "item_7",
+          "exit_code": 1,
+          "categories": [
+            "scratch_probe_compilation"
+          ]
+        },
+        {
+          "id": "item_9",
+          "exit_code": 1,
+          "categories": [
+            "scratch_probe_assertion"
+          ]
+        },
+        {
+          "id": "item_11",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "deb9d77596832b3c6948393713fc28ac023d3b09098c4ee545400d876863830f",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_short-1-combined",
+      "arm": "combined",
+      "commands": 3,
+      "file_change_events": 1,
+      "production_file_change_events": 0,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 1,
+      "node_commits": 1,
+      "node_body_bytes": [
+        283
+      ],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 3,
+      "target_source_command_results": 0,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_6",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "ed6004112d86582371429f189e789f0f5b72dc8500061b941150b630b31523b7",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_short-1-compact",
+      "arm": "compact",
+      "commands": 4,
+      "file_change_events": 2,
+      "production_file_change_events": 1,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 2,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_8",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "0168f35c48d562fb5ec7290f1d666f66dae6b6aad7d323e8dee6be2b845750c0",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_short-1-native",
+      "arm": "native",
+      "commands": 3,
+      "file_change_events": 2,
+      "production_file_change_events": 1,
+      "bundles": 0,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 2,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_2",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "000b1b460531e004aa8e84e49a82f9a1947731d28a720a44fae9e70651fe531e",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_short-1-node",
+      "arm": "node",
+      "commands": 2,
+      "file_change_events": 0,
+      "production_file_change_events": 0,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 1,
+      "node_commits": 1,
+      "node_body_bytes": [
+        288
+      ],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 2,
+      "target_source_command_results": 0,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_5",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "78e5910625250e7585b34f1e2e9e4ce3cf34002a9c7e99c1170cf298718ab59e",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_short-1-slim",
+      "arm": "slim",
+      "commands": 3,
+      "file_change_events": 2,
+      "production_file_change_events": 1,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 0,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_4",
+          "exit_code": 1,
+          "categories": [
+            "jshell_socket"
+          ]
+        },
+        {
+          "id": "item_7",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "c54a7bd2aeef00c1594db6581b67e7dd78b5b3efc8e556fc47d63db39dcef8aa",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_short-2-combined",
+      "arm": "combined",
+      "commands": 2,
+      "file_change_events": 1,
+      "production_file_change_events": 0,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 1,
+      "node_commits": 1,
+      "node_body_bytes": [
+        283
+      ],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 2,
+      "target_source_command_results": 0,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_3",
+          "exit_code": 1,
+          "categories": [
+            "jshell_socket"
+          ]
+        },
+        {
+          "id": "item_5",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "e07efbdfc49b58640c1f1cc6c6943e4f7be3d1c5b4b50530fbc30c4b79862c19",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_short-2-compact",
+      "arm": "compact",
+      "commands": 2,
+      "file_change_events": 2,
+      "production_file_change_events": 1,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 0,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_4",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "3cc706ff364da77b081581b951188f2f7afa0c44354103dc8fce5eb4fb5c7b86",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_short-2-native",
+      "arm": "native",
+      "commands": 2,
+      "file_change_events": 2,
+      "production_file_change_events": 1,
+      "bundles": 0,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 2,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_1",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "051c96f174a9bb5b7cf7eb53edd5df313ecb872de02265c5fdad4fed077273b4",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_short-2-node",
+      "arm": "node",
+      "commands": 2,
+      "file_change_events": 1,
+      "production_file_change_events": 0,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 1,
+      "node_commits": 1,
+      "node_body_bytes": [
+        275
+      ],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 2,
+      "target_source_command_results": 1,
+      "target_source_after_commit": 1,
+      "failed_commands": [],
+      "raw_events_sha256": "c61ead7e28f5050469cc7765b8e73f10900cbdd3d3441fe25f13f515f0319d29",
+      "observed_errors_in_zero_exit_commands": []
+    },
+    {
+      "id": "java_short-2-slim",
+      "arm": "slim",
+      "commands": 3,
+      "file_change_events": 2,
+      "production_file_change_events": 1,
+      "bundles": 1,
+      "ambiguous_bundles": 0,
+      "get_source": 0,
+      "node_calls": 0,
+      "node_commits": 0,
+      "node_body_bytes": [],
+      "mcp_after_commit": 0,
+      "commands_after_commit": 0,
+      "target_source_command_results": 1,
+      "target_source_after_commit": 0,
+      "failed_commands": [
+        {
+          "id": "item_3",
+          "exit_code": 129,
+          "categories": [
+            "git_nonrepository"
+          ]
+        }
+      ],
+      "raw_events_sha256": "c2da8296fa5c67fdba5f184a54e03e395b30d19b9a552330dac0dbc7f172df56",
+      "observed_errors_in_zero_exit_commands": []
+    }
+  ],
+  "formatting_observations": [
+    {
+      "runs": [
+        "java_overload-1-node",
+        "java_overload-2-node"
+      ],
+      "observation": "First node calls used an unindented first line and eight-space indentation on later lines; renderer added eight spaces to each line. Both first commits compiled and passed their focused probe. Each run then read source, fetched a fresh bundle and committed a second body with identical non-whitespace text and normalized indentation. These were formatting rewrites, not rejected edits or behavior-repair retries. The refreshed graph also included the agent-authored scratch probe as a caller.",
+      "intermediate_file_hash": "3a7519d57879f515e44653fbe6c556e5561adb552bb001cbd1da1b78038abddd",
+      "final_file_hash": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    {
+      "runs": [
+        "java_long-1-node"
+      ],
+      "observation": "The same mixed base indentation added eight spaces to 47 subsequent body lines. One commit was made and this formatting remained in the final file. Behavior and permitted-body scope passed; this is still avoidable diff noise.",
+      "final_file_hash": "03dd399690c40f27db1061724b9202b71d0f8e55c0e1bb4a1f3b4c387d103f50"
+    }
+  ],
+  "validation_observations": {
+    "scored_runs_with_observed_compiled_focused_probe_execution": 30,
+    "calibration_exception": "Node calibration attempted JShell, hit a socket restriction and inspected bytecode instead. Its external behavioral grade passed separately; do not count bytecode inspection as model-executed behavioral testing.",
+    "scratch_probe_failures": "Three compilation failures arose from probe constructor/argument mistakes. Five assertion failures arose from probe expectations. Repairs to these self-authored probes did not change the already-correct production fix or the external evaluator.",
+    "nonzero_shell_event_count": 47,
+    "additional_zero_exit_commands_with_observed_inner_errors": 3,
+    "interpretation": "Counts are observable command outcomes; failed Git commands, expected no-match checks, and successful tests followed by a failing later command are not interchangeable with failed repairs."
+  },
+  "source_provenance_review": {
+    "returned_source_slices_checked": 47,
+    "line_only_slices": 0,
+    "committed_node_byte_results_reconstructed": 14,
+    "mismatches": 0,
+    "method": "Compared retained result slices against their hash-bound exact byte spans from initial/final/intermediate sources, including agent-authored scratch sources. Reconstructed documented body indentation for intermediate commit receipts; all independent external behavior/scope grades were also rerun."
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "product_commit": "346d71b",
+  "matcher_commit": "9ce342a",
+  "jvm_tests": {
+    "tests": 132,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "command": "nix develop --command gradle test installDist --console=plain",
+    "suite_sha256": {
+      "TEST-graphharness.AnalysisProcessTest.xml": "3d112a3e3047fddd3d86135dce8f71bb00a2a47882954045d5c6248ad1f56669",
+      "TEST-graphharness.AnalyzerTest.xml": "685e1240c47352ac54ceb782b580ece3ec2272f7581e3afd7c0481bfc4b392ce",
+      "TEST-graphharness.ContextRetrievalTest.xml": "ab8ccd6701613dcb679e1be8922c3d1c8cbafc603d18f0d4ea7f5cda8170bbe2",
+      "TEST-graphharness.CoordinatedDaemonTest.xml": "8ebfc4f7e79a30ec65f8905973d1067e46e274c60862d907a660e18ee0421dd9",
+      "TEST-graphharness.EditCoordinatorTest.xml": "bd38061aec8cac18fa97a6a2dd5ca4f5f3551db997b55e8509d8928f3b03c84e",
+      "TEST-graphharness.JavaDeclarationsTest.xml": "9f04e5016fe2b9ffa2f74b8b447dc825a59205e5bbb69daa1f58985fb1b6316d",
+      "TEST-graphharness.JavaParameterTypesTest.xml": "cc3190c8e3cbabd9d3ba3f0d8b0ef7a062512cce78452819964d8f188c1aa250",
+      "TEST-graphharness.JavaStructureTest.xml": "0af832651970698799910450a8c1543324c456313ac8677c5dfd009be14d5137",
+      "TEST-graphharness.LiveBridgeTest.xml": "3a9f9a685e571c899f6d6b9718bc082b40437a4208a72938eb4d9f1f2d200cd9",
+      "TEST-graphharness.LiveDaemonTest.xml": "29f68c92af1d46429ac8f554979516818ae9b23b83a522553802e90065f2087f",
+      "TEST-graphharness.LiveEditsTest.xml": "42e73fa162c802a6cd64941a34e247ac2f3ea46ccf0d74848d735e5143bafd81",
+      "TEST-graphharness.LiveStateTest.xml": "064b52867b084f9a291d17625d467dd409eec4d55e8fad7c37e151b84e060f50",
+      "TEST-graphharness.LocalRuntimeTest.xml": "b7070d585f3660aa3ba0c02810ab7157ccb0694ab0021aaa2123670001fabe47",
+      "TEST-graphharness.NodeBodyEditTest.xml": "4831600b5e534ec35eb76133ce66f5fb98277f7a9fa575f89c4fa9be6ff258a4",
+      "TEST-graphharness.SafeJavaEditTest.xml": "f95e9d2ce1a7c5bcbbf0b8707b7a08b2b26d8a91ba9717d45e479fb76a638d94",
+      "TEST-graphharness.ServerTest.xml": "87faa30c2fdb022855075a07261f1023cd3915487c2435b3062a18373b1537a4",
+      "TEST-graphharness.SnapshotSafetyTest.xml": "c01f952f1801d556fa6b9707124dfba781175c8e320ac8f235b8ecf02f4d3745",
+      "TEST-graphharness.SourceResponseFormatTest.xml": "e5e90d12315ab2d00d61fc6511dc9726fc4165ded8b0c3202ebd3cbc9d006100",
+      "TEST-graphharness.StructuralAdapterTest.xml": "ab1f9f4d2d0bbcc582f5e73348b6ce7050669ce1a26458cc4f5557c2fc75c518",
+      "TEST-graphharness.ValidationRunnerTest.xml": "b27a2b97f5a60f867c14b73097191539d201258ea9e70ad54208198b01aaaa77"
+    }
+  },
+  "benchmark_tests": {
+    "tests": 42,
+    "failures": 0,
+    "command": "python3 -m unittest benchmarks.token_node_followup.test_preflight benchmarks.token_node_followup.test_report benchmarks.token_node_followup.test_tasks benchmarks.token_node_followup.test_calibration -q",
+    "collector_retested_after_reporting_change": {
+      "tests": 19,
+      "failures": 0
+    }
+  },
+  "guidance_tests": {
+    "tests": 6,
+    "failures": 0,
+    "command": "node --test scripts/codex-guidance.test.mjs"
+  },
+  "evaluation_commit": "4751583",
+  "study": "guided_node_development_rerun",
+  "task_provenance": "Same three known tasks and evaluator; not an unseen holdout.",
+  "retained_distribution_files_verified": 147,
+  "preflight": {
+    "targets": 3,
+    "actual_joern_commits": 3,
+    "external_behavior_and_scope_passed": 3,
+    "independently_reviewed": 3,
+    "counts_excluded_from_scored_totals": true,
+    "evidence_sha256": "a10260ac16fa8c9296853262486584ca5303a78871e2b1e003f454d3ea0e08ac",
+    "independent_review_sha256": "40506b3052396b12cb5f449ba2ac954282ff14c0bcd8f47cd0d0534703abb1ad"
+  },
+  "calibration": {
+    "attempts": 5,
+    "all_gates_passed": true,
+    "counts_excluded_from_scored_totals": true,
+    "node_calibration_model_jshell_failed_then_bytecode_inspected": true,
+    "external_behavior_passed": true
+  },
+  "scored_study": {
+    "scheduled": 30,
+    "completed": 30,
+    "correct": 30,
+    "access_valid": 30,
+    "correctness_recomputed": 30,
+    "common_task_repetition_cells": 6,
+    "graph_retrieval_runs": 24,
+    "node_enabled_runs": 12,
+    "node_committed_runs": 12,
+    "node_calls": 14,
+    "node_commits": 14,
+    "source_v1_runs": 12,
+    "retries": 0,
+    "timeouts": 0,
+    "infrastructure_failures": 0,
+    "missing_usage": 0,
+    "excluded_cells": 0,
+    "aggregate_contrasts_independently_checked": 8,
+    "paired_contrasts_independently_checked": 48,
+    "returned_source_slices_independently_checked": 47,
+    "node_commits_independently_reconstructed": 14,
+    "frozen_sha256": "e04327702e0765ab25be5545c9e390653a6292c47346be626a3ec1bbc37c8ac2",
+    "collector_command": "python3 benchmarks/token_node_followup/report.py --artifacts <private-frozen-run-directory> --output reviews/token-node-followup"
+  },
+  "private_archives": {
+    "scored": {
+      "manifest_sha256": "d194fedeb8b226fb07fcf01139bf019273da81bee4f4f43ee944f89412900464",
+      "file_count": 1951,
+      "runtime_credentials_excluded": true,
+      "copies_rehashed": true
+    }
+  },
+  "plot": {
+    "command": "uv run --locked benchmarks/token_node_followup/plot.py reviews/token-node-followup",
+    "dependency": "matplotlib==3.10.6",
+    "source": "summary.json",
+    "reused_tasks_and_actual_adoption_labeled": true,
+    "svg_sha256": "366069e3eb81c94f7278abf36a41b1e546d36bf7a5a7d21a7bcbd82c2e7f64d5",
+    "png_sha256": "da5ab88a065879c4b089d5971255b3245a64378daf2415aa2cd27dc084696d37",
+    "visually_checked_for_labels_and_clipping": true
+  },
+  "known_limitations": {
+    "overload_whitespace_only_second_commits": 2,
+    "long_node_final_excess_indentation_runs": 1,
+    "all_scored_runs_eventually_executed_focused_behavior_probe": true,
+    "observed_nonzero_shell_events": 47,
+    "observed_errors_inside_zero_exit_commands": 3,
+    "cache_controlled": false,
+    "provider_model_identity_attested": false,
+    "fresh_holdout": false
+  },
+  "final_verification": {
+    "frozen_identity_unchanged": true,
+    "private_archive_files_rehashed": 1951,
+    "independent_review_sha256": "bb9f51e7c5875bb6339544beb15cd997a9315107a58d934a6eceba160b0d94f2",
+    "mechanism_evidence_sha256": "6f3372a9aeb7d0a949e66374a0a5305e6a6b4b7baf042f60a4709f5e18667b7e",
+    "public_machine_path_and_credential_pattern_scan_passed": true,
+    "local_documentation_links_resolve": true,
+    "local_documentation_links_checked": 54,
+    "task_evaluator_bytes_unchanged_from_previous_study": true
+  }
+}
