@@ -79,7 +79,7 @@ internal class LiveEdits(
         val nodeId = arguments.requiredString("node_id")
         val target = snapshot.methodInfos[nodeId] ?: throw LiveFailure("unsupported_operation", 422, "A concrete Java method is required.")
         val source = snapshot.sourceFiles[target.file] ?: throw LiveFailure("stale_source", 409, "Source is unavailable; refresh first.")
-        val body = SafeJavaEditor.plan(source, target, arguments.requiredString("expected_file_hash"), arguments.requiredString("new_body"))
+        val body = SafeJavaEditor.plan(source, target, arguments.requiredString("expected_file_hash"), arguments.requiredString("new_body"), snapshot.sourceFiles)
         var currentPath = snapshot.root
         java.nio.file.Path.of(target.file).forEach { part ->
             currentPath = currentPath.resolve(part)

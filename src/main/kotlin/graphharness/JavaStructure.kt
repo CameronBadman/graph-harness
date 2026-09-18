@@ -18,6 +18,7 @@ fun enrichJavaStructure(snapshot: Snapshot): Snapshot {
     val nodes = snapshot.nodeSummaries.toMutableMap()
     val edges = snapshot.edges.filterNot { it.provenance == "javac_parser" }.toMutableList()
     val diagnostics = snapshot.sourceDiagnostics.toMutableList()
+    val declarations = JavaTypeDeclarations.fromSources(snapshot.sourceFiles)
     snapshot.sourceFiles.filterKeys { it.endsWith(".java") }.forEach { (file, source) ->
         val fileId = "java:file:$file"
         nodes[fileId] = NodeSummary(
@@ -40,7 +41,9 @@ fun enrichJavaStructure(snapshot: Snapshot): Snapshot {
         val boundaries = JavaUtf8Boundaries(source.text())
         val packageName = parsed.unit.packageName?.toString().orEmpty()
         val classes = mutableListOf<String>()
+        val classTrees = mutableListOf<ClassTree>()
         val classIds = mutableListOf<String>()
+        val parameterTypes = JavaParameterTypes(parsed.unit, declarations)
         object : TreePathScanner<Unit, Unit>() {
             override fun visitClass(node: ClassTree, unused: Unit?) {
                 val start = parsed.positions.getStartPosition(parsed.unit, node).toInt()
@@ -65,9 +68,11 @@ fun enrichJavaStructure(snapshot: Snapshot): Snapshot {
                     edges += EdgeSummary(classIds.lastOrNull()?.takeIf { it.isNotBlank() } ?: fileId, id, "contains", file, range.start, "javac_parser", "exact")
                 }
                 classes += simple
+                classTrees += node
                 classIds += id ?: ""
                 super.visitClass(node, unused)
                 classes.removeLast()
+                classTrees.removeLast()
                 classIds.removeLast()
             }
 
@@ -78,10 +83,9 @@ fun enrichJavaStructure(snapshot: Snapshot): Snapshot {
                     val range = SourceRange(parsed.unit.lineMap.getLineNumber(start.toLong()).toInt(), parsed.unit.lineMap.getLineNumber((end - 1).toLong()).toInt())
                     val parent = (listOf(packageName) + classes).filter { it.isNotBlank() }.joinToString(".")
                     val binaryParent = listOf(packageName, classes.joinToString("$")).filter { it.isNotBlank() }.joinToString(".")
-                    val parameterTypes = node.parameters.map { normalizeJavaType(it.type.toString()) }
                     val candidates = snapshot.methodInfos.values.filter { method ->
                         method.file == file && method.simpleName == node.name.toString() && method.parentQualifiedName in setOf(parent, binaryParent) &&
-                            method.lineRange == range && method.parameterTypes.map(::normalizeJavaType) == parameterTypes
+                            method.lineRange == range && parameterTypes.matches(node, classTrees, method.parameterTypes)
                     }
                     val id = candidates.singleOrNull()?.id
                     if (id != null) {
@@ -119,8 +123,6 @@ private fun parseJavaStructure(file: String, text: String): JavaParsed? {
         else JavaParsed(units.single(), Trees.instance(task).sourcePositions)
     }
 }
-
-private fun normalizeJavaType(value: String): String = value.filterNot(Char::isWhitespace).replace("...", "[]")
 
 private class JavaUtf8Boundaries(source: String) {
     private val offsets = IntArray(source.length + 1) { -1 }

@@ -38,6 +38,7 @@ object SafeJavaEditor {
         target: MethodInfo,
         expectedHash: String,
         newBody: String,
+        javaSources: Map<String, RetainedSource> = mapOf(target.file to source),
     ): SafeJavaBodyPlan {
         if (source.hash != expectedHash) fail("stale_source", 409, "Source bytes changed before planning.")
         if (target.simpleName == "<init>" || target.simpleName == "<clinit>") {
@@ -48,7 +49,8 @@ object SafeJavaEditor {
         }.getOrElse { fail("invalid_encoding", 422, "Replacement must contain valid Unicode text.") }
         val sourceText = source.text()
         val parsed = parse(sourceText, "parse_error")
-        val candidate = selectCandidate(parsed.unit, parsed.positions, target)
+        val declarations = JavaTypeDeclarations.fromSources(javaSources + (target.file to source))
+        val candidate = selectCandidate(parsed.unit, parsed.positions, target, declarations)
         val body = candidate.body ?: fail("unsupported_body_span", 422, "The method does not have a concrete body.")
         val start = parsed.positions.getStartPosition(parsed.unit, body)
         val end = parsed.positions.getEndPosition(parsed.unit, body)
@@ -69,7 +71,7 @@ object SafeJavaEditor {
         val reparsed = parse(decodeUtf8(updated), "replacement_parse_error")
         val expectedEnd = start + rendered.length + 2
         val updatedTarget = target.copy(lineRange = SourceRange(target.lineRange.start, reparsed.unit.lineMap.getLineNumber(expectedEnd - 1).toInt()))
-        val updatedMethod = selectCandidate(reparsed.unit, reparsed.positions, updatedTarget)
+        val updatedMethod = selectCandidate(reparsed.unit, reparsed.positions, updatedTarget, declarations)
         if (reparsed.positions.getStartPosition(reparsed.unit, updatedMethod.body) != start ||
             reparsed.positions.getEndPosition(reparsed.unit, updatedMethod.body) != expectedEnd) {
             fail("scope_changed", 422, "Replacement must stay within the selected method body.")
@@ -81,15 +83,20 @@ object SafeJavaEditor {
         unit: CompilationUnitTree,
         positions: com.sun.source.util.SourcePositions,
         target: MethodInfo,
+        declarations: JavaTypeDeclarations,
     ): MethodTree {
         val packageName = unit.packageName?.toString().orEmpty()
         val candidates = mutableListOf<MethodTree>()
         val classNames = mutableListOf<String>()
+        val classes = mutableListOf<ClassTree>()
+        val parameterTypes = JavaParameterTypes(unit, declarations)
         object : TreePathScanner<Unit, Unit>() {
             override fun visitClass(node: ClassTree, unused: Unit?) {
                 classNames += node.simpleName.toString()
+                classes += node
                 super.visitClass(node, unused)
                 classNames.removeLast()
+                classes.removeLast()
             }
 
             override fun visitMethod(node: MethodTree, unused: Unit?) {
@@ -100,7 +107,7 @@ object SafeJavaEditor {
                 val linesMatch = start >= 0 && end >= start &&
                     unit.lineMap.getLineNumber(start) == target.lineRange.start.toLong() &&
                     unit.lineMap.getLineNumber((end - 1).coerceAtLeast(start)) == target.lineRange.end.toLong()
-                val parametersMatch = node.parameters.map { normalizeType(it.type.toString()) } == target.parameterTypes.map(::normalizeType)
+                val parametersMatch = parameterTypes.matches(node, classes, target.parameterTypes)
                 if (node.body != null && node.returnType != null && target.parentQualifiedName in setOf(parent, binaryParent) && node.name.toString() == target.simpleName && parametersMatch && linesMatch) {
                     candidates += node
                 }
@@ -111,8 +118,6 @@ object SafeJavaEditor {
         if (candidates.size != 1) fail("ambiguous_target", 422, "More than one parser-confirmed method matches the requested node.")
         return candidates.single()
     }
-
-    private fun normalizeType(value: String): String = value.filterNot(Char::isWhitespace)
 
     private fun renderBody(source: String, openBrace: Int, newBody: String): String {
         val lineEnding = if ("\r\n" in source) "\r\n" else "\n"
