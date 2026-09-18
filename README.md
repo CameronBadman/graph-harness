@@ -49,6 +49,11 @@ A second Codex session can use a different display label. Every bridge obtains i
 
 The bridge uses newline-delimited MCP stdio. Protocol messages are the only stdout output. Current configuration keys follow the [official Codex MCP documentation](https://learn.chatgpt.com/docs/extend/mcp?surface=cli).
 
+For read-only exploration, the optional [Codex navigation setup](docs/codex-navigation.md)
+uses four tools, compact responses, and explicit code-mode discovery guidance.
+Run `graphharness codex-instructions` to print that guidance. Token savings still
+require the correctness-gated comparison; this profile is not an efficiency guarantee.
+
 Try the public [ticket-office example](examples/ticket-office/README.md): ask one agent to inspect `TicketInventory.reserve` and another to inspect `PriceQuote.totalCents`. Watch their search/source events, select an event to focus its nodes, follow a session, or use the keyboard-operable code list to inspect source. Use the language filter to inspect the fixture’s TypeScript formatter and Python report. These have parser-observed definitions and containment; runtime calls between languages are not inferred.
 
 ## Coordinated edits
