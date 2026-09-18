@@ -19,3 +19,9 @@ preserving task correctness. Earlier pilots remain unchanged development evidenc
 
 No source/evaluator-specific answer shortcuts. Fresh evaluation tasks are separated
 from development regressions. No claims of generality from synthetic pilot results.
+
+Iteration 2: H1 reproduced for path/multi-language/ambiguity/unknown-target cases and
+the constructor observation with the real Joern backend. H2/H3 have positive
+installed-client mock evidence for deferred discovery and duplicate representations,
+but effects on real model trajectories remain to be measured. H4 remains plausible;
+historical stderr confirms policy recovery as an additional confound.

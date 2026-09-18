@@ -1,0 +1,282 @@
+{
+  "scope": "Direct replay of the exact three tool arguments observed in the old guided pilot. Development diagnosis, not fresh evaluation or model token measurement. Payload sizes are stable UTF-8 HTTP result JSON; unlike the old report they exclude MCP wrappers.",
+  "runs": [
+    {
+      "label": "baseline-complete",
+      "task_id": "java_repair",
+      "tool": "build_context_bundle",
+      "arguments": {
+        "task": "Fix the boundary defect in CouponPolicy.discount: a subtotal exactly at the minimum qualifying amount must receive the configured discount. Preserve other behavior, including invalid inputs and large subtotals. Modify only CouponPolicy.java.",
+        "token_budget": 1800
+      },
+      "fixture_manifest_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "chosen_node_id": null,
+      "notes": [
+        "bundle_resolution=resolve_edit_target_ambiguous",
+        "no_node_resolved"
+      ],
+      "source_slices": [],
+      "search_results": [],
+      "http_result_json_bytes": 857,
+      "private_result_sha256": "a0945fdda27b28d9c02798d188320def22e2ed4acec1b71ebfde261319be6b41",
+      "measurement_valid": false,
+      "exclusion": "Diagnostic setup mistake: fixture was under the repository ignored artifacts directory; parent git ignore rules omitted all source. This empty-snapshot result is not evidence about retrieval."
+    },
+    {
+      "label": "baseline-complete",
+      "task_id": "polyglot_lookup",
+      "tool": "build_context_bundle",
+      "arguments": {
+        "task": "Find the TypeScript and Python functions that return \"settled\" for a non-cancelled payment starting at attempt two, \"retry\" before that, and \"cancel\" for cancelled payments regardless of attempt count. Several modules have the same function names. Return each as relative/path:symbol.",
+        "token_budget": 1800
+      },
+      "fixture_manifest_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "chosen_node_id": null,
+      "notes": [
+        "bundle_resolution=resolve_edit_target_ambiguous",
+        "no_node_resolved"
+      ],
+      "source_slices": [],
+      "search_results": [],
+      "http_result_json_bytes": 906,
+      "private_result_sha256": "92322cb9f3c1570f44122e6ab0b5fb36e0a021862ec9f7b39da42cb0a2d3467f",
+      "measurement_valid": false,
+      "exclusion": "Diagnostic setup mistake: fixture was under the repository ignored artifacts directory; parent git ignore rules omitted all source. This empty-snapshot result is not evidence about retrieval."
+    },
+    {
+      "label": "baseline-complete",
+      "task_id": "polyglot_lookup",
+      "tool": "search_graph",
+      "arguments": {
+        "query": "payment",
+        "kind": "function"
+      },
+      "fixture_manifest_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "chosen_node_id": null,
+      "notes": null,
+      "source_slices": [],
+      "search_results": [],
+      "http_result_json_bytes": 391,
+      "private_result_sha256": "46eb32145f4fcde13dd2206d50ab0115a1763c0553a5f6784f74cf4c0f3b319f",
+      "measurement_valid": false,
+      "exclusion": "Diagnostic setup mistake: fixture was under the repository ignored artifacts directory; parent git ignore rules omitted all source. This empty-snapshot result is not evidence about retrieval."
+    },
+    {
+      "label": "baseline-admitted",
+      "measurement_valid": true,
+      "observed_source_files": 18,
+      "task_id": "java_repair",
+      "tool": "build_context_bundle",
+      "arguments": {
+        "task": "Fix the boundary defect in CouponPolicy.discount: a subtotal exactly at the minimum qualifying amount must receive the configured discount. Preserve other behavior, including invalid inputs and large subtotals. Modify only CouponPolicy.java.",
+        "token_budget": 1800
+      },
+      "fixture_manifest_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "chosen_node_id": "method:CouponPolicy.<init>::void",
+      "notes": [
+        "bundle_resolution=resolve_edit_target_ambiguous",
+        "bundle_resolution=search_graph:CouponPolicy",
+        "chosen_node=CouponPolicy.<init>",
+        "impact_basis=incoming_calls,method_implementations"
+      ],
+      "source_slices": [
+        {
+          "node_id": "method:CouponPolicy.<init>::void",
+          "file": "CouponPolicy.java",
+          "source_utf8_bytes": 28,
+          "source_sha256": "15f6aca03ac977ad6b67b6948b70d987e49894f2d59454e03ce998557d985b5a"
+        },
+        {
+          "node_id": "method:Invoice.<init>::void",
+          "file": "Invoice.java",
+          "source_utf8_bytes": 83,
+          "source_sha256": "20258b25f1549b545c9795720a5a80ac4cf98d2682a8650ef60e8c780b24bc94"
+        }
+      ],
+      "search_results": [],
+      "http_result_json_bytes": 3260,
+      "private_result_sha256": "6619be808408ecfe239a558bce1ddb945d69428acc274b551faab7dffca8407f"
+    },
+    {
+      "label": "baseline-admitted",
+      "measurement_valid": true,
+      "observed_source_files": 14,
+      "task_id": "polyglot_lookup",
+      "tool": "build_context_bundle",
+      "arguments": {
+        "task": "Find the TypeScript and Python functions that return \"settled\" for a non-cancelled payment starting at attempt two, \"retry\" before that, and \"cancel\" for cancelled payments regardless of attempt count. Several modules have the same function names. Return each as relative/path:symbol.",
+        "token_budget": 1800
+      },
+      "fixture_manifest_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "chosen_node_id": null,
+      "notes": [
+        "bundle_resolution=resolve_edit_target_ambiguous",
+        "no_node_resolved"
+      ],
+      "source_slices": [],
+      "search_results": [],
+      "http_result_json_bytes": 908,
+      "private_result_sha256": "c9ee651cfcbcfcb78859f59102d74476f986aacd7a6febe1f43ad1a6a8a3ed67"
+    },
+    {
+      "label": "baseline-admitted",
+      "measurement_valid": true,
+      "observed_source_files": 14,
+      "task_id": "polyglot_lookup",
+      "tool": "search_graph",
+      "arguments": {
+        "query": "payment",
+        "kind": "function"
+      },
+      "fixture_manifest_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "chosen_node_id": null,
+      "notes": null,
+      "source_slices": [],
+      "search_results": [],
+      "http_result_json_bytes": 392,
+      "private_result_sha256": "5a8522402621a0079d2b275273d68c03a2f2e073e019fb86eb01f840a65f6fcf"
+    },
+    {
+      "label": "fixed-admitted",
+      "measurement_valid": true,
+      "observed_source_files": 18,
+      "task_id": "java_repair",
+      "tool": "build_context_bundle",
+      "arguments": {
+        "task": "Fix the boundary defect in CouponPolicy.discount: a subtotal exactly at the minimum qualifying amount must receive the configured discount. Preserve other behavior, including invalid inputs and large subtotals. Modify only CouponPolicy.java.",
+        "token_budget": 1800
+      },
+      "fixture_manifest_sha256": "40c473dea31b3c90c08df787469e9821f423dd3eb2457d3f5e79f0ba41c546ee",
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "chosen_node_id": "method:CouponPolicy.discount:int|int|int:int",
+      "notes": [
+        "bundle_resolution=qualified_symbol",
+        "chosen_node=CouponPolicy.discount",
+        "impact_basis=incoming_calls,method_implementations"
+      ],
+      "source_slices": [
+        {
+          "node_id": "method:CouponPolicy.discount:int|int|int:int",
+          "file": "CouponPolicy.java",
+          "source_utf8_bytes": 316,
+          "source_sha256": "f36e1090ddfd82fe71f234b4d8c0bbf9347878a29f2b4653da729b56c0c13b63"
+        },
+        {
+          "node_id": "method:CouponPolicy.payable:int|int|int:int",
+          "file": "CouponPolicy.java",
+          "source_utf8_bytes": 130,
+          "source_sha256": "76a403097b2103a3ac117a43df82e5b489d963181c6bac92adfb4a57d8832f5f"
+        }
+      ],
+      "search_results": [],
+      "http_result_json_bytes": 3978,
+      "private_result_sha256": "fd73568121f68960b379c4ed140710eb21bba7ad1ed5e1da8df3de14462bf89c"
+    },
+    {
+      "label": "fixed-admitted",
+      "measurement_valid": true,
+      "observed_source_files": 14,
+      "task_id": "polyglot_lookup",
+      "tool": "build_context_bundle",
+      "arguments": {
+        "task": "Find the TypeScript and Python functions that return \"settled\" for a non-cancelled payment starting at attempt two, \"retry\" before that, and \"cancel\" for cancelled payments regardless of attempt count. Several modules have the same function names. Return each as relative/path:symbol.",
+        "token_budget": 1800
+      },
+      "fixture_manifest_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "chosen_node_id": null,
+      "notes": [
+        "bundle_resolution=ambiguous",
+        "Provide node_id or a more specific qualified symbol/file; candidate nodes are listed without source.",
+        "no_node_resolved"
+      ],
+      "source_slices": [],
+      "search_results": [],
+      "http_result_json_bytes": 3723,
+      "private_result_sha256": "fee71a3d302970efd33095923df425b0b682bd54c7c39d8dcbf2413d835e5423"
+    },
+    {
+      "label": "fixed-admitted",
+      "measurement_valid": true,
+      "observed_source_files": 14,
+      "task_id": "polyglot_lookup",
+      "tool": "search_graph",
+      "arguments": {
+        "query": "payment",
+        "kind": "function"
+      },
+      "fixture_manifest_sha256": "d0f53d9f9033ad8a3b2f5d5f353d1f53df30d8921c6af448d2cecebfe55c5fcb",
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "chosen_node_id": null,
+      "notes": null,
+      "source_slices": [],
+      "search_results": [
+        {
+          "id": "python:ops/payments.py:root:function:normalize:0",
+          "name": "normalize",
+          "file": "ops/payments.py",
+          "language": "python"
+        },
+        {
+          "id": "typescript:web/payments.ts:root:FunctionDeclaration:normalize:0",
+          "name": "normalize",
+          "file": "web/payments.ts",
+          "language": "typescript"
+        },
+        {
+          "id": "python:ops/payments.py:root:function:preview:0",
+          "name": "preview",
+          "file": "ops/payments.py",
+          "language": "python"
+        },
+        {
+          "id": "typescript:web/payments.ts:root:FunctionDeclaration:preview:0",
+          "name": "preview",
+          "file": "web/payments.ts",
+          "language": "typescript"
+        },
+        {
+          "id": "python:ops/payments.py:root:function:resolve:0",
+          "name": "resolve",
+          "file": "ops/payments.py",
+          "language": "python"
+        },
+        {
+          "id": "typescript:web/payments.ts:root:FunctionDeclaration:resolve:0",
+          "name": "resolve",
+          "file": "web/payments.ts",
+          "language": "typescript"
+        },
+        {
+          "id": "python:ops/payments.py:root:function:terminal:0",
+          "name": "terminal",
+          "file": "ops/payments.py",
+          "language": "python"
+        },
+        {
+          "id": "typescript:web/payments.ts:root:FunctionDeclaration:terminal:0",
+          "name": "terminal",
+          "file": "web/payments.ts",
+          "language": "typescript"
+        }
+      ],
+      "http_result_json_bytes": 3885,
+      "private_result_sha256": "3d173e88e2970c917fcf08e19630ed4bc1229f41ecbc00fd2d169a8313b4a745"
+    }
+  ]
+}

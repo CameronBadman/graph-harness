@@ -1228,35 +1228,88 @@ private fun normalizeMethodBodyFingerprint(body: String): String =
         )
     }
 
-    private fun resolveBundleNode(task: String, snapshot: Snapshot, notes: MutableList<String>): NodeSummary? {
-        val resolved = runCatching { resolveEditTarget(task, 4, snapshot) }.getOrNull()
-        val resolvedCandidate = resolved?.resolved_candidate
-        if (resolvedCandidate != null && !resolved.needs_disambiguation) {
-            notes += "bundle_resolution=resolve_edit_target"
-            return resolvedCandidate.node
-        }
-        if (resolved != null && resolved.needs_disambiguation) {
-            notes += "bundle_resolution=resolve_edit_target_ambiguous"
-        }
+    private data class BundleResolution(
+        val nodes: List<NodeSummary>,
+        val candidates: List<NodeSummary> = emptyList(),
+    )
 
-        val searchTerms = Regex("""[A-Za-z_]\w+""")
-            .findAll(task)
-            .map { it.value }
-            .filter { it.length >= 4 }
-            .toList()
-        for (term in searchTerms) {
-            val match = search(term, "method", null, null, snapshot).results.firstOrNull()
-            if (match != null) {
-                notes += "bundle_resolution=search_graph:$term"
-                return match
+    private fun resolveBundleNodes(task: String, snapshot: Snapshot, notes: MutableList<String>): BundleResolution {
+        val identifier = """[\p{L}_$][\p{L}\p{N}_$]*"""
+        val symbolPattern = "$identifier(?:[.#]$identifier)*"
+        val symbols = snapshot.nodeSummaries.values.filter { it.kind != "file" && '<' !in it.name }
+        fun matches(node: NodeSummary, reference: String): Boolean {
+            val normalized = reference.replace('#', '.')
+            return listOf(node.name, node.qualified_name).any { name ->
+                name.equals(normalized, ignoreCase = true) || name.endsWith(".$normalized", ignoreCase = true)
             }
         }
-
-        val fallback = summaryMap(snapshot).entrypoints.firstOrNull()?.let { snapshot.nodeSummaries[it.id] }
-        if (fallback != null) {
-            notes += "bundle_resolution=entrypoint_fallback"
+        fun finish(groups: List<List<NodeSummary>>, basis: String, allowSeparateFiles: Boolean = false): BundleResolution {
+            val candidates = groups.flatten().distinctBy { it.id }
+            val ambiguous = groups.any { group ->
+                group.size > 1 && (!allowSeparateFiles || group.groupBy { it.file }.any { it.value.size > 1 })
+            }
+            if (ambiguous) {
+                notes += "bundle_resolution=ambiguous"
+                notes += "Provide node_id or a more specific qualified symbol/file; candidate nodes are listed without source."
+                return BundleResolution(emptyList(), candidates)
+            }
+            if (candidates.isNotEmpty()) notes += "bundle_resolution=$basis"
+            if (groups.any { it.isEmpty() }) notes += "some_explicit_targets_unresolved"
+            return BundleResolution(candidates)
         }
-        return fallback
+
+        val fileSymbols = Regex("""([\p{L}\p{N}_$./-]+\.(?:java|tsx?|jsx?|py))[:#]($symbolPattern)""")
+            .findAll(task).toList()
+        if (fileSymbols.isNotEmpty()) {
+            return finish(fileSymbols.map { reference ->
+                val file = reference.groupValues[1].removePrefix("./")
+                symbols.filter { node ->
+                    (node.file == file || node.file.endsWith("/$file")) && matches(node, reference.groupValues[2])
+                }
+            }, "file_symbol")
+        }
+
+        fun mentions(reference: String): Boolean = Regex(
+            """(?<![\p{L}\p{N}_$/-])${Regex.escape(reference)}(?![\p{L}\p{N}_$/-])""",
+        ).containsMatchIn(task)
+        val files = snapshot.sourceIndex.keys.filter { file ->
+            mentions(file) || mentions(file.substringAfterLast('/'))
+        }.toSet()
+        val explicitSeparateFiles = files.size > 1 && files.all(::mentions)
+        val scopedSymbols = symbols.filter { files.isEmpty() || it.file in files }
+        val references = Regex(symbolPattern).findAll(task).map { it.value.replace('#', '.') }.distinct().toList()
+        val qualifiedReferences = references.filter {
+            '.' in it && it.substringAfterLast('.').lowercase() !in setOf("java", "ts", "tsx", "js", "jsx", "py")
+        }
+        if (qualifiedReferences.isNotEmpty()) {
+            return finish(qualifiedReferences.map { reference -> scopedSymbols.filter { matches(it, reference) } },
+                "qualified_symbol", explicitSeparateFiles)
+        }
+
+        val bareReferences = references.filter { '.' !in it }
+        val groups = bareReferences.map { reference ->
+            val candidates = scopedSymbols.filter { node ->
+                node.name.substringAfterLast('.').equals(reference, ignoreCase = true)
+            }
+            val ownerMatches = candidates.filter { node ->
+                node.qualified_name.substringBeforeLast('.', "").split('.').any { owner ->
+                    bareReferences.any { it.equals(owner, ignoreCase = true) }
+                }
+            }
+            ownerMatches.ifEmpty { candidates }
+        }.filter { it.isNotEmpty() }
+        val callableGroups = groups.map { group -> group.filter { it.kind in setOf("method", "function") } }
+            .filter { it.isNotEmpty() }
+        if (groups.isNotEmpty()) return finish(callableGroups.ifEmpty { groups }, "symbol", explicitSeparateFiles)
+
+        if (files.isNotEmpty()) {
+            val fileGroups = files.map { file ->
+                val fileNodes = snapshot.nodeSummaries.values.filter { it.file == file && it.kind == "file" }
+                fileNodes.ifEmpty { scopedSymbols.filter { it.file == file && it.id in snapshot.typeInfos } }
+            }
+            return finish(if (files.size > 1 && !explicitSeparateFiles) listOf(fileGroups.flatten()) else fileGroups, "file")
+        }
+        return BundleResolution(emptyList())
     }
 
     private fun estimateBundleTokenUsage(
@@ -1583,10 +1636,11 @@ private fun normalizeMethodBodyFingerprint(body: String): String =
         val budget = tokenBudget.coerceIn(400, 12000)
         val notes = mutableListOf<String>()
         val summary = summaryMap(snapshot)
-        val chosenNode = when {
-            !nodeId.isNullOrBlank() -> snapshot.nodeSummaries[nodeId] ?: error("Unknown node_id: $nodeId")
-            else -> resolveBundleNode(task!!.trim(), snapshot, notes)
+        val resolution = when {
+            !nodeId.isNullOrBlank() -> BundleResolution(listOf(snapshot.nodeSummaries[nodeId] ?: error("Unknown node_id: $nodeId")))
+            else -> resolveBundleNodes(task!!.trim(), snapshot, notes)
         }
+        val chosenNode = resolution.nodes.firstOrNull()
         val chosenNodeId = chosenNode?.id
         val focusIds = linkedSetOf<String>()
         val focusNodes = mutableListOf<NodeSummary>()
@@ -1596,18 +1650,19 @@ private fun normalizeMethodBodyFingerprint(body: String): String =
         val clusters = mutableListOf<ClusterSummary>()
         val entrypoints = summary.entrypoints.take(3)
 
-        if (chosenNode != null) {
-            focusIds += chosenNode.id
-            focusNodes += chosenNode
-            val cluster = snapshot.clusters.firstOrNull { chosenNode.id in snapshot.clusterNodes[it.cluster_id].orEmpty() }
+        resolution.nodes.forEach { target ->
+            if (focusIds.add(target.id)) focusNodes += target
+        }
+        resolution.nodes.forEach { target ->
+            val cluster = snapshot.clusters.firstOrNull { target.id in snapshot.clusterNodes[it.cluster_id].orEmpty() }
             if (cluster != null) clusters += cluster
 
-            notes += "chosen_node=${chosenNode.name}"
-            if (chosenNode.language != "java") {
+            notes += "chosen_node=${target.name}"
+            if (target.language != "java") {
                 snapshot.edges
-                    .filter { (it.from == chosenNode.id || it.to == chosenNode.id) && it.relationship == "contains" }
+                    .filter { (it.from == target.id || it.to == target.id) && it.relationship == "contains" }
                     .forEach { edge ->
-                        val relatedId = if (edge.from == chosenNode.id) edge.to else edge.from
+                        val relatedId = if (edge.from == target.id) edge.to else edge.from
                         snapshot.nodeSummaries[relatedId]?.let { related ->
                             if (focusIds.add(related.id)) focusNodes += related
                         }
@@ -1617,10 +1672,10 @@ private fun normalizeMethodBodyFingerprint(body: String): String =
                     .take(12)
                 notes += "structural_context_only"
             } else {
-                val detail = nodeDetail(chosenNode.id, snapshot)
-                (listOf(chosenNode) + detail.callers.take(2).map { it.node } + detail.callees.take(3).map { it.node } + detail.implementations.take(2))
+                val detail = nodeDetail(target.id, snapshot)
+                (detail.callers.take(2).map { it.node } + detail.callees.take(3).map { it.node } + detail.implementations.take(2))
                     .forEach { node ->
-                        if (node.id != chosenNode.id && focusIds.add(node.id)) {
+                        if (focusIds.add(node.id)) {
                             focusNodes += node
                         }
                     }
@@ -1628,7 +1683,7 @@ private fun normalizeMethodBodyFingerprint(body: String): String =
                     .filter { it.from in focusIds && it.to in focusIds }
                     .filter { it.relationship in setOf("calls", "implements", "extends", "uses_type") }
                     .take(12)
-                val impact = runCatching { impact(chosenNode.id, 2, snapshot) }.getOrNull()
+                val impact = runCatching { impact(target.id, 2, snapshot) }.getOrNull()
                 impactFiles += impact?.affected_files.orEmpty().take(6)
                 if (impact != null) {
                     notes += "impact_basis=${impact.analysis_basis.joinToString(",")}"
@@ -1636,7 +1691,9 @@ private fun normalizeMethodBodyFingerprint(body: String): String =
                     notes += "impact_basis=unavailable_for_backend"
                 }
             }
-        } else {
+        }
+        if (chosenNode == null) {
+            focusNodes += resolution.candidates
             notes += "no_node_resolved"
         }
 
@@ -1657,8 +1714,14 @@ private fun normalizeMethodBodyFingerprint(body: String): String =
         )
         var consumed = 0
         val orderedSourceIds = mutableListOf<String>().apply {
-            chosenNodeId?.let { add(it) }
-            addAll(focusNodes.map { it.id }.filter { it != chosenNodeId })
+            addAll(resolution.nodes.map { it.id })
+            if (resolution.nodes.isNotEmpty()) {
+                addAll(focusNodes.filter { node ->
+                    node.id !in this && node.kind != "file" && snapshot.edges.none {
+                        it.from == node.id && it.to in this && it.relationship == "contains"
+                    }
+                }.map { it.id })
+            }
         }
         orderedSourceIds.forEach { id ->
             val source = source(id, 0, snapshot)
@@ -2002,7 +2065,8 @@ private fun normalizeMethodBodyFingerprint(body: String): String =
         val allowed = clusterId?.let { snapshot.clusterNodes[it].orEmpty().toSet() }
         val results = snapshot.nodeSummaries.values.filter { node ->
             val clusterMatch = allowed == null || node.id in allowed
-            val queryMatch = query.isBlank() || node.name.contains(query, ignoreCase = true)
+            val queryMatch = query.isBlank() || listOf(node.name, node.qualified_name, node.file)
+                .any { it.contains(query, ignoreCase = true) }
             val kindMatch = kind == null || node.kind == kind
             val annotationMatch = annotation == null || node.annotations.any { it.contains(annotation, ignoreCase = true) }
             clusterMatch && queryMatch && kindMatch && annotationMatch
