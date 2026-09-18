@@ -11,8 +11,9 @@ internal class LiveEdits(
     private val lookupLease: (String) -> EditLease?,
     private val onPlanned: (String, String, String, String) -> Unit,
     private val queueIndex: (String) -> Unit = manager::queueRefresh,
+    beforeAtomicMove: (() -> Unit)? = null,
 ) {
-    private val coordinator = EditCoordinator(manager.current().root, epoch, clock, authorize, transition)
+    private val coordinator = EditCoordinator(manager.current().root, epoch, clock, authorize, transition, beforeAtomicMove)
     private val planLock = Any()
     private val plans = linkedMapOf<String, Plan>()
     private var retainedBytes = 0
@@ -58,8 +59,9 @@ internal class LiveEdits(
             }
             "renew_edit_lease" -> leaseJson(coordinator.renew(owner, arguments.requiredString("lease_id"), arguments.requiredString("generation")))
             "release_edit_lease" -> jObject("released" to coordinator.release(owner, arguments.requiredString("lease_id"), arguments.requiredString("generation")))
-            "plan_edit" -> plan(owner, arguments)
+            "plan_edit" -> preview(prepare(owner, arguments))
             "apply_edit" -> apply(owner, arguments, committed)
+            "replace_node_body" -> replaceNodeBody(owner, arguments, committed)
             else -> throw LiveFailure("unsupported_operation", 422, "Unsupported coordinated edit operation.")
         }
     } catch (failure: EditCoordinatorFailure) {
@@ -71,7 +73,7 @@ internal class LiveEdits(
         throw LiveFailure(failure.code, status, failure.message.orEmpty(), jValue(failure.details) as JObject)
     }
 
-    private fun plan(owner: String, arguments: JObject): JObject {
+    private fun prepare(owner: String, arguments: JObject): Plan {
         val snapshot = manager.current()
         if (arguments.requiredString("snapshot_id") != snapshot.id) throw LiveFailure("stale_source", 409, "Refresh source before planning against a new snapshot.")
         val nodeId = arguments.requiredString("node_id")
@@ -96,8 +98,40 @@ internal class LiveEdits(
             plans[edit.id] = edit
             retainedBytes += edit.size
         }
-        onPlanned(owner, nodeId, body.file, edit.id)
-        return preview(edit)
+        try { onPlanned(owner, nodeId, body.file, edit.id) }
+        catch (failure: Exception) {
+            synchronized(planLock) { removePlan(edit.id) }
+            throw failure
+        }
+        return edit
+    }
+
+    private fun replaceNodeBody(owner: String, arguments: JObject, committed: (JObject, String, String) -> Unit): JObject {
+        val edit = prepare(owner, arguments)
+        var lease: EditLease? = null
+        var result: JObject? = null
+        var failure: Exception? = null
+        try {
+            lease = coordinator.acquire(owner, edit.body.file, edit.body.baseHash)
+            result = apply(owner, jObject("edit_id" to edit.id, "lease_id" to lease.id, "generation" to lease.generation), committed, compact = true)
+        } catch (error: Exception) {
+            failure = error
+            throw error
+        } finally {
+            lease?.let { acquired ->
+                try {
+                    coordinator.releaseAfterOperation(owner, acquired.id, acquired.generation)
+                } catch (cleanup: Exception) {
+                    failure?.addSuppressed(cleanup)
+                    result = result?.let { JObject(LinkedHashMap(it.fields).apply {
+                        put("lease_cleanup", JString("pending"))
+                        put("diagnostic", JString("Write committed; reservation cleanup failed and will expire within its bounded lifetime."))
+                    }) }
+                }
+            }
+            if (failure != null) synchronized(planLock) { if (!edit.applied) removePlan(edit.id) }
+        }
+        return checkNotNull(result)
     }
 
     private fun preview(edit: Plan): JObject {
@@ -113,7 +147,7 @@ internal class LiveEdits(
             "expires_in_ms" to maxOf(0, (edit.expires - clock()) / 1_000_000))
     }
 
-    private fun apply(owner: String, arguments: JObject, committed: (JObject, String, String) -> Unit): JObject {
+    private fun apply(owner: String, arguments: JObject, committed: (JObject, String, String) -> Unit, compact: Boolean = false): JObject {
         val edit = synchronized(planLock) {
             purge()
             val found = plans[arguments.requiredString("edit_id")] ?: throw LiveFailure("stale_plan", 409, "Edit plan expired or is unavailable.")
@@ -125,7 +159,9 @@ internal class LiveEdits(
         if (lease.file != edit.body.file) throw LiveFailure("stale_plan", 409, "Lease must cover the plan's exact file.")
         if (edit.applied) throw LiveFailure("stale_plan", 409, "This plan was already applied; replay the original operation instead.")
         val updated = edit.body.updatedBytes()
-        var result = jObject("edit_id" to edit.id, "file" to edit.body.file, "plan_snapshot_id" to edit.snapshotId, "committed" to true,
+        var result = if (compact) jObject("edit_id" to edit.id, "node_id" to edit.nodeId, "file" to edit.body.file, "committed" to true,
+            "file_hash" to sha256(updated), "indexing" to "pending", "syntax_checked" to true, "project_tests_run" to false)
+        else jObject("edit_id" to edit.id, "file" to edit.body.file, "plan_snapshot_id" to edit.snapshotId, "committed" to true,
             "file_hash" to sha256(updated), "indexing" to "pending", "project_tests_run" to false)
         val outcome = coordinator.commit(owner, leaseId, arguments.requiredString("generation"), edit.body.baseHash, updated) {
             synchronized(planLock) { edit.applied = true }
@@ -149,7 +185,7 @@ internal class LiveEdits(
     }
 
     companion object {
-        val toolNames = setOf("acquire_edit_lease", "renew_edit_lease", "release_edit_lease", "plan_edit", "apply_edit")
+        val toolNames = setOf("acquire_edit_lease", "renew_edit_lease", "release_edit_lease", "plan_edit", "apply_edit", "replace_node_body")
         fun definitions(): List<ToolDefinition> {
             fun definition(name: String, description: String, properties: Map<String, Any?>) = ToolDefinition(name, description,
                 mapOf("type" to "object", "properties" to properties, "required" to properties.keys.toList(), "additionalProperties" to false))
@@ -160,6 +196,7 @@ internal class LiveEdits(
                 definition("release_edit_lease", "Release an owned file reservation.", mapOf("lease_id" to string, "generation" to string)),
                 definition("plan_edit", "Preview replacement of one parser-confirmed Java method body. Supply snapshot and file hash from fresh source. No write or project tests occur.", mapOf("node_id" to string, "snapshot_id" to string, "expected_file_hash" to string, "new_body" to string)),
                 definition("apply_edit", "Atomically apply this session's single-file plan under its reservation. Checks current bytes and fencing; committed and indexing status are separate.", mapOf("edit_id" to string, "lease_id" to string, "generation" to string)),
+                definition("replace_node_body", "Replace one parser-confirmed Java method body in one call. Supply fresh node, snapshot and file hash; acquire and release a brief exclusive file reservation internally. Existing reservations return lease_busy. Supply body statements only, at most 4096 characters. Returns commit status and hash; checks syntax, not project tests. Do not retry uncertain writes without fresh source.", mapOf("node_id" to string, "snapshot_id" to string, "expected_file_hash" to string, "new_body" to string)),
             )
         }
     }

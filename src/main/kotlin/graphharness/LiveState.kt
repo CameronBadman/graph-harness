@@ -53,6 +53,7 @@ class LiveState(
         "get_dependencies", "get_impact", "get_source", "get_source_batch", "build_context_bundle",
         "get_snapshot_delta",
     )
+    internal var beforeEditAtomicMove: (() -> Unit)? = null
     private val edits by lazy {
         LiveEdits(manager, epoch, clock, authorize = { owner -> synchronized(lock) {
             val session = sessions[owner] ?: throw LiveFailure("session_expired", 401, "Session expired.")
@@ -69,7 +70,7 @@ class LiveState(
             }
         } }, lookupLease = { id -> synchronized(lock) { leases[id] } }, onPlanned = { owner, node, file, edit -> synchronized(lock) {
             append("edit_planned", sessions[owner], nodes = listOf(node), files = listOf(file), editId = edit)
-        } })
+        } }, beforeAtomicMove = { beforeEditAtomicMove?.invoke() })
     }
 
     fun createSession(label: String, role: String): LiveSession = synchronized(lock) {
@@ -249,7 +250,7 @@ class LiveState(
             if (result.stringify().toByteArray().size > 64 * 1024) {
                 throw LiveFailure("result_limit", 413, "Result exceeds 64 KiB; narrow the request.")
             }
-            if (name != "apply_edit") publishSnapshot()
+            if (name !in setOf("apply_edit", "replace_node_body")) publishSnapshot()
             val references = resultReferences(result)
             val nodeIds = if (name == "get_source") listOfNotNull(arguments.optionalString("node_id")) else references.first
             synchronized(lock) {
@@ -266,7 +267,7 @@ class LiveState(
                 }
                 append("${prefix}_failed", session, operationId, name, duration = (clock() - started) / 1_000_000, inspectionId = inspectionId, requestId = requestId,
                     errorCode = (failure as? LiveFailure)?.code ?: "tool_failed")
-                if (name in setOf("plan_edit", "apply_edit") && coordinatedWrites) append("edit_rejected", session, operationId, name,
+                if (name in setOf("plan_edit", "apply_edit", "replace_node_body") && coordinatedWrites) append("edit_rejected", session, operationId, name,
                     errorCode = (failure as? LiveFailure)?.code ?: "tool_failed")
             }
             if (failure is LiveFailure) throw failure
@@ -356,7 +357,7 @@ class LiveState(
             "leases" to leases.values.map(::leaseJson),
             "capabilities" to jObject("languages" to (listOf("java") + snapshot.adapterInfo.filterValues { it.available }.keys).distinct(),
                 "language_adapters" to snapshot.adapterInfo, "coordinated_writes" to coordinatedWrites,
-                "disabled_tools" to if (coordinatedWrites) listOf("validate_edit", "rename_node") else listOf("apply_edit", "plan_edit", "validate_edit", "rename_node")),
+                "disabled_tools" to if (coordinatedWrites) listOf("validate_edit", "rename_node") else listOf("apply_edit", "plan_edit", "replace_node_body", "validate_edit", "rename_node")),
         )
     }
 

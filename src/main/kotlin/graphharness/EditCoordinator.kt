@@ -144,6 +144,18 @@ class EditCoordinator(
         }
     }
 
+    internal fun releaseAfterOperation(owner: String, leaseId: String, generation: String): Boolean {
+        val key = leaseFiles[leaseId] ?: return false
+        return lockFor(key).withLock {
+            val lease = leases[key] ?: return@withLock false
+            if (lease.id != leaseId) return@withLock false
+            if (lease.owner != owner) throw EditCoordinatorFailure("not_owner", "Lease belongs to another session.")
+            if (lease.generation != generation) throw EditCoordinatorFailure("lease_expired", "Lease fencing generation is no longer current.")
+            removeForTransition(key, lease, LeaseTransitionType.RELEASED, tombstone = true)
+            true
+        }
+    }
+
     fun expire() {
         leases.keys.forEach { key -> lockFor(key).withLock { expireLocked(key) } }
     }
