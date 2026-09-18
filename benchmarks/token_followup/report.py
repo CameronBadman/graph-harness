@@ -449,7 +449,7 @@ def render(frozen, rows, summary, output):
              'Every correctness result was recomputed by the external evaluator.', '',
              f"Configured model: `{frozen['model']}`; client: `{frozen['codex_version']}`. "
              'Input includes cached input; output includes reasoning. Counters are not independently reconciled billing.', '',
-             '| Configuration | Correct / valid / attempted | Read retrieval attempted / runs | Policy rejections | Known input | Known output |',
+             '| Configuration | Correct / valid / attempted | Read retrieval attempted / runs | Stderr approval rejections | Known input | Known output |',
              '| --- | ---: | ---: | ---: | ---: | ---: |']
     for arm, result in summary['arms'].items():
         totals = result['all_known_usage_totals']
@@ -472,7 +472,7 @@ def render(frozen, rows, summary, output):
                   f"{_format_percent(values['input_tokens'])} | {_format_percent(values['output_tokens'])} | "
                   f"{_format_percent(values['uncached_input_tokens'])} |"]
     lines += ['', '## Every attempt', '',
-              '| Task | Rep | Arm | Correct | Valid | Input | Cached | Output | Retrieval | Access | Rejections |',
+              '| Task | Rep | Arm | Correct | Valid | Input | Cached | Output | Retrieval | Access | Stderr approval rejections |',
               '| --- | ---: | --- | --- | --- | ---: | ---: | ---: | --- | --- | ---: |']
     for row in rows:
         usage, diagnostic = row.get('usage') or {}, row.get('diagnostics', {})
@@ -499,7 +499,9 @@ def render(frozen, rows, summary, output):
               'not a production benchmark or statistical generalization. Provider cache state is uncontrolled. '
               'Repaired and navigation receive explicit integration guidance, including its input overhead; '
               'native and legacy do not. Repaired versus legacy changes resolution and integration together. '
-              'Navigation changes tool availability and response format together. Low tool adoption limits attribution.', '',
+              'Navigation changes tool availability and response format together. Low tool adoption limits attribution. '
+              'Stderr approval rejections count only the observed Rejected( marker; sandbox or runtime failures '
+              'inside command output remain separate tool errors. Zero in that column does not imply no tool failures.', '',
               'Private raw transcripts, stderr, prompts, answers and final workspaces are bound by digests in runs.json. '
               'The collector verifies per-run records, rederives usage and diagnostics, checks the frozen artifact '
               'and fixture identities, and reruns the external correctness evaluator. Access review is a separate '

@@ -1,0 +1,238 @@
+{
+  "scope": "All scored bundle calls. Observable source/selection and subsequent shell calls; not model reasoning or per-request token attribution.",
+  "projection_compliance": "Not observable in exec JSONL; guidance is frozen, installed-client mock proves the route only.",
+  "bundles": [
+    {
+      "run": "polyglot_retry-2-repaired",
+      "events_sha256": "a0a0d760175a8b1c2fb7af115b39cffb25e15753df82ad433a063c347a682294",
+      "chosen_node_id": null,
+      "notes": [
+        "bundle_resolution=ambiguous",
+        "Provide node_id or a more specific qualified symbol/file; candidate nodes are listed without source.",
+        "no_node_resolved"
+      ],
+      "source_files": [],
+      "source_slices": 0,
+      "later_shell_calls": 3,
+      "source_characters": 0,
+      "transport_result_sha256": "ac8877ae7064970138eedfdd6663f790207b3afe715bedd7489ddc1cfc9bbf7d",
+      "focus_nodes": 2
+    },
+    {
+      "run": "polyglot_retry-2-navigation",
+      "events_sha256": "06e3a4a3e1ecced75438f6a395aa896b4b9ab4c003cfa3c73628ece8b1d0f7b4",
+      "chosen_node_id": null,
+      "notes": [
+        "bundle_resolution=ambiguous",
+        "Provide node_id or a more specific qualified symbol/file; candidate nodes are listed without source.",
+        "no_node_resolved"
+      ],
+      "source_files": [],
+      "source_slices": 0,
+      "later_shell_calls": 1,
+      "source_characters": 0,
+      "transport_result_sha256": "8e3eafb1bbb265d9d63fa4238c75caff4a83e014e5d935b970b11b48eb869091",
+      "focus_nodes": 2
+    },
+    {
+      "run": "java_dispatch-1-repaired",
+      "events_sha256": "a7fc27ed5fe5d8607da9f5a9d8802d91547f75ca72687537f1b399fd2eefbbed",
+      "chosen_node_id": "method:relay.DispatchService.dispatch:relay.DispatchRequest:relay.DispatchDecision",
+      "notes": [
+        "bundle_resolution=qualified_symbol",
+        "some_explicit_targets_unresolved",
+        "chosen_node=relay.DispatchService.dispatch",
+        "impact_basis="
+      ],
+      "source_files": [
+        "src/main/java/relay/DispatchService.java",
+        "src/main/java/relay/CancellationLedger.java",
+        "src/main/java/relay/DispatchRequest.java",
+        "src/main/java/relay/DispatchRouter.java"
+      ],
+      "source_slices": 4,
+      "later_shell_calls": 4,
+      "source_characters": 844,
+      "transport_result_sha256": "5a7e9da249cde9ba7ec884633f258d3cbef1dc00ad6ea37462d5700b13d3515f",
+      "focus_nodes": 4
+    },
+    {
+      "run": "java_dispatch-1-navigation",
+      "events_sha256": "02be9224313999c2f0177f2bd748fdea620450f86c4866d5257ba9b043b90271",
+      "chosen_node_id": "method:relay.DispatchService.dispatch:relay.DispatchRequest:relay.DispatchDecision",
+      "notes": [
+        "bundle_resolution=qualified_symbol",
+        "some_explicit_targets_unresolved",
+        "chosen_node=relay.DispatchService.dispatch",
+        "impact_basis="
+      ],
+      "source_files": [
+        "src/main/java/relay/DispatchService.java",
+        "src/main/java/relay/CancellationLedger.java",
+        "src/main/java/relay/DispatchRequest.java",
+        "src/main/java/relay/DispatchRouter.java"
+      ],
+      "source_slices": 4,
+      "later_shell_calls": 3,
+      "source_characters": 844,
+      "transport_result_sha256": "9994aa112a3fb4204d2a8fa4965f00568f888f8d225626c6e4900cfde64549e7",
+      "focus_nodes": 4
+    },
+    {
+      "run": "polyglot_retry-1-navigation",
+      "events_sha256": "fa39ec9a9315dbaf8df7c26408efca4f5b8dbccf0802ce55feb7a76a1fcf2cb9",
+      "chosen_node_id": null,
+      "notes": [
+        "bundle_resolution=ambiguous",
+        "Provide node_id or a more specific qualified symbol/file; candidate nodes are listed without source.",
+        "no_node_resolved"
+      ],
+      "source_files": [],
+      "source_slices": 0,
+      "later_shell_calls": 1,
+      "source_characters": 0,
+      "transport_result_sha256": "f1216297182967b96397acc90a084143b74c2e955274d21a0489bc21a3ff2fa3",
+      "focus_nodes": 2
+    },
+    {
+      "run": "polyglot_retry-1-repaired",
+      "events_sha256": "0c13f96191ee95afcd2df11d108d817914effaf52a277f8c49067d731837b1e4",
+      "chosen_node_id": null,
+      "notes": [
+        "bundle_resolution=ambiguous",
+        "Provide node_id or a more specific qualified symbol/file; candidate nodes are listed without source.",
+        "no_node_resolved"
+      ],
+      "source_files": [],
+      "source_slices": 0,
+      "later_shell_calls": 1,
+      "source_characters": 0,
+      "transport_result_sha256": "2fb7a7dd0760a2a271a5c1a6231ad4ca07ce986e98c8ebd7439f48e8c8ffeb1f",
+      "focus_nodes": 2
+    },
+    {
+      "run": "java_dispatch-2-navigation",
+      "events_sha256": "bee67d61e74447784b1d01e688ece1ac2645b35e791d2635e027f8c2cb297de9",
+      "chosen_node_id": "method:relay.DispatchService.dispatch:relay.DispatchRequest:relay.DispatchDecision",
+      "notes": [
+        "bundle_resolution=qualified_symbol",
+        "some_explicit_targets_unresolved",
+        "chosen_node=relay.DispatchService.dispatch",
+        "impact_basis="
+      ],
+      "source_files": [
+        "src/main/java/relay/DispatchService.java",
+        "src/main/java/relay/CancellationLedger.java",
+        "src/main/java/relay/DispatchRequest.java",
+        "src/main/java/relay/DispatchRouter.java"
+      ],
+      "source_slices": 4,
+      "later_shell_calls": 2,
+      "source_characters": 844,
+      "transport_result_sha256": "e400c68bb2ac700494b91defb5560cd935f863cab545aeae4c393f6155bf80f1",
+      "focus_nodes": 4
+    },
+    {
+      "run": "java_dispatch-2-repaired",
+      "events_sha256": "d0b4834f95e543cce22c5c79245794e3a953cb8a9952382ab2d4ccdb007d97c9",
+      "chosen_node_id": "method:relay.DispatchService.dispatch:relay.DispatchRequest:relay.DispatchDecision",
+      "notes": [
+        "bundle_resolution=qualified_symbol",
+        "some_explicit_targets_unresolved",
+        "chosen_node=relay.DispatchService.dispatch",
+        "impact_basis="
+      ],
+      "source_files": [
+        "src/main/java/relay/DispatchService.java",
+        "src/main/java/relay/CancellationLedger.java",
+        "src/main/java/relay/DispatchRequest.java",
+        "src/main/java/relay/DispatchRouter.java"
+      ],
+      "source_slices": 4,
+      "later_shell_calls": 2,
+      "source_characters": 844,
+      "transport_result_sha256": "04a53ba1b3b535d65faf9fe7f36aac122d9a4d59ac7981b90aeb47fea26efc27",
+      "focus_nodes": 4
+    },
+    {
+      "run": "java_backoff-2-repaired",
+      "events_sha256": "cce5c0b7dc97ecbe254e3b5815504637fbf2f903b06c4d3c77e649a1c0ce2a02",
+      "chosen_node_id": "method:relay.BackoffPolicy.delayMillis:int|int|int:int",
+      "notes": [
+        "bundle_resolution=qualified_symbol",
+        "chosen_node=relay.BackoffPolicy.delayMillis",
+        "impact_basis=incoming_calls,method_implementations"
+      ],
+      "source_files": [
+        "src/main/java/relay/BackoffPolicy.java",
+        "src/main/java/relay/BackoffPolicy.java",
+        "src/main/java/relay/BackoffPolicy.java"
+      ],
+      "source_slices": 3,
+      "later_shell_calls": 3,
+      "source_characters": 625,
+      "transport_result_sha256": "a1423666d72b78ecf6a1aac241fb16114e754b8f05e0ae6d36715fa34256df2c",
+      "focus_nodes": 3
+    },
+    {
+      "run": "java_backoff-2-navigation",
+      "events_sha256": "eeb614927eb795722f5384292bafc2278c1597f2209dfae6ff691b78e88d6f9f",
+      "chosen_node_id": "method:relay.BackoffPolicy.delayMillis:int|int|int:int",
+      "notes": [
+        "bundle_resolution=qualified_symbol",
+        "chosen_node=relay.BackoffPolicy.delayMillis",
+        "impact_basis=incoming_calls,method_implementations"
+      ],
+      "source_files": [
+        "src/main/java/relay/BackoffPolicy.java",
+        "src/main/java/relay/BackoffPolicy.java",
+        "src/main/java/relay/BackoffPolicy.java"
+      ],
+      "source_slices": 3,
+      "later_shell_calls": 5,
+      "source_characters": 625,
+      "transport_result_sha256": "58cc4a32abbfdcbc25e97f6c3b3e936d01db2528653e24a47d72af60cb6ff7a7",
+      "focus_nodes": 3
+    },
+    {
+      "run": "java_backoff-1-navigation",
+      "events_sha256": "84c0e728ed2c2f75f6411496c01769e3c8ae60e234baed24cc524cb23c3dc623",
+      "chosen_node_id": "method:relay.BackoffPolicy.delayMillis:int|int|int:int",
+      "notes": [
+        "bundle_resolution=qualified_symbol",
+        "chosen_node=relay.BackoffPolicy.delayMillis",
+        "impact_basis=incoming_calls,method_implementations"
+      ],
+      "source_files": [
+        "src/main/java/relay/BackoffPolicy.java",
+        "src/main/java/relay/BackoffPolicy.java",
+        "src/main/java/relay/BackoffPolicy.java"
+      ],
+      "source_slices": 3,
+      "later_shell_calls": 3,
+      "source_characters": 625,
+      "transport_result_sha256": "b3a941266957cde4ee13315c308e8ef124a5fb8befcbfd466ac63e1384bf24cd",
+      "focus_nodes": 3
+    },
+    {
+      "run": "java_backoff-1-repaired",
+      "events_sha256": "3746e58feb9d2e93844d63114bd687f504351357c758b155194de5132d5f5af1",
+      "chosen_node_id": "method:relay.BackoffPolicy.delayMillis:int|int|int:int",
+      "notes": [
+        "bundle_resolution=qualified_symbol",
+        "chosen_node=relay.BackoffPolicy.delayMillis",
+        "impact_basis=incoming_calls,method_implementations"
+      ],
+      "source_files": [
+        "src/main/java/relay/BackoffPolicy.java",
+        "src/main/java/relay/BackoffPolicy.java",
+        "src/main/java/relay/BackoffPolicy.java"
+      ],
+      "source_slices": 3,
+      "later_shell_calls": 4,
+      "source_characters": 625,
+      "transport_result_sha256": "abfb1cc29bc3776b6c6db78be22eca6d3bdca37096ffa1d55f61c3e993d9a836",
+      "focus_nodes": 3
+    }
+  ]
+}

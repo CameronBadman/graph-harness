@@ -1,0 +1,136 @@
+{
+  "jvm_tests": {
+    "tests": 97,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "command": "nix develop --command gradle test --console=plain",
+    "xml_suites": [
+      {
+        "file": "TEST-graphharness.AnalysisProcessTest.xml",
+        "sha256": "5992a7ac6819d49e80d4028089a603c4569b9fd02952cc7cd3d06657ae226862"
+      },
+      {
+        "file": "TEST-graphharness.AnalyzerTest.xml",
+        "sha256": "8f1ee7937a6f943e7105246e874e89529ce6bde365d420282d6c381c347b59ac"
+      },
+      {
+        "file": "TEST-graphharness.ContextRetrievalTest.xml",
+        "sha256": "8d6cde8a87d57cb54c2eb5f889c358925c3184e22e5b5f7e5c1e30069b8b03f3"
+      },
+      {
+        "file": "TEST-graphharness.CoordinatedDaemonTest.xml",
+        "sha256": "30b4d285181ef1e44399dad31af0e6f058fecd13706952adb1b64a54e0ba21b0"
+      },
+      {
+        "file": "TEST-graphharness.EditCoordinatorTest.xml",
+        "sha256": "5841b1eb170eeae809f4356f054a1ff04796235af044f0cbf3a15c16319d83f3"
+      },
+      {
+        "file": "TEST-graphharness.JavaDeclarationsTest.xml",
+        "sha256": "a250ca44bfffcdac10c6b840bc232f2b44c56abe0b729fb6d80c3e04a81372b5"
+      },
+      {
+        "file": "TEST-graphharness.JavaStructureTest.xml",
+        "sha256": "17015c3e8e0e17d887b53f3e6d36ea4aebd756bff8c19f5cb06194cc6c151b7b"
+      },
+      {
+        "file": "TEST-graphharness.LiveBridgeTest.xml",
+        "sha256": "3c4cbb48e36410895bab11ac410f29d2fa1968f37d1c149d1dc8c15f1b166d34"
+      },
+      {
+        "file": "TEST-graphharness.LiveDaemonTest.xml",
+        "sha256": "68d9f10de34d768127ecb3768c67223587b67801b5d4f474c3b3c6c360f6379c"
+      },
+      {
+        "file": "TEST-graphharness.LiveEditsTest.xml",
+        "sha256": "8048ae0cf1c6c5b6a2a3b5f4ce7ed376b90aee087f7f9826ff35e718828c240d"
+      },
+      {
+        "file": "TEST-graphharness.LiveStateTest.xml",
+        "sha256": "90e6fad814a3419a4656b2aee7120b234705d01cd178584d4a0ecea6e5c76a4a"
+      },
+      {
+        "file": "TEST-graphharness.LocalRuntimeTest.xml",
+        "sha256": "9fbf73e10853f02ec9875f1ad0e6dbf4892231906986428b56b42fbead701209"
+      },
+      {
+        "file": "TEST-graphharness.SafeJavaEditTest.xml",
+        "sha256": "f3aba32112b5593d06f6a0c9cdbecf3020f3508a378d5a363b72d4d27a00de4e"
+      },
+      {
+        "file": "TEST-graphharness.ServerTest.xml",
+        "sha256": "80f1ec770af07b04bf383a4e08cd790b865aca6660dfafd6dbbe35d10695e525"
+      },
+      {
+        "file": "TEST-graphharness.SnapshotSafetyTest.xml",
+        "sha256": "3f6f66317e176455e52c7be3df72ba6235cbc00fe9232753ed1ff019d103bebc"
+      },
+      {
+        "file": "TEST-graphharness.StructuralAdapterTest.xml",
+        "sha256": "aa6296eb3ff7b7a61a6ee64618aa487ede5c6bd0cce8f5df3c070b4446b6d9b3"
+      },
+      {
+        "file": "TEST-graphharness.ValidationRunnerTest.xml",
+        "sha256": "77b8137378d83e9e7bc9fdf6daee0e84582700e24a3fe6e4712dac5904225230"
+      }
+    ]
+  },
+  "benchmark_tests": {
+    "tests": 23,
+    "failures": 0,
+    "command": "python3 -m unittest benchmarks.token_followup.test_tasks benchmarks.token_followup.test_report -v"
+  },
+  "legacy_distribution_matches_original_pilot": {
+    "files_checked": 143,
+    "mismatches": 0,
+    "original_frozen_sha256": "282e6337c81429fc3de08e6a20aaf9bb4bb12d3dec4325fa0a2a4bcb1a4a8228"
+  },
+  "client_probe": {
+    "real_model_calls": 0,
+    "expected_observations_match": true,
+    "report_sha256": "8e0a81b2db26cd48d2903cb5edd0c93c77d351c8d45771631d7427bdd0619093"
+  },
+  "scored_trials": {
+    "attempted": 24,
+    "correct": 24,
+    "access_valid": 24,
+    "excluded": 0,
+    "retried": 0,
+    "common_cells_per_arm": 6,
+    "collector_reproduced_complete_outcomes": true,
+    "independent_review": "INDEPENDENT_REVIEW.md"
+  },
+  "calibrations": {
+    "attempted": 4,
+    "correct": 4,
+    "access_valid": 4,
+    "routes_verified": true,
+    "included_in_scored_usage": false
+  },
+  "private_archive": {
+    "files_verified": 1431,
+    "mismatches": 0,
+    "manifest_sha256": "9c0d3313cc463f5625da4a4ffbe93054d83bc59d3a9f6b1ec081de3b36f56e71",
+    "daemon_runtime_credentials_included": false
+  },
+  "collector": {
+    "command": "python3 benchmarks/token_followup/report.py --artifacts PRIVATE_ARTIFACT_DIRECTORY --output reviews/token-fix",
+    "exit_code": 0,
+    "sha256": "bc64d95062c22a8eb5110ba2762247868a9a7ce19e7ed361bb64ba906e5afdbb"
+  },
+  "plot": {
+    "command": "uv run --locked benchmarks/token_followup/plot.py reviews/token-fix",
+    "exit_code": 0,
+    "visually_inspected": true,
+    "values_independently_reviewed": true
+  },
+  "efficiency_gate_passed": false,
+  "limits": [
+    "Small synthetic development-confirmation fixtures, not production-repository generalization.",
+    "Composite workflow changes and differing guidance do not isolate each feature effect.",
+    "Provider caching and complete effective client context are uncontrolled.",
+    "Code-mode wrapper scripts are absent from scored JSONL; projection compliance is unobservable.",
+    "Raw transcripts remain private; public hashes alone are not independent execution proof."
+  ]
+}

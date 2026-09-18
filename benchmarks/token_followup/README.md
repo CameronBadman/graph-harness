@@ -5,6 +5,9 @@ installed GraphHarness, compares it with the repaired full and navigation profil
 and retains an efficient native Codex baseline. Fixtures and evaluators were authored
 separately from the product fixes. This is a small generated development comparison.
 
+The [completed findings](../../reviews/token-fix/FINDINGS.md) retain the negative
+result: neither repaired configuration reduced input and output versus native.
+
 The [client diagnostic](../../debug/client-probe.json) uses a local mock provider
 with fixed responses and no actual model calls. It measures client discovery and
 serialization behavior; its mock counters are not token-efficiency measurements.
@@ -41,6 +44,7 @@ its token overhead is counted. Native tools remain available to every arm.
 
 ```sh
 python3 benchmarks/token_followup/report.py --artifacts /tmp/gh-followup-new --output /tmp/gh-followup-report
+uv run --locked benchmarks/token_followup/plot.py /tmp/gh-followup-report
 ```
 
 The collector verifies raw bindings and recomputes correctness and counters. Its
