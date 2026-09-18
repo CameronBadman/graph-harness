@@ -65,3 +65,32 @@ type rather than the actual Java file node produced by JavaStructure. An indepen
 JVM probe confirmed complete correct source retrieval. The expectation was corrected,
 without product changes; all seven focused retrieval tests then passed. The previous
 focused Analyzer/StructuralAdapter/LiveBridge suite also passed.
+
+## Iteration 3 — frozen fresh confirmation
+
+The final full JVM rerun passed all 97 tests; the separate benchmark suite passed
+23. Product code remained frozen throughout 24 randomized scored invocations on
+three fresh synthetic tasks, plus four unscored calibrations. All 28 passed their
+external correctness and independent access checks. There were no scored exclusions
+or retries. See [full findings](../reviews/token-fix/FINDINGS.md).
+
+Both repaired configurations used retrieval in 6/6 trials. Relative to native,
+repaired full tools used 46.1% more input and 38.2% more output; navigation used
+18.2% more input and 16.9% more output. The preserved old build used 7.8% more input
+and 20.5% more output on these same tasks. Do not compare these percentages with
+the earlier pilot as if the task populations were identical.
+
+All four polyglot bundles returned ambiguous candidates without source. All four
+Java navigation bundles returned the named method but were followed by more source
+inspection. Repair bundles selected the target correctly; shell editing/testing
+after them is expected. This supports insufficient replacement of native inspection
+as a remaining mechanism, without assigning each token to a feature. JShell socket
+denials and non-Git inspection errors were retained in usage; zero stderr approval
+rejections does not mean zero tool failures.
+
+The registered efficiency threshold failed. Keep the verified resolution fixes and
+optional profile, but make no token-saving claim or mandatory bundle-first
+recommendation. The independent auditor reproduced the totals, all complete scored
+evaluator outcomes and artifact bindings. Fresh outcomes were not used to retune
+the product during this cycle. The experiment is development confirmation, not
+production-repository generalization.

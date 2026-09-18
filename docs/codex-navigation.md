@@ -1,10 +1,16 @@
 # Using GraphHarness for Codex navigation
 
 The optional navigation profile exposes four read-only tools: context bundles,
-symbol/path search, single-source reads, and batched source reads. It removes
-orientation-only metadata from responses while retaining source, hashes, byte/line
-spans, snapshot state, relationships, provenance, and limitations. The full bridge
-remains the default. Token savings are experimental and must be measured.
+symbol/path search, single-source reads, and batched source reads. It omits project
+orientation sections, timing fields, and node annotation/visibility/complexity
+summaries. It retains source, hashes, byte/line spans, snapshot state, relationships,
+provenance, and limitations. The full bridge remains the default.
+
+The [24-run follow-up](../reviews/token-fix/FINDINGS.md) measured **18.2% more input
+and 16.9% more output** for this profile than native Codex on three small synthetic
+tasks. All tasks passed and retrieval was used in every profile run. This is an
+optional experimental workflow, not a proven token optimization; mandatory
+bundle-first use is not recommended on the strength of these results.
 
 Start the daemon as documented in the README, then configure the bridge:
 

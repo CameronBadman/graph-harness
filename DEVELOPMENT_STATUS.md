@@ -2,7 +2,29 @@
 
 Updated 2026-09-18. Local implementation and verification; nothing pushed, deployed or submitted. Scores below evaluate planning, not software quality or competition prospects.
 
-## Codex token-efficiency pilot
+## Codex token-efficiency investigation
+
+The [fresh follow-up](reviews/token-fix/FINDINGS.md) completed **24 scored runs and
+four calibrations**, with all outcomes correct and all independent access reviews
+passing. The repaired full tools used **46.1% more input / 38.2% more output** than
+native; the optional navigation profile used **18.2% more input / 16.9% more output**.
+The preserved old build used 7.8% more input / 20.5% more output on these same tasks.
+No scored attempt was excluded or retried. The registered efficiency gate failed.
+
+Qualified target/path resolution, explicit ambiguity, code-mode discovery guidance
+and an optional compact four-tool bridge are implemented. Both repaired arms used
+retrieval in 6/6 runs; the preserved old arm used it in 0/6. Mixed-language behavioral
+queries still returned no source, and Java navigation bundles did not eliminate
+subsequent source inspection. Repair shell edits/tests are expected and are not by
+themselves failed retrieval. The full bridge remains default; do not advertise a
+token-saving benefit. Results apply to small generated fixtures, with uncontrolled
+provider caching and differing integration guidance.
+
+The current JVM suite passed **97 tests**, and the follow-up benchmark passed
+**23 tests**. [Verification receipts](reviews/token-fix/checks.json) and the
+[independent review](reviews/token-fix/INDEPENDENT_REVIEW.md) bind the results.
+
+### Earlier pilot
 
 The [token-ablation findings](reviews/token-ablation/FINDINGS.md) record 36 actual
 Codex task runs and four separate integration calibrations. All tasks passed their
@@ -11,8 +33,8 @@ exclusion. The product was frozen throughout. Twelve benchmark unit tests pass.
 
 This pilot does **not** establish token savings. Default MCP adoption was 0/18;
 conditional graph-first guidance produced only 2/9 uses, both followed by shell
-fallback after wrong/empty bundles. Routing and task-to-symbol selection are the
-next efficiency priorities. Cached input is reported separately; these counters
+fallback after wrong/empty bundles. Those findings motivated the follow-up above.
+Cached input is reported separately; these counters
 are not a monetary-cost or subscription-quota estimate. The generated fixtures
 are small development cases, not large-repository or multi-agent evidence.
 
@@ -29,7 +51,7 @@ are small development cases, not large-repository or multi-agent evidence.
 | E public assets | Prepared locally | README, public mixed fixture, static landing page and unpublished launch copy. Recorded public-fixture browser screenshot distinguishes scripted clients. Completed real-agent recording: 97.28s raw, 88.48s presented at 1.1×. Real conflict, guarded repair, release and fresh reader acquisition; fixture changed from expected failure to passing |
 | Publication | Not performed | No push, deployment, Product Hunt submission or eligibility claim |
 
-## Final integrated build
+## Earlier integrated release build
 
 `nix develop --offline --command gradle test installDist --console=plain` passed in **2m23s: 88 tests, zero failures/errors/skips**. `reviews/release-jvm-evidence.json` records source, helper, UI and distribution hashes and per-suite totals. That artifact supersedes the earlier C-only build (80 tests, recorded separately).
 

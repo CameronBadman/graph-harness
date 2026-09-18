@@ -8,7 +8,7 @@ The local daemon provides **Java, TypeScript, JavaScript and Python structural n
 
 The recording uses two actual Codex clients configured with `gpt-5.6-terra`, deliberate reservation timing, and the public fixture. Playback is 1.1×. The journal and expected-failure/passing-test evidence are in [the recording report](reviews/recorded-demo-evidence.json).
 
-**Token efficiency remains unproven.** A [36-run Codex pilot](reviews/token-ablation/FINDINGS.md) found low tool adoption and two unhelpful context bundles. It preserves actual input/output counters, cached input, correctness checks and an independently reviewed exclusion. The next efficiency priorities are reliable routing, correct symbol selection and compact retrieval; fewer tokens are not yet an established benefit.
+**The token-saving goal remains unmet.** After fixing lookup and discovery problems, a [24-run follow-up](reviews/token-fix/FINDINGS.md) found that the optional navigation profile used **18.2% more input and 16.9% more output** than native Codex. Repaired full tools used 46.1% more input and 38.2% more output. All tasks passed, and both repaired configurations used retrieval every time, but the bundles did not replace enough native inspection. These are small synthetic tasks, not a general effect estimate. The [original 36-run pilot](reviews/token-ablation/FINDINGS.md) remains available unchanged.
 
 ## Build and run
 
@@ -51,8 +51,8 @@ The bridge uses newline-delimited MCP stdio. Protocol messages are the only stdo
 
 For read-only exploration, the optional [Codex navigation setup](docs/codex-navigation.md)
 uses four tools, compact responses, and explicit code-mode discovery guidance.
-Run `graphharness codex-instructions` to print that guidance. Token savings still
-require the correctness-gated comparison; this profile is not an efficiency guarantee.
+Run `graphharness codex-instructions` to print that guidance. The measured workflow
+did not save tokens; keep it optional rather than requiring bundle-first use for efficiency.
 
 Try the public [ticket-office example](examples/ticket-office/README.md): ask one agent to inspect `TicketInventory.reserve` and another to inspect `PriceQuote.totalCents`. Watch their search/source events, select an event to focus its nodes, follow a session, or use the keyboard-operable code list to inspect source. Use the language filter to inspect the fixture’s TypeScript formatter and Python report. These have parser-observed definitions and containment; runtime calls between languages are not inferred.
 
