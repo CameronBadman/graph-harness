@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import random
 import re
+import secrets
 import shutil
 import subprocess
 import sys
@@ -27,7 +28,7 @@ NODE_ARMS = {"node", "combined"}
 SLIM_ARMS = {"slim", "combined"}
 SEED = 2026091804
 NAVIGATION = {"build_context_bundle", "search_graph", "get_source", "get_source_batch"}
-COMMON = support.COMMON_PROMPT + "Put temporary build/probe files under .scratch in this workspace. Do not delete files.\n\n"
+COMMON = support.COMMON_PROMPT + "Put temporary build/probe files under .scratch in this workspace. For Java compilation, create .scratch first and use javac -d .scratch; never emit class files beside source and move them afterward. Do not delete files.\n\n"
 digest, stable, write_json = support.digest, support.stable, support.write_json
 
 
@@ -223,11 +224,43 @@ def calibration_spec(workspace, arm, guidance):
     return spec
 
 
+def calibration_behavior(workspace):
+    try:
+        original = b"public class Gauge { public int reading() { return 37; } }\n"
+        actual = (workspace / "Gauge.java").read_bytes()
+        start, end = tasks.body_span(original, "public int reading()")
+        suffix = original[end:]
+        if not actual.startswith(original[:start]) or not actual.endswith(suffix):
+            return False
+        expected_span = (str(start) + ":" + str(len(actual) - len(suffix))).encode()
+        if set(tasks.contents(workspace)) != {"Gauge.java"}:
+            return False
+        with tempfile.TemporaryDirectory(prefix="gh-calibration-behavior-") as temporary:
+            root = Path(temporary)
+            (root / "Gauge.java").write_bytes(actual)
+            (root / "ScopeProbe.java").write_text(tasks._scope_probe())
+            (root / "CalibrationProbe.java").write_text(
+                'public class CalibrationProbe { public static void main(String[] args) {'
+                ' if (new Gauge().reading() != 38) throw new AssertionError(); System.out.print(args[0]); } }')
+            compiled = subprocess.run(['javac', '-proc:none', '-d', str(root), str(root / 'Gauge.java'),
+                                       str(root / 'ScopeProbe.java'), str(root / 'CalibrationProbe.java')],
+                                      capture_output=True, timeout=30)
+            if compiled.returncode:
+                return False
+            scope = subprocess.run(['java', '-cp', str(root), 'ScopeProbe', str(root / 'Gauge.java')],
+                                   capture_output=True, timeout=10)
+            if scope.returncode or expected_span not in scope.stdout.splitlines():
+                return False
+            nonce = secrets.token_hex(16)
+            run = subprocess.run(['java', '-cp', str(root), 'CalibrationProbe', nonce], capture_output=True, timeout=10)
+            return run.returncode == 0 and run.stdout == nonce.encode()
+    except (OSError, ValueError, subprocess.TimeoutExpired):
+        return False
+
+
 def calibration_result(workspace, answer, diagnostic, arm):
     try:
-        correct = json.loads(answer) == {"reading": 38}
-        source = re.sub(r"\s", "", (workspace / "Gauge.java").read_text())
-        correct = correct and source == "publicclassGauge{publicintreading(){return38;}}"
+        correct = json.loads(answer) == {"reading": 38} and calibration_behavior(workspace)
     except (ValueError, OSError):
         correct = False
     calls = diagnostic.get("tool_calls", {})

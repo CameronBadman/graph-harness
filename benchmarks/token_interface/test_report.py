@@ -57,6 +57,7 @@ def dataset():
         identity = {'benchmarks/token_interface/tasks.py': report.digest(Path(report.trials.tasks.__file__).read_bytes()),
                     'product/artifact': 'registered product hash'}
         with patch.object(report.trials, 'identity', return_value=identity) as identity_mock, \
+                patch.object(report.trials, 'calibration_behavior', side_effect=lambda root: 'return 38;' in (root / 'Gauge.java').read_text()), \
                 patch.object(report.trials.tasks, 'create_task', side_effect=fixture), \
                 patch.object(report.trials.tasks, 'evaluate', side_effect=evaluate) as evaluator:
             tasks = {}

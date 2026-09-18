@@ -91,3 +91,19 @@ wrapper; evaluator worker owns fresh tasks/checks; root owns runner/integration 
 Git index. A separate auditor checks completed raw runs. Commit the registered
 protocol, verified interface, verified edits, frozen evaluation harness, and final
 results/documentation as coherent milestones. Preserve user changes; no push.
+
+## Calibration correction before scoring
+
+The first freeze (commit 964639a) ran four calibrations and zero scored tasks.
+Its exact-source calibration checker falsely rejected a correct nested-block
+replacement. Independent compilation and behavior reproduced the false negative.
+A separate calibration violated the declared scratch-output location by compiling
+a class beside its source, then moving it. Both original records and access
+decisions remain unchanged; they do not enter scored totals.
+
+The second freeze replaces only calibration grading with compilation, behavior and
+compiler-backed scope checks, and makes the existing scratch-output instruction
+explicit for every arm. Scored task evaluators, product, seed, metrics and gates
+remain unchanged. New regression tests accept equivalent bodies and reject wrong
+behavior, scope escape and fabricated completion. Refreeze in a new directory and
+rerun all five calibrations before scoring; do not overwrite the initial attempt.

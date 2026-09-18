@@ -10,7 +10,7 @@ Build/test the product, then preserve the complete installed distribution and
 freeze the evaluator before running:
 
 ```sh
-python3 -m unittest benchmarks.token_interface.test_tasks benchmarks.token_interface.test_report -v
+python3 -m unittest benchmarks.token_interface.test_calibration benchmarks.token_interface.test_tasks benchmarks.token_interface.test_report -v
 python3 benchmarks/token_interface/run_trials.py prepare --artifacts /tmp/gh-interface-new --launcher /path/to/preserved-install/bin/graphharness
 python3 benchmarks/token_interface/run_trials.py calibrate --artifacts /tmp/gh-interface-new
 ```
@@ -44,3 +44,10 @@ is a configured alias. No general billing or production-efficiency conclusion fo
 Raw transcripts, host instructions, machine paths and daemon credentials stay
 private. Archive raw evidence without runtime directories; publish only reviewed
 sanitized reports. Preserve existing experiments unchanged.
+
+The initial four-calibration attempt is retained separately: one valid nested-block
+repair exposed an overly strict text checker, and another run violated the scratch
+output rule. Before any scored run, calibration grading was corrected and the
+shared prompt's existing Java output-location instruction was clarified for every
+arm. Product and scored task evaluators remained frozen; use the second freeze for
+the complete scored study.
