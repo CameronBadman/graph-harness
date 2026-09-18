@@ -27,7 +27,11 @@ fallback remains available and its use must be reported, not excluded afterward.
 All graph daemons have writes enabled; bridge tool exposure controls the factor.
 
 Rerun every control contemporaneously. Use configured gpt-5.6-terra, medium
-reasoning and the same native permissions/common task prompt as the prior study.
+reasoning and the same native permissions/base task prompt as the prior study.
+Add one identical requirement to every arm: validate the repair with compilation
+and focused behavior checks using native tools. This pre-launch revision equalizes
+validation demand that otherwise appeared only in graph guidance. It is a disclosed
+change from the previous study, not a change made after observing rerun outcomes.
 New graph guidance changes the workflow; compare costs including that guidance.
 Randomize arm order within each task/repetition block and block order with seed
 2026091805. Run sequentially, with a 240-second model timeout and no silent retries.
