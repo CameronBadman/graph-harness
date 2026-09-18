@@ -79,5 +79,15 @@ MCP call is not automatically a replay of the original write.
 
 Both options are experimental and disabled by default. Smaller response bytes or
 fewer coordination calls alone do not establish lower total Codex token use. The
-[registered comparison](../benchmarks/token_interface/PROTOCOL.md) tests them
-separately and together against native editing.
+[30-run comparison](../reviews/token-interface/FINDINGS.md) found 66.8% more input
+and 77.6% more output with the new format than native Codex; the combined options
+used 58.4% more input and 58.3% more output. All tasks passed, but no scored run
+called the node editor. The experiment therefore does not establish the token
+efficiency of actually writing through nodes.
+
+The separate [eligibility diagnostic](../reviews/token-interface/edit-eligibility.json)
+found an inherited Joern restriction: methods using custom parameter types can
+return `target_not_found` because backend-qualified types do not match compiler
+source spellings. Two of the three benchmark targets were rejected by this check.
+Do not infer edit support from navigation support or body size alone. The editor
+fails closed; native editing remains available.

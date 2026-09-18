@@ -1,0 +1,4013 @@
+[
+  {
+    "id": "java_overload-1-node",
+    "task": "java_overload",
+    "arm": "node",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 96770,
+      "cached_input_tokens": 73472,
+      "output_tokens": 2114,
+      "reasoning_output_tokens": 699,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 23298,
+      "total_tokens": 98884
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "383e7ec4e082e045654b0a6cde56a6c8d0367f5b63c1f6a3f4fad7cd5085b1b2",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "99ecf274a40377409d01763e66a1bdbc5868a5d2a692e9d65ee8406a8c4971f1"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.951,
+    "elapsed_seconds": 50.151,
+    "fixture_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_before_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_after_sha256": "367a500adba02451d02483736d9fa126b5dc773fa308e039ed692ba7fe123d9d",
+    "prompt_sha256": "6874248adc320f9c27b3e3ebf81fc7736c12bed74461e417b2a9386a51883d33",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "864e0b3c709e2629c28601cc5e5dd7e5c97ba8371a9486018c437893d991227f",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "f1a60675cb6f81a6d29b2b0f5befc0a8bb8ee73a74ade29cbd17e8eca88e0f6e",
+    "tool_schema_sha256": "2365301dcf096a11d5b549609fe07bb1985f0ead9038ee398828d405f29a093a",
+    "tool_schema_json_bytes": 2449,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch",
+      "replace_node_body"
+    ],
+    "mcp_contract_sha256": "4b719828106d27ace54510145a741297a8767bb3d70f910668bf1279a1dc83dd",
+    "capabilities_sha256": "932aa21dddc6286024a052f808277781a4bd92871e7374d4dcb0f23d3c699ff4",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 4
+      },
+      "shell_output_bytes": 13677,
+      "mcp_result_json_bytes": 3357,
+      "tool_errors": 2,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "383e7ec4e082e045654b0a6cde56a6c8d0367f5b63c1f6a3f4fad7cd5085b1b2",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "99ecf274a40377409d01763e66a1bdbc5868a5d2a692e9d65ee8406a8c4971f1"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_overload-1-native",
+    "task": "java_overload",
+    "arm": "native",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 107284,
+      "cached_input_tokens": 85504,
+      "output_tokens": 1668,
+      "reasoning_output_tokens": 457,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 21780,
+      "total_tokens": 108952
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 0,
+    "elapsed_seconds": 43.777,
+    "fixture_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_before_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_after_sha256": "a14bf4f696df3c5d25fd4416c7038e28e2e27c609cf13be763c7a08bcec96b9c",
+    "prompt_sha256": "48526ad2c6ab5fc945385101756f15aebe373acf4a8d55fe3ff85c509197ddaa",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "70c39328879c568d4b3cc0f051ab633e2a30343f4a8dead7ad572f7d75b667ad",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "f1a60675cb6f81a6d29b2b0f5befc0a8bb8ee73a74ade29cbd17e8eca88e0f6e",
+    "tool_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "tool_schema_json_bytes": 0,
+    "tools": [],
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 4
+      },
+      "shell_output_bytes": 11519,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 1,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": false,
+    "raw_binding_complete": true
+  },
+  {
+    "id": "java_overload-1-compact",
+    "task": "java_overload",
+    "arm": "compact",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 170302,
+      "cached_input_tokens": 137984,
+      "output_tokens": 2350,
+      "reasoning_output_tokens": 450,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 32318,
+      "total_tokens": 172652
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "2c2232e75af5c3c800dba56210d95ca90b7493a35a2799f160d09817a9630b61",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "901cf2b814373bb353f6e19665dbe9881aa2d4fbb20b4c25f930d3b02f4e7cb6"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.948,
+    "elapsed_seconds": 69.634,
+    "fixture_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_before_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_after_sha256": "cfcbd86ecdffe7816d4e4a46980e678130db764d4072ad99f3c637749d241295",
+    "prompt_sha256": "6874248adc320f9c27b3e3ebf81fc7736c12bed74461e417b2a9386a51883d33",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "6418e065c4ca520e6a3f74894d516e6b77b4ba4180b2431440a59a7b44abcb64",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "f1a60675cb6f81a6d29b2b0f5befc0a8bb8ee73a74ade29cbd17e8eca88e0f6e",
+    "tool_schema_sha256": "bb9536c8ecef37fae4866f571d037a81b70852e1e09e9c7fbda75ff4c2204c00",
+    "tool_schema_json_bytes": 1749,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch"
+    ],
+    "mcp_contract_sha256": "c6ce0289fe57af531f6149678e3b2b8578307e9b94f1978c8b219164bc065e61",
+    "capabilities_sha256": "a3bff3c027f23a0fde7047420ce6020bf88d1a0181e73b4e6b8886976c7e585b",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 6
+      },
+      "shell_output_bytes": 8550,
+      "mcp_result_json_bytes": 5167,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "2c2232e75af5c3c800dba56210d95ca90b7493a35a2799f160d09817a9630b61",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "901cf2b814373bb353f6e19665dbe9881aa2d4fbb20b4c25f930d3b02f4e7cb6"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_overload-1-combined",
+    "task": "java_overload",
+    "arm": "combined",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 158107,
+      "cached_input_tokens": 132096,
+      "output_tokens": 2079,
+      "reasoning_output_tokens": 458,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 26011,
+      "total_tokens": 160186
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.95,
+    "elapsed_seconds": 53.768,
+    "fixture_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_before_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_after_sha256": "a14bf4f696df3c5d25fd4416c7038e28e2e27c609cf13be763c7a08bcec96b9c",
+    "prompt_sha256": "6874248adc320f9c27b3e3ebf81fc7736c12bed74461e417b2a9386a51883d33",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "6f59a2dc963d23ad4dba94ecfaa39a9e245154c3a79bf85e4e97cd52176f43a0",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "f1a60675cb6f81a6d29b2b0f5befc0a8bb8ee73a74ade29cbd17e8eca88e0f6e",
+    "tool_schema_sha256": "2365301dcf096a11d5b549609fe07bb1985f0ead9038ee398828d405f29a093a",
+    "tool_schema_json_bytes": 2449,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch",
+      "replace_node_body"
+    ],
+    "mcp_contract_sha256": "4b719828106d27ace54510145a741297a8767bb3d70f910668bf1279a1dc83dd",
+    "capabilities_sha256": "ab5113d8959ab96e9ecc209ecbf7725b2c1da8559416e08f879c9547e277ef62",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 2,
+        "shell": 4
+      },
+      "shell_output_bytes": 13917,
+      "mcp_result_json_bytes": 9874,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        },
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 2,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_overload-1-slim",
+    "task": "java_overload",
+    "arm": "slim",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 200051,
+      "cached_input_tokens": 156416,
+      "output_tokens": 2461,
+      "reasoning_output_tokens": 601,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 43635,
+      "total_tokens": 202512
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.951,
+    "elapsed_seconds": 74.84,
+    "fixture_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_before_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_after_sha256": "a14bf4f696df3c5d25fd4416c7038e28e2e27c609cf13be763c7a08bcec96b9c",
+    "prompt_sha256": "6874248adc320f9c27b3e3ebf81fc7736c12bed74461e417b2a9386a51883d33",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "bb8f1c447ee434d578ad0ce988fa073b0f3efef7f4829f0fc00e3683cd746f8c",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "f1a60675cb6f81a6d29b2b0f5befc0a8bb8ee73a74ade29cbd17e8eca88e0f6e",
+    "tool_schema_sha256": "bb9536c8ecef37fae4866f571d037a81b70852e1e09e9c7fbda75ff4c2204c00",
+    "tool_schema_json_bytes": 1749,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch"
+    ],
+    "mcp_contract_sha256": "c6ce0289fe57af531f6149678e3b2b8578307e9b94f1978c8b219164bc065e61",
+    "capabilities_sha256": "4149d28d26e97f22bdb57264f33b93559a3e9637f6b9fef8441183b2e7b78a86",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 2,
+        "shell": 5
+      },
+      "shell_output_bytes": 13653,
+      "mcp_result_json_bytes": 11780,
+      "tool_errors": 3,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        },
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 2,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_short-1-slim",
+    "task": "java_short",
+    "arm": "slim",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 110002,
+      "cached_input_tokens": 88576,
+      "output_tokens": 1452,
+      "reasoning_output_tokens": 402,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 21426,
+      "total_tokens": 111454
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "12d20bd44c496e0135a1e6f152005747564e1df20006b9dda25288e26537f323",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "08a9b82702246c410a67bf46e809d23d027fbe7d31408eac60c620aea71e4668"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.954,
+    "elapsed_seconds": 39.428,
+    "fixture_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_before_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_after_sha256": "f5aec177892087f3a19a37c804ae92ab866455b4cc6d8084dd7603d156532073",
+    "prompt_sha256": "f7ca975561f9677fb7fff0346778d2a26ffe953b4de53c13831b5fad40750f72",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "da3ffe92e475bda63487004524fee5627b4e197b55b9132827dd77d2e77c3a46",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "356e979ee59b4599ca7844e23d8f5bad7ed39e73e227984ee8215515071fa217",
+    "tool_schema_sha256": "bb9536c8ecef37fae4866f571d037a81b70852e1e09e9c7fbda75ff4c2204c00",
+    "tool_schema_json_bytes": 1749,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch"
+    ],
+    "mcp_contract_sha256": "c6ce0289fe57af531f6149678e3b2b8578307e9b94f1978c8b219164bc065e61",
+    "capabilities_sha256": "0c4d3c96965407fbae640c99087efe77337f220a03dd4ccd0149e4880537d080",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 3
+      },
+      "shell_output_bytes": 8358,
+      "mcp_result_json_bytes": 5631,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 1,
+      "bundle_source_lines": 5,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "12d20bd44c496e0135a1e6f152005747564e1df20006b9dda25288e26537f323",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "08a9b82702246c410a67bf46e809d23d027fbe7d31408eac60c620aea71e4668"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_short-1-node",
+    "task": "java_short",
+    "arm": "node",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 127108,
+      "cached_input_tokens": 103680,
+      "output_tokens": 1529,
+      "reasoning_output_tokens": 317,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 23428,
+      "total_tokens": 128637
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3c0173ef332acbc0a38c42710149194a026eaddd4ee790354bf4ad77fa64bd16",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "38944df018535376e6554cd44055c6bc13814695cd423858bdbf4809d41a17e0"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.948,
+    "elapsed_seconds": 44.038,
+    "fixture_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_before_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_after_sha256": "db0165e84d15416d180eec6743859575b04a45b85ff790faea53fe3be343444c",
+    "prompt_sha256": "f7ca975561f9677fb7fff0346778d2a26ffe953b4de53c13831b5fad40750f72",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "f4e755e4604e3af972d25b1884bd8cf3f5a5996988e56787bb68f3c7bcd24bab",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "356e979ee59b4599ca7844e23d8f5bad7ed39e73e227984ee8215515071fa217",
+    "tool_schema_sha256": "2365301dcf096a11d5b549609fe07bb1985f0ead9038ee398828d405f29a093a",
+    "tool_schema_json_bytes": 2449,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch",
+      "replace_node_body"
+    ],
+    "mcp_contract_sha256": "4b719828106d27ace54510145a741297a8767bb3d70f910668bf1279a1dc83dd",
+    "capabilities_sha256": "96884b8e0d5aeed91623b5be281637d332040a8446832ddfc62fa5c14440e91b",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 4
+      },
+      "shell_output_bytes": 10030,
+      "mcp_result_json_bytes": 6183,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 5,
+      "source_lines_repeated_in_later_shell": 3,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3c0173ef332acbc0a38c42710149194a026eaddd4ee790354bf4ad77fa64bd16",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "38944df018535376e6554cd44055c6bc13814695cd423858bdbf4809d41a17e0"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_short-1-compact",
+    "task": "java_short",
+    "arm": "compact",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 96911,
+      "cached_input_tokens": 86528,
+      "output_tokens": 1299,
+      "reasoning_output_tokens": 276,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 10383,
+      "total_tokens": 98210
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "22cbf7b4bd110dae46d98374c9958b1a0b086eaa3c0dd5766a61ea5e2ac0cab4",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "4ccb60d121ed161208bf88500764903df244b030b9cd5fcd023421cd7af7c43a"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.844,
+    "elapsed_seconds": 42.239,
+    "fixture_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_before_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_after_sha256": "458c81ed615f8b465db88f9a8dd75590ec1b85609af5d5ff208fc3ed6962338b",
+    "prompt_sha256": "f7ca975561f9677fb7fff0346778d2a26ffe953b4de53c13831b5fad40750f72",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "6161bea997072a98ce3403b88cd43a29490021193b8701788ef158c169d46d97",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "356e979ee59b4599ca7844e23d8f5bad7ed39e73e227984ee8215515071fa217",
+    "tool_schema_sha256": "bb9536c8ecef37fae4866f571d037a81b70852e1e09e9c7fbda75ff4c2204c00",
+    "tool_schema_json_bytes": 1749,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch"
+    ],
+    "mcp_contract_sha256": "c6ce0289fe57af531f6149678e3b2b8578307e9b94f1978c8b219164bc065e61",
+    "capabilities_sha256": "a25165fb61b4a7575a802a41f82f01bc877c06cc467a667b3e8083d1df37f465",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 2
+      },
+      "shell_output_bytes": 7437,
+      "mcp_result_json_bytes": 6183,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 5,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "22cbf7b4bd110dae46d98374c9958b1a0b086eaa3c0dd5766a61ea5e2ac0cab4",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "4ccb60d121ed161208bf88500764903df244b030b9cd5fcd023421cd7af7c43a"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_short-1-native",
+    "task": "java_short",
+    "arm": "native",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 91111,
+      "cached_input_tokens": 71424,
+      "output_tokens": 1062,
+      "reasoning_output_tokens": 231,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 19687,
+      "total_tokens": 92173
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "12d20bd44c496e0135a1e6f152005747564e1df20006b9dda25288e26537f323",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "08a9b82702246c410a67bf46e809d23d027fbe7d31408eac60c620aea71e4668"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 0,
+    "elapsed_seconds": 32.863,
+    "fixture_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_before_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_after_sha256": "f5aec177892087f3a19a37c804ae92ab866455b4cc6d8084dd7603d156532073",
+    "prompt_sha256": "cec76a42c88772b5e00097fe25a947e6a111b8c7909fab7a1af3642123d1a119",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "cd7d628e59d3347c5a73bf1dfa1353aa7603cb360d4be55045c78f6f0037cdd2",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "356e979ee59b4599ca7844e23d8f5bad7ed39e73e227984ee8215515071fa217",
+    "tool_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "tool_schema_json_bytes": 0,
+    "tools": [],
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 3
+      },
+      "shell_output_bytes": 10948,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 1,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "12d20bd44c496e0135a1e6f152005747564e1df20006b9dda25288e26537f323",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "08a9b82702246c410a67bf46e809d23d027fbe7d31408eac60c620aea71e4668"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": false,
+    "raw_binding_complete": true
+  },
+  {
+    "id": "java_short-1-combined",
+    "task": "java_short",
+    "arm": "combined",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 107104,
+      "cached_input_tokens": 71424,
+      "output_tokens": 1558,
+      "reasoning_output_tokens": 383,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 35680,
+      "total_tokens": 108662
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "359c96287da9ceb8f62aa96ace22ed520aeaf26dfc1f55a40095c915ee352ebf",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "bd063c5b5d54ae2c654a4c4de5aabfddb3dbf41997c7c6ada072da0e99b11a80"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.95,
+    "elapsed_seconds": 49.693,
+    "fixture_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_before_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_after_sha256": "4ced08a0b279b4f7b06ca6a8935337a6e14281226e14ad86472cad3cf310b568",
+    "prompt_sha256": "f7ca975561f9677fb7fff0346778d2a26ffe953b4de53c13831b5fad40750f72",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "3111e2ec7b6a53b0a12823e5f4eae6c9125d2a9329dff6b0e992c26bdfe37228",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "356e979ee59b4599ca7844e23d8f5bad7ed39e73e227984ee8215515071fa217",
+    "tool_schema_sha256": "2365301dcf096a11d5b549609fe07bb1985f0ead9038ee398828d405f29a093a",
+    "tool_schema_json_bytes": 2449,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch",
+      "replace_node_body"
+    ],
+    "mcp_contract_sha256": "4b719828106d27ace54510145a741297a8767bb3d70f910668bf1279a1dc83dd",
+    "capabilities_sha256": "931e23e8c24d399114878cac3603089bcc53be9f47183b4838e7f94a7f5d2ae4",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 3
+      },
+      "shell_output_bytes": 7473,
+      "mcp_result_json_bytes": 5631,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 1,
+      "bundle_source_lines": 5,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "359c96287da9ceb8f62aa96ace22ed520aeaf26dfc1f55a40095c915ee352ebf",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "bd063c5b5d54ae2c654a4c4de5aabfddb3dbf41997c7c6ada072da0e99b11a80"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_short-2-compact",
+    "task": "java_short",
+    "arm": "compact",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 110504,
+      "cached_input_tokens": 98560,
+      "output_tokens": 1426,
+      "reasoning_output_tokens": 314,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 11944,
+      "total_tokens": 111930
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "097add77ab8ead979ad0e143b34dc2ba0a11d62a169ecd2823ba3859854fb39d",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "e06f4880eb82cdd285ffe8b88c49021a2d86e01ee0b930a71fb52df493420844"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.946,
+    "elapsed_seconds": 39.138,
+    "fixture_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_before_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_after_sha256": "1ad27147d4278fa97573b0888aece0116b62f669bf6ec93e21f4dde6ff725669",
+    "prompt_sha256": "f7ca975561f9677fb7fff0346778d2a26ffe953b4de53c13831b5fad40750f72",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "bf5a638c18b7ed7e6615b794e0bfdfb13c982c831617bcbfc97eb36b50a8c8e8",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "356e979ee59b4599ca7844e23d8f5bad7ed39e73e227984ee8215515071fa217",
+    "tool_schema_sha256": "bb9536c8ecef37fae4866f571d037a81b70852e1e09e9c7fbda75ff4c2204c00",
+    "tool_schema_json_bytes": 1749,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch"
+    ],
+    "mcp_contract_sha256": "c6ce0289fe57af531f6149678e3b2b8578307e9b94f1978c8b219164bc065e61",
+    "capabilities_sha256": "2f3b6e07f71792139f0f06a6e42b924f8acab70437537d5988d068f4b9e96bc0",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 3
+      },
+      "shell_output_bytes": 8961,
+      "mcp_result_json_bytes": 6183,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 5,
+      "source_lines_repeated_in_later_shell": 3,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "097add77ab8ead979ad0e143b34dc2ba0a11d62a169ecd2823ba3859854fb39d",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "e06f4880eb82cdd285ffe8b88c49021a2d86e01ee0b930a71fb52df493420844"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_short-2-combined",
+    "task": "java_short",
+    "arm": "combined",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 142941,
+      "cached_input_tokens": 128768,
+      "output_tokens": 1776,
+      "reasoning_output_tokens": 536,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 14173,
+      "total_tokens": 144717
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3c0173ef332acbc0a38c42710149194a026eaddd4ee790354bf4ad77fa64bd16",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "38944df018535376e6554cd44055c6bc13814695cd423858bdbf4809d41a17e0"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.946,
+    "elapsed_seconds": 50.198,
+    "fixture_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_before_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_after_sha256": "db0165e84d15416d180eec6743859575b04a45b85ff790faea53fe3be343444c",
+    "prompt_sha256": "f7ca975561f9677fb7fff0346778d2a26ffe953b4de53c13831b5fad40750f72",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "247bb1fbed8cddee5eef01f119f9a1a92f93c124edf456fde9b6c695276cb78b",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "356e979ee59b4599ca7844e23d8f5bad7ed39e73e227984ee8215515071fa217",
+    "tool_schema_sha256": "2365301dcf096a11d5b549609fe07bb1985f0ead9038ee398828d405f29a093a",
+    "tool_schema_json_bytes": 2449,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch",
+      "replace_node_body"
+    ],
+    "mcp_contract_sha256": "4b719828106d27ace54510145a741297a8767bb3d70f910668bf1279a1dc83dd",
+    "capabilities_sha256": "375fcf1a74e55b41c84b795b44984545b30e2cb21c5d186a51be9241886754fd",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 4
+      },
+      "shell_output_bytes": 9918,
+      "mcp_result_json_bytes": 5631,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 1,
+      "bundle_source_lines": 5,
+      "source_lines_repeated_in_later_shell": 3,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3c0173ef332acbc0a38c42710149194a026eaddd4ee790354bf4ad77fa64bd16",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "38944df018535376e6554cd44055c6bc13814695cd423858bdbf4809d41a17e0"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_short-2-slim",
+    "task": "java_short",
+    "arm": "slim",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 139709,
+      "cached_input_tokens": 117760,
+      "output_tokens": 1855,
+      "reasoning_output_tokens": 443,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 21949,
+      "total_tokens": 141564
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "359c96287da9ceb8f62aa96ace22ed520aeaf26dfc1f55a40095c915ee352ebf",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "bd063c5b5d54ae2c654a4c4de5aabfddb3dbf41997c7c6ada072da0e99b11a80"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 7.051,
+    "elapsed_seconds": 54.708,
+    "fixture_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_before_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_after_sha256": "4ced08a0b279b4f7b06ca6a8935337a6e14281226e14ad86472cad3cf310b568",
+    "prompt_sha256": "f7ca975561f9677fb7fff0346778d2a26ffe953b4de53c13831b5fad40750f72",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "3f3bb032def85aa42174249a24b7ede339b0efef240caee6709540b089a88baa",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "356e979ee59b4599ca7844e23d8f5bad7ed39e73e227984ee8215515071fa217",
+    "tool_schema_sha256": "bb9536c8ecef37fae4866f571d037a81b70852e1e09e9c7fbda75ff4c2204c00",
+    "tool_schema_json_bytes": 1749,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch"
+    ],
+    "mcp_contract_sha256": "c6ce0289fe57af531f6149678e3b2b8578307e9b94f1978c8b219164bc065e61",
+    "capabilities_sha256": "dfe14539b522fa39435ff46d6fed9faadafe28ec149d10f3116557a3044d3d4d",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 5
+      },
+      "shell_output_bytes": 2277,
+      "mcp_result_json_bytes": 5631,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 1,
+      "bundle_source_lines": 5,
+      "source_lines_repeated_in_later_shell": 4,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "359c96287da9ceb8f62aa96ace22ed520aeaf26dfc1f55a40095c915ee352ebf",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "bd063c5b5d54ae2c654a4c4de5aabfddb3dbf41997c7c6ada072da0e99b11a80"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_short-2-native",
+    "task": "java_short",
+    "arm": "native",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 89420,
+      "cached_input_tokens": 69376,
+      "output_tokens": 1296,
+      "reasoning_output_tokens": 309,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 20044,
+      "total_tokens": 90716
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "12d20bd44c496e0135a1e6f152005747564e1df20006b9dda25288e26537f323",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "08a9b82702246c410a67bf46e809d23d027fbe7d31408eac60c620aea71e4668"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 0,
+    "elapsed_seconds": 36.766,
+    "fixture_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_before_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_after_sha256": "f5aec177892087f3a19a37c804ae92ab866455b4cc6d8084dd7603d156532073",
+    "prompt_sha256": "cec76a42c88772b5e00097fe25a947e6a111b8c7909fab7a1af3642123d1a119",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "42dd295a174b48f2244004779c122ae143bbf30c2542155e884aa17167c9dee6",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "356e979ee59b4599ca7844e23d8f5bad7ed39e73e227984ee8215515071fa217",
+    "tool_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "tool_schema_json_bytes": 0,
+    "tools": [],
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 3
+      },
+      "shell_output_bytes": 8660,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 1,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "12d20bd44c496e0135a1e6f152005747564e1df20006b9dda25288e26537f323",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "08a9b82702246c410a67bf46e809d23d027fbe7d31408eac60c620aea71e4668"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": false,
+    "raw_binding_complete": true
+  },
+  {
+    "id": "java_short-2-node",
+    "task": "java_short",
+    "arm": "node",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 92725,
+      "cached_input_tokens": 66304,
+      "output_tokens": 1472,
+      "reasoning_output_tokens": 443,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 26421,
+      "total_tokens": 94197
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "7d426aca88b37a3d40a3567d43aa708d935f5f826dc374ffa7f9f94009f6229f",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "48fe5700ae0267423e9ba4beb765307c7813aa22bd8c64bbf9523af65797e42c"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.945,
+    "elapsed_seconds": 41.286,
+    "fixture_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_before_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+    "workspace_after_sha256": "a3f2b70c8748ed0f171e99b85178273bc84a5961ab4146a4cab28a7882e5b8d3",
+    "prompt_sha256": "f7ca975561f9677fb7fff0346778d2a26ffe953b4de53c13831b5fad40750f72",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "20f522c5028850988777e95362072a407049a359c36372f7fd04dbf7074a24fc",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "356e979ee59b4599ca7844e23d8f5bad7ed39e73e227984ee8215515071fa217",
+    "tool_schema_sha256": "2365301dcf096a11d5b549609fe07bb1985f0ead9038ee398828d405f29a093a",
+    "tool_schema_json_bytes": 2449,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch",
+      "replace_node_body"
+    ],
+    "mcp_contract_sha256": "4b719828106d27ace54510145a741297a8767bb3d70f910668bf1279a1dc83dd",
+    "capabilities_sha256": "b73e99666a6a092707bcced19de87f52ea69b2fb1eb16bb694a26d9abb9f5b55",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 2
+      },
+      "shell_output_bytes": 8358,
+      "mcp_result_json_bytes": 6183,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 5,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/DayWindow.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 22194,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "7d426aca88b37a3d40a3567d43aa708d935f5f826dc374ffa7f9f94009f6229f",
+      "test_output_sha256": "4c10fd3787467891e18f0d039653ed508497ce629c540148e12e01d1a3035b18",
+      "diff_sha256": "48fe5700ae0267423e9ba4beb765307c7813aa22bd8c64bbf9523af65797e42c"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_long-1-compact",
+    "task": "java_long",
+    "arm": "compact",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 157364,
+      "cached_input_tokens": 132096,
+      "output_tokens": 2278,
+      "reasoning_output_tokens": 416,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 25268,
+      "total_tokens": 159642
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.951,
+    "elapsed_seconds": 59.363,
+    "fixture_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_before_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_after_sha256": "7c1dbdf18e39ddcddf694de085d7e9b1346ae2bc95cb170ba4bbb5823a2271bf",
+    "prompt_sha256": "deec514f767b53a63e2d8d7af57f98ffa371782333407ea77bfef09dcc9a8a86",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "aff364d0671a94432b53e327555ec547a492e54e01939923e833c0e978f9dafb",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "a84855100b1a387fcc890467e4fc4a3df52dee8be93e0b6be789c3d5ab1dcedb",
+    "tool_schema_sha256": "bb9536c8ecef37fae4866f571d037a81b70852e1e09e9c7fbda75ff4c2204c00",
+    "tool_schema_json_bytes": 1749,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch"
+    ],
+    "mcp_contract_sha256": "c6ce0289fe57af531f6149678e3b2b8578307e9b94f1978c8b219164bc065e61",
+    "capabilities_sha256": "0b6fadef9c04cf70ec73ea93aac459a415a2025693b4b5825fef5cc64641fc5a",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 5
+      },
+      "shell_output_bytes": 12982,
+      "mcp_result_json_bytes": 10951,
+      "tool_errors": 2,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 39,
+      "source_lines_repeated_in_later_shell": 17,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_long-1-slim",
+    "task": "java_long",
+    "arm": "slim",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 131299,
+      "cached_input_tokens": 91648,
+      "output_tokens": 1643,
+      "reasoning_output_tokens": 464,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 39651,
+      "total_tokens": 132942
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 7.053,
+    "elapsed_seconds": 44.744,
+    "fixture_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_before_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_after_sha256": "7c1dbdf18e39ddcddf694de085d7e9b1346ae2bc95cb170ba4bbb5823a2271bf",
+    "prompt_sha256": "deec514f767b53a63e2d8d7af57f98ffa371782333407ea77bfef09dcc9a8a86",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "32314c97035933dd16538d19c852126c51805ae1709ade0c14c14ca3c73b5eb7",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "a84855100b1a387fcc890467e4fc4a3df52dee8be93e0b6be789c3d5ab1dcedb",
+    "tool_schema_sha256": "bb9536c8ecef37fae4866f571d037a81b70852e1e09e9c7fbda75ff4c2204c00",
+    "tool_schema_json_bytes": 1749,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch"
+    ],
+    "mcp_contract_sha256": "c6ce0289fe57af531f6149678e3b2b8578307e9b94f1978c8b219164bc065e61",
+    "capabilities_sha256": "17d61966cd9f45c92992a35b00a0154c5e4fd571b935dd1fc3954d77f4338203",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 4
+      },
+      "shell_output_bytes": 10795,
+      "mcp_result_json_bytes": 10799,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 1,
+      "bundle_source_lines": 39,
+      "source_lines_repeated_in_later_shell": 39,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_long-1-native",
+    "task": "java_long",
+    "arm": "native",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 74506,
+      "cached_input_tokens": 65280,
+      "output_tokens": 644,
+      "reasoning_output_tokens": 168,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 9226,
+      "total_tokens": 75150
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 0,
+    "elapsed_seconds": 21.896,
+    "fixture_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_before_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_after_sha256": "7c1dbdf18e39ddcddf694de085d7e9b1346ae2bc95cb170ba4bbb5823a2271bf",
+    "prompt_sha256": "e32b03620ffe9c45b347ff34c2ed281215587eb678b39e108e738396d47788b6",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "7a10b5b2fe4196c2e49fdb04a317a34a48679c9ee9555484406445cfe9117d31",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "a84855100b1a387fcc890467e4fc4a3df52dee8be93e0b6be789c3d5ab1dcedb",
+    "tool_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "tool_schema_json_bytes": 0,
+    "tools": [],
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 3
+      },
+      "shell_output_bytes": 11002,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 1,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": false,
+    "raw_binding_complete": true
+  },
+  {
+    "id": "java_long-1-combined",
+    "task": "java_long",
+    "arm": "combined",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 159681,
+      "cached_input_tokens": 133120,
+      "output_tokens": 1510,
+      "reasoning_output_tokens": 336,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 26561,
+      "total_tokens": 161191
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 7.048,
+    "elapsed_seconds": 46.239,
+    "fixture_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_before_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_after_sha256": "7c1dbdf18e39ddcddf694de085d7e9b1346ae2bc95cb170ba4bbb5823a2271bf",
+    "prompt_sha256": "deec514f767b53a63e2d8d7af57f98ffa371782333407ea77bfef09dcc9a8a86",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "e2efdb061a8a7b6185d07e323dd8634ddc8e97f6b1a06606eb91386ad7bafe51",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "a84855100b1a387fcc890467e4fc4a3df52dee8be93e0b6be789c3d5ab1dcedb",
+    "tool_schema_sha256": "2365301dcf096a11d5b549609fe07bb1985f0ead9038ee398828d405f29a093a",
+    "tool_schema_json_bytes": 2449,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch",
+      "replace_node_body"
+    ],
+    "mcp_contract_sha256": "4b719828106d27ace54510145a741297a8767bb3d70f910668bf1279a1dc83dd",
+    "capabilities_sha256": "028bf013596e68cbb4e2036303e7480c294970fce7177e00148a65eedc57dea0",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 5
+      },
+      "shell_output_bytes": 22493,
+      "mcp_result_json_bytes": 10799,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 1,
+      "bundle_source_lines": 39,
+      "source_lines_repeated_in_later_shell": 38,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_long-1-node",
+    "task": "java_long",
+    "arm": "node",
+    "repetition": 1,
+    "usage": {
+      "input_tokens": 177840,
+      "cached_input_tokens": 163328,
+      "output_tokens": 1998,
+      "reasoning_output_tokens": 604,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 14512,
+      "total_tokens": 179838
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.949,
+    "elapsed_seconds": 58.312,
+    "fixture_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_before_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_after_sha256": "7c1dbdf18e39ddcddf694de085d7e9b1346ae2bc95cb170ba4bbb5823a2271bf",
+    "prompt_sha256": "deec514f767b53a63e2d8d7af57f98ffa371782333407ea77bfef09dcc9a8a86",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "28c722a0f70b46d86a8b15016e376e16fb3e43f55e0a8e78cd3b941d52ce45cb",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "a84855100b1a387fcc890467e4fc4a3df52dee8be93e0b6be789c3d5ab1dcedb",
+    "tool_schema_sha256": "2365301dcf096a11d5b549609fe07bb1985f0ead9038ee398828d405f29a093a",
+    "tool_schema_json_bytes": 2449,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch",
+      "replace_node_body"
+    ],
+    "mcp_contract_sha256": "4b719828106d27ace54510145a741297a8767bb3d70f910668bf1279a1dc83dd",
+    "capabilities_sha256": "175b3c28298d182642ffa83a5c83f962925004a5527f0dc6345d854cadcd5191",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 5
+      },
+      "shell_output_bytes": 11837,
+      "mcp_result_json_bytes": 10951,
+      "tool_errors": 2,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 39,
+      "source_lines_repeated_in_later_shell": 38,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_overload-2-slim",
+    "task": "java_overload",
+    "arm": "slim",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 173142,
+      "cached_input_tokens": 147968,
+      "output_tokens": 2731,
+      "reasoning_output_tokens": 768,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 25174,
+      "total_tokens": 175873
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 7.05,
+    "elapsed_seconds": 67.037,
+    "fixture_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_before_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_after_sha256": "a14bf4f696df3c5d25fd4416c7038e28e2e27c609cf13be763c7a08bcec96b9c",
+    "prompt_sha256": "6874248adc320f9c27b3e3ebf81fc7736c12bed74461e417b2a9386a51883d33",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "c0318ac6ebe6fb1c13c6708baef8d620672e2658c2526ac42cc873675a4d9a5a",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "f1a60675cb6f81a6d29b2b0f5befc0a8bb8ee73a74ade29cbd17e8eca88e0f6e",
+    "tool_schema_sha256": "bb9536c8ecef37fae4866f571d037a81b70852e1e09e9c7fbda75ff4c2204c00",
+    "tool_schema_json_bytes": 1749,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch"
+    ],
+    "mcp_contract_sha256": "c6ce0289fe57af531f6149678e3b2b8578307e9b94f1978c8b219164bc065e61",
+    "capabilities_sha256": "0f24c65d953222f0382171e64d670cc609aacf87ceaac293f914b7143ad833fe",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 5
+      },
+      "shell_output_bytes": 15099,
+      "mcp_result_json_bytes": 3521,
+      "tool_errors": 2,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 1,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_overload-2-node",
+    "task": "java_overload",
+    "arm": "node",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 165144,
+      "cached_input_tokens": 143872,
+      "output_tokens": 2002,
+      "reasoning_output_tokens": 455,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 21272,
+      "total_tokens": 167146
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 7.051,
+    "elapsed_seconds": 55.562,
+    "fixture_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_before_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_after_sha256": "a14bf4f696df3c5d25fd4416c7038e28e2e27c609cf13be763c7a08bcec96b9c",
+    "prompt_sha256": "6874248adc320f9c27b3e3ebf81fc7736c12bed74461e417b2a9386a51883d33",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "72fdb05d7b754f4655f7e9714e0aeb63764ee56a9a1818068d23fd6f3d6353ee",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "f1a60675cb6f81a6d29b2b0f5befc0a8bb8ee73a74ade29cbd17e8eca88e0f6e",
+    "tool_schema_sha256": "2365301dcf096a11d5b549609fe07bb1985f0ead9038ee398828d405f29a093a",
+    "tool_schema_json_bytes": 2449,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch",
+      "replace_node_body"
+    ],
+    "mcp_contract_sha256": "4b719828106d27ace54510145a741297a8767bb3d70f910668bf1279a1dc83dd",
+    "capabilities_sha256": "1a3c02fd956fefb41a613ed5d8d5f3d62f2198740c7f099e39618c63abac6e4c",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 5
+      },
+      "shell_output_bytes": 11226,
+      "mcp_result_json_bytes": 3357,
+      "tool_errors": 3,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_overload-2-compact",
+    "task": "java_overload",
+    "arm": "compact",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 168055,
+      "cached_input_tokens": 152064,
+      "output_tokens": 2277,
+      "reasoning_output_tokens": 757,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 15991,
+      "total_tokens": 170332
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.948,
+    "elapsed_seconds": 61.072,
+    "fixture_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_before_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_after_sha256": "a14bf4f696df3c5d25fd4416c7038e28e2e27c609cf13be763c7a08bcec96b9c",
+    "prompt_sha256": "6874248adc320f9c27b3e3ebf81fc7736c12bed74461e417b2a9386a51883d33",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "587764d05df815ceee198464a3b94874b16b3350a0ccf7d0391b17385fa91ff5",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "f1a60675cb6f81a6d29b2b0f5befc0a8bb8ee73a74ade29cbd17e8eca88e0f6e",
+    "tool_schema_sha256": "bb9536c8ecef37fae4866f571d037a81b70852e1e09e9c7fbda75ff4c2204c00",
+    "tool_schema_json_bytes": 1749,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch"
+    ],
+    "mcp_contract_sha256": "c6ce0289fe57af531f6149678e3b2b8578307e9b94f1978c8b219164bc065e61",
+    "capabilities_sha256": "a1c2d87adf9923b7623042d9e673bd4429f6eecbba109132bce63f6e17fd71c8",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 6
+      },
+      "shell_output_bytes": 14200,
+      "mcp_result_json_bytes": 3357,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_overload-2-native",
+    "task": "java_overload",
+    "arm": "native",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 71163,
+      "cached_input_tokens": 62208,
+      "output_tokens": 936,
+      "reasoning_output_tokens": 331,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 8955,
+      "total_tokens": 72099
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 0,
+    "elapsed_seconds": 29.956,
+    "fixture_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_before_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_after_sha256": "a14bf4f696df3c5d25fd4416c7038e28e2e27c609cf13be763c7a08bcec96b9c",
+    "prompt_sha256": "48526ad2c6ab5fc945385101756f15aebe373acf4a8d55fe3ff85c509197ddaa",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "d01b0a42164dcb550d73b658184e78a1aebb880ce4228fbbe2e897a35b00f39e",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "f1a60675cb6f81a6d29b2b0f5befc0a8bb8ee73a74ade29cbd17e8eca88e0f6e",
+    "tool_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "tool_schema_json_bytes": 0,
+    "tools": [],
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 3
+      },
+      "shell_output_bytes": 12449,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 2,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": false,
+    "raw_binding_complete": true
+  },
+  {
+    "id": "java_overload-2-combined",
+    "task": "java_overload",
+    "arm": "combined",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 153964,
+      "cached_input_tokens": 131840,
+      "output_tokens": 1958,
+      "reasoning_output_tokens": 338,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 22124,
+      "total_tokens": 155922
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.946,
+    "elapsed_seconds": 55.15,
+    "fixture_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_before_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+    "workspace_after_sha256": "a14bf4f696df3c5d25fd4416c7038e28e2e27c609cf13be763c7a08bcec96b9c",
+    "prompt_sha256": "6874248adc320f9c27b3e3ebf81fc7736c12bed74461e417b2a9386a51883d33",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "e96e9d790e7aa178895c089748642125e6d023f218e0dd6825f2d6b22b16706a",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "f1a60675cb6f81a6d29b2b0f5befc0a8bb8ee73a74ade29cbd17e8eca88e0f6e",
+    "tool_schema_sha256": "2365301dcf096a11d5b549609fe07bb1985f0ead9038ee398828d405f29a093a",
+    "tool_schema_json_bytes": 2449,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch",
+      "replace_node_body"
+    ],
+    "mcp_contract_sha256": "4b719828106d27ace54510145a741297a8767bb3d70f910668bf1279a1dc83dd",
+    "capabilities_sha256": "3095d88732499ea1f56ce496b240d71ae1d01eca8a9183a96fe5a46269e0a1cb",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 2,
+        "shell": 4
+      },
+      "shell_output_bytes": 15374,
+      "mcp_result_json_bytes": 7044,
+      "tool_errors": 2,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        },
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 2,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/PermissionGate.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 3178,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "841bc4dc77ee7dd26a73f5d1cf3d5ce0fd10ec39cd0635d28c3d77d75372118b",
+      "test_output_sha256": "12367b03cfb6466f6a39776d47eab04e5396195f9489560e9bd37dbef3831d7b",
+      "diff_sha256": "90ac3afe331b33e90ddf41ae3d8f24896638dc1b684db0fd59a4f52bb78d073f"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_long-2-native",
+    "task": "java_long",
+    "arm": "native",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 108961,
+      "cached_input_tokens": 87552,
+      "output_tokens": 1115,
+      "reasoning_output_tokens": 179,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 21409,
+      "total_tokens": 110076
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 0,
+    "elapsed_seconds": 37.271,
+    "fixture_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_before_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_after_sha256": "7c1dbdf18e39ddcddf694de085d7e9b1346ae2bc95cb170ba4bbb5823a2271bf",
+    "prompt_sha256": "e32b03620ffe9c45b347ff34c2ed281215587eb678b39e108e738396d47788b6",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "d80d6bf3794e2c02be145de3b13e311365ea26ff798503bbe4453d6645092b33",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "a84855100b1a387fcc890467e4fc4a3df52dee8be93e0b6be789c3d5ab1dcedb",
+    "tool_schema_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "tool_schema_json_bytes": 0,
+    "tools": [],
+    "diagnostics": {
+      "tool_calls": {
+        "shell": 4
+      },
+      "shell_output_bytes": 14758,
+      "mcp_result_json_bytes": 0,
+      "tool_errors": 1,
+      "bundle_arguments": [],
+      "retrieval_used": false,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 0,
+      "source_lines_repeated_in_later_shell": 0,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": false,
+    "raw_binding_complete": true
+  },
+  {
+    "id": "java_long-2-node",
+    "task": "java_long",
+    "arm": "node",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 132510,
+      "cached_input_tokens": 110592,
+      "output_tokens": 1417,
+      "reasoning_output_tokens": 345,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 21918,
+      "total_tokens": 133927
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 7.047,
+    "elapsed_seconds": 40.984,
+    "fixture_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_before_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_after_sha256": "7c1dbdf18e39ddcddf694de085d7e9b1346ae2bc95cb170ba4bbb5823a2271bf",
+    "prompt_sha256": "deec514f767b53a63e2d8d7af57f98ffa371782333407ea77bfef09dcc9a8a86",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "795e39119a01d216144e8650abcaf694f7ef01f62b2e357e353771e49c2b8e57",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "a84855100b1a387fcc890467e4fc4a3df52dee8be93e0b6be789c3d5ab1dcedb",
+    "tool_schema_sha256": "2365301dcf096a11d5b549609fe07bb1985f0ead9038ee398828d405f29a093a",
+    "tool_schema_json_bytes": 2449,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch",
+      "replace_node_body"
+    ],
+    "mcp_contract_sha256": "4b719828106d27ace54510145a741297a8767bb3d70f910668bf1279a1dc83dd",
+    "capabilities_sha256": "cbc20a79801bbda9bd420cb4e7f132b00bdbd582094fbbe6e9a7231f9100d8e7",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 4
+      },
+      "shell_output_bytes": 11325,
+      "mcp_result_json_bytes": 10951,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 39,
+      "source_lines_repeated_in_later_shell": 38,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_long-2-compact",
+    "task": "java_long",
+    "arm": "compact",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 140055,
+      "cached_input_tokens": 117760,
+      "output_tokens": 1373,
+      "reasoning_output_tokens": 217,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 22295,
+      "total_tokens": 141428
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.955,
+    "elapsed_seconds": 46.79,
+    "fixture_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_before_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_after_sha256": "7c1dbdf18e39ddcddf694de085d7e9b1346ae2bc95cb170ba4bbb5823a2271bf",
+    "prompt_sha256": "deec514f767b53a63e2d8d7af57f98ffa371782333407ea77bfef09dcc9a8a86",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "d45a4008a3fa0d538a80c63a975fc6be03e0272bb8a2634d18a957e46f770913",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "a84855100b1a387fcc890467e4fc4a3df52dee8be93e0b6be789c3d5ab1dcedb",
+    "tool_schema_sha256": "bb9536c8ecef37fae4866f571d037a81b70852e1e09e9c7fbda75ff4c2204c00",
+    "tool_schema_json_bytes": 1749,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch"
+    ],
+    "mcp_contract_sha256": "c6ce0289fe57af531f6149678e3b2b8578307e9b94f1978c8b219164bc065e61",
+    "capabilities_sha256": "b939c67ff5b157fe386a6a0f5f043aa572d5eba4e4d30481011de5dc43113b64",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 4
+      },
+      "shell_output_bytes": 14917,
+      "mcp_result_json_bytes": 10951,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 0,
+      "bundle_source_lines": 39,
+      "source_lines_repeated_in_later_shell": 38,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_long-2-slim",
+    "task": "java_long",
+    "arm": "slim",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 150815,
+      "cached_input_tokens": 128768,
+      "output_tokens": 1794,
+      "reasoning_output_tokens": 604,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 22047,
+      "total_tokens": 152609
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.952,
+    "elapsed_seconds": 49.5,
+    "fixture_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_before_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_after_sha256": "7c1dbdf18e39ddcddf694de085d7e9b1346ae2bc95cb170ba4bbb5823a2271bf",
+    "prompt_sha256": "deec514f767b53a63e2d8d7af57f98ffa371782333407ea77bfef09dcc9a8a86",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "128aa67c9db5bab4a8c8a515dd51bef4d2b5a565746764ee89ce5b0685c5d54d",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "a84855100b1a387fcc890467e4fc4a3df52dee8be93e0b6be789c3d5ab1dcedb",
+    "tool_schema_sha256": "bb9536c8ecef37fae4866f571d037a81b70852e1e09e9c7fbda75ff4c2204c00",
+    "tool_schema_json_bytes": 1749,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch"
+    ],
+    "mcp_contract_sha256": "c6ce0289fe57af531f6149678e3b2b8578307e9b94f1978c8b219164bc065e61",
+    "capabilities_sha256": "4bb2ee7f4a3376379d96e54dcb39d332222d3c2dd1df1216ef4d90165162d380",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 5
+      },
+      "shell_output_bytes": 12297,
+      "mcp_result_json_bytes": 10799,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 1,
+      "bundle_source_lines": 39,
+      "source_lines_repeated_in_later_shell": 38,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  },
+  {
+    "id": "java_long-2-combined",
+    "task": "java_long",
+    "arm": "combined",
+    "repetition": 2,
+    "usage": {
+      "input_tokens": 137191,
+      "cached_input_tokens": 123904,
+      "output_tokens": 1759,
+      "reasoning_output_tokens": 471,
+      "cache_write_input_tokens": 0,
+      "uncached_input_tokens": 13287,
+      "total_tokens": 138950
+    },
+    "correctness": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "instrumentation_valid": true,
+    "valid_measurement": true,
+    "infrastructure_failure": false,
+    "timed_out": false,
+    "exit_code": 0,
+    "setup_seconds": 6.947,
+    "elapsed_seconds": 51.766,
+    "fixture_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_before_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+    "workspace_after_sha256": "7c1dbdf18e39ddcddf694de085d7e9b1346ae2bc95cb170ba4bbb5823a2271bf",
+    "prompt_sha256": "deec514f767b53a63e2d8d7af57f98ffa371782333407ea77bfef09dcc9a8a86",
+    "schema_sha256": "3952c3848cc9810b8349920a2a93c78a5280eb685f848054eebce40c2dc06431",
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "evaluator_sha256": "512b425d56a7440f0a0b402e46a77feaec199852270e13cdf3bc00032484a6da",
+    "raw_events_sha256": "646caf41522cedc62de8d443c80769030f76103614a129e8bb5e9ae13557101c",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "answer_sha256": "a84855100b1a387fcc890467e4fc4a3df52dee8be93e0b6be789c3d5ab1dcedb",
+    "tool_schema_sha256": "2365301dcf096a11d5b549609fe07bb1985f0ead9038ee398828d405f29a093a",
+    "tool_schema_json_bytes": 2449,
+    "tools": [
+      "build_context_bundle",
+      "search_graph",
+      "get_source",
+      "get_source_batch",
+      "replace_node_body"
+    ],
+    "mcp_contract_sha256": "4b719828106d27ace54510145a741297a8767bb3d70f910668bf1279a1dc83dd",
+    "capabilities_sha256": "44e460f1ed1493d1885553afc41d5940cdd7b4e3952dca81f0f844465a89a4e0",
+    "admission": {
+      "expected_source_files": 24,
+      "indexed_source_files": 24
+    },
+    "backend_sha256": "89bd6edd573e66b32b399c8cc1293260db2f210e09bccbd31e64ce0515035d28",
+    "diagnostics": {
+      "tool_calls": {
+        "mcp:build_context_bundle": 1,
+        "shell": 5
+      },
+      "shell_output_bytes": 11380,
+      "mcp_result_json_bytes": 10799,
+      "tool_errors": 1,
+      "bundle_arguments": [
+        {
+          "token_budget": 1800
+        }
+      ],
+      "retrieval_used": true,
+      "payload_measurement": "Serialized observable JSON/UTF-8 bytes; not model tokens.",
+      "node_write_calls": 0,
+      "node_write_commits": 0,
+      "source_v1_bundles": 1,
+      "bundle_source_lines": 39,
+      "source_lines_repeated_in_later_shell": 39,
+      "stderr_policy_rejections": 0
+    },
+    "access_audit": {
+      "status": "passed",
+      "passed": true,
+      "violation_count": 0,
+      "auditor_sha256": "ea9c8d83e86814184b9380f030bbcc523f553469e66ec856d0f456d156d6d9c5",
+      "method_sha256": "0c8cda10fe438950352063d79ba6cf2789dc8d3d72e6b216c2d86fc7a3f21f26"
+    },
+    "correctness_rechecked": true,
+    "correctness_recheck": {
+      "passed": true,
+      "details": "external javac/java and independent behavior checks",
+      "changed_files": [
+        "src/main/java/studio/NoticeRenderer.java"
+      ],
+      "compile_exit": 0,
+      "test_exit": 0,
+      "expected_assertions": 4173,
+      "scope_valid": true,
+      "scope_exit": 0,
+      "scope_output_sha256": "3184657e017bc050c7065fda50cede9116ca2763100824fff736b3a90d7f5795",
+      "test_output_sha256": "78d6721a33680cc1fa7a60e0864b4d118c60755ae06f1e8e80d53ff84e7aca14",
+      "diff_sha256": "230176a9f5585bb30af5fd72f2d0ab78b164482014679597d17d896724bd1848"
+    },
+    "correctness_comparison": {
+      "matched": true,
+      "comparison": "all fields",
+      "diagnostic_hash_changed": false
+    },
+    "actual_read_retrieval": true,
+    "raw_binding_complete": true,
+    "backend": {
+      "analysis_engine": "joern",
+      "engine_version": "joern-4.0.520 / cpg-1.7.62",
+      "languages": [
+        "java"
+      ],
+      "language_adapters": {
+        "java": {
+          "language": "java",
+          "parser": "joern",
+          "version": "joern-4.0.520 / cpg-1.7.62",
+          "available": true,
+          "capabilities": [
+            "search",
+            "source",
+            "node_detail",
+            "context",
+            "calls",
+            "type_hierarchy",
+            "dependencies",
+            "containment"
+          ],
+          "diagnostic_count": 0,
+          "diagnostic_sha256": []
+        }
+      },
+      "semantic_level": "best_effort"
+    }
+  }
+]

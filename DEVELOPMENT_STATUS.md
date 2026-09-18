@@ -119,3 +119,44 @@ The shared `LiveFailure` declaration was moved, unchanged, from `LiveState.kt` i
 The repository's `AGENTS.md` now requires coherent verified milestone commits, explicit staging, and a single integrating owner of the Git index during delegated work. No existing commits were rewritten and nothing was pushed.
 
 The retrospective boundaries passed isolated checks: 32 graph/protocol tests plus official SDK; 26 edit/validation tests; 30 daemon/session tests; locked UI build and packaging; then the full 88-test suite. Fresh mixed-language and coordinated SDK flows, copied installation and forced browser recovery also passed on the staged integration tree. The evidence maps each tested tree to its resulting code commit.
+
+## Source format and node editing, 2026-09-18
+
+The optional navigation bridge now supports `--response-format source-v1` and
+`--node-edits`. The first groups bundle source under matching nodes and inherits
+identical metadata; retrieval selection, source bytes and limitations stay intact.
+The second exposes `replace_node_body`, a guarded single-call Java method-body
+replacement that uses the existing coordinator and retained preview. It rejects
+existing reservations, including the caller's, and releases only the reservation
+it acquired. Neither option is enabled by default.
+
+The full product build passed **122 JVM tests**, with no failures, errors or skips.
+Coverage includes exact format round trips, ambiguous IDs and absent/null metadata;
+stale source, overloads, scope escape, reservation contention and cleanup; expiry,
+disconnect, operation replay and committed writes whose indexing fails. Tests also
+verify that guessing the new tool name cannot bypass the bridge opt-in. Benchmark
+validation passed **36 tests**, including adversarial collector checks, independent
+Java behavior/scope evaluators and calibration regressions.
+
+The implementation and experiment were delegated separately: interface/bridge,
+node-edit transaction, fresh fixtures/evaluation, and independent evidence audit.
+The integrating agent owns the runner, review, build and Git index. The registered
+protocol, node editing, response format, frozen evaluator and calibration correction
+were committed as separate milestones. Nothing was pushed.
+
+The [30-run study](reviews/token-interface/FINDINGS.md) retained every scheduled
+attempt; all were correct and independently access-valid. Compared with native,
+compact increased input/output by 55.4%/63.7%, the new format by 66.8%/77.6%, node
+availability by 46.0%/56.7%, and combined options by 58.4%/58.3%. No configuration
+met the efficiency gate. All 24 graph runs attempted retrieval, but none of the
+12 node-enabled runs called the editor. Token effects of executing node writes
+therefore remain unmeasured.
+
+A separate post-score plan-only diagnostic confirmed an inherited Joern/compiler
+type-spelling mismatch: the custom-parameter long and overloaded targets return
+`target_not_found`; the primitive-parameter short target is eligible. No file was
+changed and no scored outcome was altered. This limitation prevents broad edit
+support claims; both options remain experimental. The actual
+[checks](reviews/token-interface/checks.json), [eligibility evidence](reviews/token-interface/edit-eligibility.json)
+and [independent review](reviews/token-interface/INDEPENDENT_REVIEW.md) distinguish
+product verification from the unsuccessful efficiency goal.

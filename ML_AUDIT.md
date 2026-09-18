@@ -120,3 +120,79 @@ and transient-diagnostic failure patterns. Mechanical prevention now includes
 real admission checks, raw evidence binding, frozen treatment hashes and semantic
 regrade comparisons. [Findings](reviews/token-fix/FINDINGS.md) and the
 [independent review](reviews/token-fix/INDEPENDENT_REVIEW.md) state remaining limits.
+
+## Source-format and node-edit factorial study, 2026-09-18
+
+The [registered protocol](benchmarks/token_interface/PROTOCOL.md) isolates bundle
+presentation and node-edit availability in four graph configurations, with native
+Codex as the fifth control. Each configuration receives three independently
+authored Java repair tasks twice. The unit is a complete task/repetition invocation;
+the decision is whether either feature reduces total input by at least 20% without
+raising output or sacrificing correctness. Actual retrieval and node-write adoption
+are separate conditions. Native edits remain available, so availability is the
+treatment and nonuse cannot prove the mechanism itself inefficient.
+
+Product workers did not inspect the fresh repair answers before product freeze
+`70aa722`. The fixture worker separately supplied a connected 24-file Java corpus,
+behavior probes and compiler-backed scope verification. The code, installed
+distribution, evaluator, prompts, randomized schedule, CLI binary/launcher and
+known host instructions were hashed before scored execution. Three task families
+on one small generated corpus remain a narrow population; repetitions are not six
+independent real-world repositories. All graph arms receive identical guidance;
+native receives no graph guidance. Comparisons with native therefore include that
+setup overhead. Provider caching and complete effective host context are not
+controlled.
+
+Five unscored calibrations gate execution. The first calibration freeze recorded
+four attempts and stopped: its exact-source checker rejected a valid nested-block
+body, while a separate run compiled a temporary class beside source before moving
+it into `.scratch`. Independent Java compilation and behavior reproduced the
+checker false negative. The original outcomes, transcripts and access decisions
+were preserved. Before any scored run, calibration grading was changed to actual
+behavior plus unchanged-scope verification, and the existing temporary-output
+instruction was clarified equally for all arms. Product, scored task evaluators,
+metrics and randomization stayed unchanged. A new freeze at `7abd0f6` passed all
+five calibrations and their independent access audits. The global lessons file
+records the generalized exact-text-grading mistake; four regression tests cover
+equivalent bodies, wrong behavior, scope escape and fabricated completion.
+
+The independent evaluator runs only after model exit and is not in the task
+workspace. Its Java probe process is not an OS security sandbox, so transcript and
+edit review must also look for evaluator inspection or exploitation. Compiler scope
+checks alone do not establish behavioral correctness. Conversely, passing behavior
+does not permit changes outside the requested body. Public evidence must include
+every scheduled attempt, known token cost, failure and access disposition. Model
+tokens come from the single terminal usage event, with cached input and reasoning
+output reported as subsets rather than added twice. Smaller JSON bytes are only a
+payload diagnostic.
+
+The complete 30-run schedule finished without retries, exclusions, missing usage,
+timeouts or infrastructure failures. All correctness results were independently
+reproduced, and every run passed access review. Compared with native, compact
+increased input/output by 55.4%/63.7%, source format by 66.8%/77.6%, node availability
+by 46.0%/56.7%, and combined options by 58.4%/58.3%. None passed the acceptance gate.
+All 24 graph runs attempted retrieval; none of the 12 enabled runs called the node
+editor. The prior lesson about distinguishing availability from mechanism use
+recurred, and the interpretation gate correctly prevents an edit-efficiency claim.
+
+Post-score diagnosis exposed a separate evaluation limitation. A no-argument
+calibration established the editor route, but did not establish that every task
+target was eligible under the actual backend. Fresh-copy, plan-only probes using
+unchanged bodies confirmed that two custom-parameter targets return
+`target_not_found`: Joern's qualified parameter types disagree with source AST
+spellings in the inherited matcher. The primitive-parameter target is accepted.
+No product, scored workspace, score or denominator changed. This does not reveal
+why agents chose native editing, but it further limits interpretation of the node
+factor. The generalized lesson is recorded globally; future studies should check
+per-target eligibility using unchanged source before freezing, without exposing
+repair answers or weakening parser safety.
+
+The [findings](reviews/token-interface/FINDINGS.md),
+[checks](reviews/token-interface/checks.json) and
+[independent review](reviews/token-interface/INDEPENDENT_REVIEW.md) retain the
+negative result and support limitation. All eight aggregate contrasts and 48 paired
+comparisons were checked independently against raw terminal counters. Returned
+source slices matched their original file hashes and byte spans or literal line
+ranges. Known private evidence is retained under rehashed archives; public reports
+omit prompts, credentials and machine paths. No further product optimization was
+performed on the fresh tasks after their results became known.

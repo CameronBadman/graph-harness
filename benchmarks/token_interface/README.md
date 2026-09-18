@@ -51,3 +51,13 @@ output rule. Before any scored run, calibration grading was corrected and the
 shared prompt's existing Java output-location instruction was clarified for every
 arm. Product and scored task evaluators remained frozen; use the second freeze for
 the complete scored study.
+
+Render the percentage chart from the verified report with the pinned plotting dependency:
+
+```sh
+uv run --locked benchmarks/token_interface/plot.py /tmp/gh-interface-report
+```
+
+The public [findings and evidence](../../reviews/token-interface/) retain both
+calibration attempts separately from the scored study. Private raw archives exclude
+daemon runtime directories and include a rehashed file manifest.

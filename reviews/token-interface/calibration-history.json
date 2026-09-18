@@ -1,0 +1,114 @@
+{
+  "attempts": [
+    {
+      "attempt": "initial",
+      "frozen_sha256": "e869417cb0b7678621e4915464940b8a3d6781ba23e18671469597d618668bce",
+      "evaluation_commit": "964639af3171662196df0e4132f2f40e62dc6efa",
+      "included_in_scored_totals": false,
+      "runs": [
+        {
+          "id": "calibration-native",
+          "recorded_correct": true,
+          "instrumentation_valid": true,
+          "access_passed": true,
+          "raw_events_sha256": "a7ba31c14a62a286f87df59a1ff5715e13dde5f8847b286ba230caad74b17865",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_sha256": "6017cd21fbfe2bdd8b057182b9c1b361d7aa8cb1a440b0fa0027c47ebe121c50"
+        },
+        {
+          "id": "calibration-compact",
+          "recorded_correct": true,
+          "instrumentation_valid": true,
+          "access_passed": false,
+          "raw_events_sha256": "6a518952c13737bbb940a8da3c8d2985ed97746218be39f03c8e1624ee5e2df7",
+          "stderr_sha256": "f2dcc893bda38fff1fed24bb704b5682a48588488565fd2c19021359dfb830c8",
+          "record_sha256": "54e4be2d4225113219ae805ef3081227181a7a8c729c99f3ed0f2e591197918d"
+        },
+        {
+          "id": "calibration-slim",
+          "recorded_correct": true,
+          "instrumentation_valid": true,
+          "access_passed": true,
+          "raw_events_sha256": "f205e1b33a7d8f27e0132336b86509e3b6da689fb8025477934077892b601e5c",
+          "stderr_sha256": "0f1c2ef7e3fd6f679a0dae405ea9bffe7bf117e0bbf8cebca8469298aad9c2dd",
+          "record_sha256": "75a68887aee09d2b1179fdd903c33c74ead044114d679bac22f23fcc8918c4a8"
+        },
+        {
+          "id": "calibration-node",
+          "recorded_correct": false,
+          "instrumentation_valid": true,
+          "access_passed": true,
+          "raw_events_sha256": "1184ad29180ad809f2a5efee6e6a5d4edb6c9ad46d96485e921a3f718ff349fa",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_sha256": "ac5cb267ecb4b5608fbac1dd3119d519443d35cca7ef864770c0f9f219766460"
+        }
+      ]
+    },
+    {
+      "attempt": "corrected",
+      "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+      "evaluation_commit": "7abd0f6ff22cedb6da66c06c8229c90273c1fc85",
+      "included_in_scored_totals": false,
+      "runs": [
+        {
+          "id": "calibration-native",
+          "recorded_correct": true,
+          "instrumentation_valid": true,
+          "access_passed": true,
+          "raw_events_sha256": "a03a4839c31ee294e003f7a44da3eb66a448bb0c36c94dfcb826fb332bdfcbab",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_sha256": "c745722158fccfd4dd967ac1c0a079081dc4496f24b9139d6017eefd6c3282c1"
+        },
+        {
+          "id": "calibration-compact",
+          "recorded_correct": true,
+          "instrumentation_valid": true,
+          "access_passed": true,
+          "raw_events_sha256": "cfc79563d5b69815ef25ac148f0bc6a2bdea0e063fa5cbf098a31a9a190db13a",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_sha256": "b4e9713e1ef59f0181122da31fb962fe31f2ae93fc41330b3e973c776afe37dc"
+        },
+        {
+          "id": "calibration-slim",
+          "recorded_correct": true,
+          "instrumentation_valid": true,
+          "access_passed": true,
+          "raw_events_sha256": "4b5ba826d964ea7bb3752d43eb886d46c85229aa4fbcdcc4844d7bbca553bfd6",
+          "stderr_sha256": "6e12c009c1b49ed8f5e111bd5288df21643e6dabd010df47b0560ba07522522c",
+          "record_sha256": "6cb5fe39b282290dbbde8024aecfb14812c4e2fcc1eebc201947f1d6f7619d86"
+        },
+        {
+          "id": "calibration-node",
+          "recorded_correct": true,
+          "instrumentation_valid": true,
+          "access_passed": true,
+          "raw_events_sha256": "e7de3d0cf395b9e8037f162a83ec01fab076816f7cbc6478ca74af42f31ffbfd",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_sha256": "818f63caa81693eb43c4dea1502f979e7216d63937b51c32f23c4890dcb1c05c"
+        },
+        {
+          "id": "calibration-combined",
+          "recorded_correct": true,
+          "instrumentation_valid": true,
+          "access_passed": true,
+          "raw_events_sha256": "0b02da09d588124749e7d28b59c17c2ff5d218ca010583020b6d273eb1ba18c8",
+          "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "record_sha256": "49bfe5f6f5f289073d52d901f1c6ad12f87462f2f5b9d79fb2cb6062221fb1fa"
+        }
+      ]
+    }
+  ],
+  "correction": {
+    "scored_runs_before_correction": 0,
+    "initial_node_result": "Recorded false negative preserved: equivalent nested block compiled and returned the requested value; original checker required exact source text.",
+    "initial_compact_result": "Correct result but access-invalid: compiled temporary class beside source before moving it into .scratch.",
+    "change": "Compiler-backed calibration scope and behavior replace exact source matching; existing scratch-output instruction clarified equally for all arms.",
+    "unchanged": [
+      "product",
+      "scored task evaluator",
+      "schedule seed",
+      "metrics",
+      "acceptance criteria"
+    ]
+  }
+}

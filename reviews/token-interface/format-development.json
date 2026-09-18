@@ -1,0 +1,54 @@
+{
+  "measurement": "UTF-8 serialized response bytes, not model tokens; prior development tasks only.",
+  "product_commit": "70aa722",
+  "responses": [
+    {
+      "development_response": "java_backoff-1-navigation",
+      "original_utf8_bytes": 4238,
+      "source_v1_utf8_bytes": 3780,
+      "percent_decrease": 10.806984426616328,
+      "exact_json_roundtrip": true
+    },
+    {
+      "development_response": "java_backoff-2-navigation",
+      "original_utf8_bytes": 4238,
+      "source_v1_utf8_bytes": 3780,
+      "percent_decrease": 10.806984426616328,
+      "exact_json_roundtrip": true
+    },
+    {
+      "development_response": "java_dispatch-1-navigation",
+      "original_utf8_bytes": 5271,
+      "source_v1_utf8_bytes": 4731,
+      "percent_decrease": 10.244735344336938,
+      "exact_json_roundtrip": true
+    },
+    {
+      "development_response": "java_dispatch-2-navigation",
+      "original_utf8_bytes": 5271,
+      "source_v1_utf8_bytes": 4731,
+      "percent_decrease": 10.244735344336938,
+      "exact_json_roundtrip": true
+    },
+    {
+      "development_response": "polyglot_retry-1-navigation",
+      "original_utf8_bytes": 1422,
+      "source_v1_utf8_bytes": 1497,
+      "percent_decrease": -5.274261603375527,
+      "exact_json_roundtrip": true
+    },
+    {
+      "development_response": "polyglot_retry-2-navigation",
+      "original_utf8_bytes": 1422,
+      "source_v1_utf8_bytes": 1497,
+      "percent_decrease": -5.274261603375527,
+      "exact_json_roundtrip": true
+    }
+  ],
+  "totals": {
+    "original_utf8_bytes": 21862,
+    "source_v1_utf8_bytes": 20016,
+    "percent_decrease": 8.443875217271978
+  },
+  "implementation_probe_sha256": "f038d7da1999d1269859bf023da4b5eb97100dfc842146305276376ad241180f"
+}

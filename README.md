@@ -8,7 +8,7 @@ The local daemon provides **Java, TypeScript, JavaScript and Python structural n
 
 The recording uses two actual Codex clients configured with `gpt-5.6-terra`, deliberate reservation timing, and the public fixture. Playback is 1.1×. The journal and expected-failure/passing-test evidence are in [the recording report](reviews/recorded-demo-evidence.json).
 
-**The token-saving goal remains unmet.** After fixing lookup and discovery problems, a [24-run follow-up](reviews/token-fix/FINDINGS.md) found that the optional navigation profile used **18.2% more input and 16.9% more output** than native Codex. Repaired full tools used 46.1% more input and 38.2% more output. All tasks passed, and both repaired configurations used retrieval every time, but the bundles did not replace enough native inspection. These are small synthetic tasks, not a general effect estimate. The [original 36-run pilot](reviews/token-ablation/FINDINGS.md) remains available unchanged.
+**The token-saving goal remains unmet.** The latest [30-run comparison](reviews/token-interface/FINDINGS.md) found **66.8% more input and 77.6% more output** with the experimental source-centered format, and **58.4% more input and 58.3% more output** with that format plus node editing available, versus native Codex. All repairs passed, but no scored agent used the node editor; a separate diagnostic also found two targets unsupported by existing parser matching. These small synthetic results measure the offered workflow, not the efficiency of executing node writes. The [earlier 24-run follow-up](reviews/token-fix/FINDINGS.md) and [original pilot](reviews/token-ablation/FINDINGS.md) remain unchanged; their tasks differ.
 
 ## Build and run
 
@@ -65,6 +65,21 @@ build/install/graphharness/bin/graphharness daemon examples/ticket-office --allo
 ```
 
 Agents read fresh source, call `plan_edit` with the returned snapshot/file hash and a new method body, acquire a file lease, inspect the preview, apply it, and release. A second agent receives `lease_busy` with the holder and expiration. It can keep reading; there is no waiting queue. The bridge renews its leases, with a 120-second maximum hold. The browser shows reservations, denied requests and the actual retained before/after preview.
+
+The experimental navigation bridge can also expose a single-call Java editor:
+
+```bash
+graphharness bridge /absolute/path/to/checkout Codex --navigation --node-edits
+```
+
+`replace_node_body` takes the fresh node ID, snapshot ID, file hash and replacement
+body statements. It validates the target, briefly reserves the file, commits the
+change and releases its own reservation. Existing reservations, including the
+caller's, return `lease_busy` without being altered. The receipt distinguishes a
+committed edit from pending indexing; syntax validation does not run project tests.
+The daemon must have `--allow-edits`. An independent `--response-format source-v1`
+option groups bundle source under nodes without dropping context information. Both
+options are off by default; see the [configuration and limits](docs/codex-navigation.md#experimental-response-format-and-node-editing).
 
 Only a concrete Java method whose enclosing type, parameter metadata and source bounds match the compiler parser can be edited. Unsupported metadata fails closed. Constructors, initializers, multi-file rename and semantic refactoring are unavailable. Reservations coordinate clients using this daemon; they do not make arbitrary external editor writes transactional or prevent incompatible changes in separate files.
 

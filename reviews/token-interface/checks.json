@@ -1,0 +1,116 @@
+{
+  "jvm_tests": {
+    "command": "nix develop --command gradle test installDist --console=plain",
+    "tests": 122,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "suite_sha256": {
+      "TEST-graphharness.AnalysisProcessTest.xml": "096fd6d2731eec2776b5081d6e846b5a404a69d1b74c47edf23a89293b81ff68",
+      "TEST-graphharness.AnalyzerTest.xml": "f83968d1ef67b6f2ab823cca21008c6b0b84cd01f9af56afea5a66b788d351eb",
+      "TEST-graphharness.ContextRetrievalTest.xml": "8944e82deb5a331738f616290d16e4f82e37640a9d5f9b9259ae0b00ca508079",
+      "TEST-graphharness.CoordinatedDaemonTest.xml": "b9a35d25933e4d646d246b1f56c1c3ea4beb3110b2c1bbfaa6e56562c46aabc7",
+      "TEST-graphharness.EditCoordinatorTest.xml": "c33f6dd4609f8ae78d6a5f5a8bd7cc2622950bb9cfc7ae6703f09b5b3e3c7092",
+      "TEST-graphharness.JavaDeclarationsTest.xml": "5cb6b481ca4f4b578fb7bf1c0810be213d3ebac621cdcc30d5f82c0e5339cc36",
+      "TEST-graphharness.JavaStructureTest.xml": "ef8fdd1d282f93c7594fac729b6bf1c81da800805b1458ee285751588bd31cbc",
+      "TEST-graphharness.LiveBridgeTest.xml": "8b053dd74c61e1d0af6d60b0cc9e299b608d116966fe71a00984d030ef392f9f",
+      "TEST-graphharness.LiveDaemonTest.xml": "0f84ebb52205c87fdbd198aa0e7c24b713e3ed631d73d7703130dde580ae9d46",
+      "TEST-graphharness.LiveEditsTest.xml": "842a4019a12ebf267b2e5028444359e9a5ee525d8b19218df6167d01d609636a",
+      "TEST-graphharness.LiveStateTest.xml": "1e5e3681250c2c1da5ab6f858a8c20f1dce2200ef232f5cf16a64ba27813bffa",
+      "TEST-graphharness.LocalRuntimeTest.xml": "6c85678ffa641151054f5924dc80e02cb9e9e988b564f3875b48a48da961451d",
+      "TEST-graphharness.NodeBodyEditTest.xml": "0325fe6a1fe5f2785bc08fdcb6f03bf03c763cbef89185f3f70058edda16d724",
+      "TEST-graphharness.SafeJavaEditTest.xml": "9e68ddb92e748e9bbfe4b45794faddbed7653a7cc9542b4e18ae25fbb0da74ce",
+      "TEST-graphharness.ServerTest.xml": "a91264032b726343ab67368c7e52b68dc05ceef3f0b0ba1a1af1b80c171e1613",
+      "TEST-graphharness.SnapshotSafetyTest.xml": "21c5ae3876759c93a8d11294432cae0ea417ef57ffa93e6542c80f8f834a6e4e",
+      "TEST-graphharness.SourceResponseFormatTest.xml": "2d505ad827f3ae0e657927c2d8854b0bf7e37e2d6647b2f92239d7ed09519e7f",
+      "TEST-graphharness.StructuralAdapterTest.xml": "2147507acec1b36023ada8dbaefdc708a2f137e5bbefdb2483c8d30f5af5d538",
+      "TEST-graphharness.ValidationRunnerTest.xml": "4c75d10fdbf2e780db3dba44d1ea7a0999c40c5e304109204563371de01ead81"
+    }
+  },
+  "benchmark_tests": {
+    "command": "python3 -m unittest benchmarks.token_interface.test_calibration benchmarks.token_interface.test_tasks benchmarks.token_interface.test_report -q",
+    "tests": 36,
+    "failures": 0
+  },
+  "product_commit": "70aa722",
+  "evaluation_commit": "7abd0f6",
+  "product_frozen_before_fixture_review": true,
+  "initial_calibration_retained": true,
+  "retained_distribution_files_verified": 147,
+  "scored_study": {
+    "scheduled": 30,
+    "completed": 30,
+    "correct": 30,
+    "access_valid": 30,
+    "correctness_recomputed": 30,
+    "common_task_repetition_cells": 6,
+    "graph_retrieval_runs": 24,
+    "node_enabled_runs": 12,
+    "node_calls": 0,
+    "source_v1_runs": 12,
+    "retries": 0,
+    "timeouts": 0,
+    "infrastructure_failures": 0,
+    "missing_usage": 0,
+    "aggregate_contrasts_independently_checked": 8,
+    "paired_contrasts_independently_checked": 48,
+    "frozen_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+    "collector_command": "python3 benchmarks/token_interface/report.py --artifacts <private-frozen-run-directory> --output reviews/token-interface"
+  },
+  "calibration": {
+    "initial_attempts_retained": 4,
+    "corrected_attempts": 5,
+    "corrected_all_gates_passed": true,
+    "scored_runs_before_correction": 0,
+    "counts_excluded_from_scored_totals": true
+  },
+  "post_score_eligibility": {
+    "targets": 3,
+    "accepted": 1,
+    "rejected_by_inherited_parser_matching": 2,
+    "scored_workspaces_or_product_changed": false,
+    "applied_edits": 0,
+    "included_in_token_totals": false,
+    "evidence_sha256": "4266d6379acd9b7e8127f3d0f257d713c8288550ff7f25837b24647472435902"
+  },
+  "private_archives": {
+    "calibration-v1": {
+      "manifest_sha256": "d70215d2f94976c80354890709b7cc7f5e3229d77ba8d03f0d2bdeaf125e69d6",
+      "file_count": 61,
+      "runtime_credentials_excluded": true,
+      "copies_rehashed": true
+    },
+    "scored-v2": {
+      "manifest_sha256": "c4c678d1383422bb53f75e014129c79f5cf0e9d3741b3de5c166db2782d55568",
+      "file_count": 1887,
+      "runtime_credentials_excluded": true,
+      "copies_rehashed": true
+    },
+    "eligibility-diagnostic": {
+      "manifest_sha256": "1bdaa53a1fa5cac167aede89aa3954ade6d3b332e91966810984948a768f4110",
+      "file_count": 91,
+      "runtime_credentials_excluded": true,
+      "copies_rehashed": true
+    }
+  },
+  "plot": {
+    "command": "uv run --locked benchmarks/token_interface/plot.py reviews/token-interface",
+    "dependency": "matplotlib==3.10.6",
+    "source": "summary.json",
+    "node_nonuse_labeled": true,
+    "svg_sha256": "5247c304826b4b2bd0e42f00a76c355150d7323d9687a8f8b6fa509a5c421ea1",
+    "png_sha256": "8a34551b72b67d69d8b062f9590c31be70fbd826f9b676eec52f6c02049bb18b",
+    "visually_checked_for_labels_and_clipping": true
+  },
+  "final_verification": {
+    "frozen_identity_unchanged": true,
+    "private_archive_files_rehashed": {
+      "calibration-v1": 61,
+      "scored-v2": 1887,
+      "eligibility-diagnostic": 91
+    },
+    "public_machine_path_and_credential_pattern_scan_passed": true,
+    "local_documentation_links_resolve": true,
+    "independent_review_sha256": "cf09eb480da849ccf66ee9d77f10ec985c7720595788167918357bb384894e83"
+  }
+}

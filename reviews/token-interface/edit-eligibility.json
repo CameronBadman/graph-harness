@@ -1,0 +1,120 @@
+{
+  "study": "post-score non-model edit eligibility diagnostic",
+  "product_commit": "70aa722",
+  "frozen_evaluation_sha256": "a98597f5e034630a9401eb70a275a640377d97d52a2ccb9c113406669a7d8ade",
+  "timing": "After all 30 scored invocations finished; excluded from token totals and acceptance gates.",
+  "method": "Fresh fixture copy per target. Read exact node source, validate current raw-byte file hash, pass that snapshot/hash/node and the unchanged original body to plan_edit. No apply_edit or replace_node_body calls. Verify identical before/after fixture manifests.",
+  "limitations": [
+    "This probes shared preparation eligibility; it does not measure model token use or one-call transaction completion.",
+    "The rejection was not observed in scored runs: none attempted node editing. It does not establish why a model chose native editing.",
+    "Results concern this frozen Joern backend and these three targets. No product fix or scored workspace change followed."
+  ],
+  "diagnosis": {
+    "observed": "Only the primitive-parameter short target obtains a plan; both custom-type targets return target_not_found.",
+    "source_evidence": [
+      "src/main/kotlin/graphharness/SafeJavaEdit.kt:103",
+      "src/main/kotlin/graphharness/SafeJavaEdit.kt:115",
+      "src/main/kotlin/graphharness/JavaStructure.kt:84"
+    ],
+    "interpretation": "Both parser matching paths compare type spellings after whitespace removal. Joern node parameter types are package-qualified, while these source declarations use simple names. The same shared prepare path is used by plan_edit and replace_node_body.",
+    "qualification": "This parser matching code predates the one-call edit feature."
+  },
+  "results": [
+    {
+      "task": "java_short",
+      "node_id": "method:studio.DayWindow.contains:int|int|int:boolean",
+      "file": "src/main/java/studio/DayWindow.java",
+      "backend": {
+        "analysis_engine": "joern",
+        "engine_version": "joern-4.0.520 / cpg-1.7.62",
+        "semantic_level": "best_effort"
+      },
+      "admission": {
+        "expected_source_files": 24,
+        "indexed_source_files": 24
+      },
+      "snapshot_id": "a7c62359caef861f",
+      "file_hash": "941342f5c4590b57a8ea725fac1d16e103cb3695ba7d36bf6677dfee8102d4e5",
+      "source_has_byte_span": true,
+      "source_provenance": "javac_parser",
+      "replacement_characters": 221,
+      "http_status": 200,
+      "plan_created": true,
+      "error": null,
+      "syntax_checked": true,
+      "project_tests_run": false,
+      "workspace_before_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+      "workspace_after_sha256": "da430682d7fa00c2797c46e17cccbd84cc17b1718374ef683ea3e25bd6d5d4a2",
+      "source_response_sha256": "0f548133683332cc44ed18f4fd8466a1c68034909629d40d866b4b39c1c655ca",
+      "plan_response_sha256": "71838728627d2c889c6a17b59ec32c383e39d0143acfc43b93fdfd47ec99b8a4"
+    },
+    {
+      "task": "java_long",
+      "node_id": "method:studio.NoticeRenderer.render:studio.Notice|studio.NoticeOptions:java.lang.String",
+      "file": "src/main/java/studio/NoticeRenderer.java",
+      "backend": {
+        "analysis_engine": "joern",
+        "engine_version": "joern-4.0.520 / cpg-1.7.62",
+        "semantic_level": "best_effort"
+      },
+      "admission": {
+        "expected_source_files": 24,
+        "indexed_source_files": 24
+      },
+      "snapshot_id": "a7c62359caef861f",
+      "file_hash": "f9e54904df74de1ec7eb21cc9e668d728edbff0c10e7a5e6f4ae69ea2dc9c589",
+      "source_has_byte_span": false,
+      "source_provenance": null,
+      "replacement_characters": 2262,
+      "http_status": 422,
+      "plan_created": false,
+      "error": {
+        "code": "target_not_found",
+        "message": "No parser-confirmed method matches the requested node.",
+        "details": {
+          "http_status": 422
+        }
+      },
+      "syntax_checked": null,
+      "project_tests_run": null,
+      "workspace_before_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+      "workspace_after_sha256": "2ed3b68962b1539b29669df4d3c52bbd7b74d03aaaffe545dbfae710660e1ad9",
+      "source_response_sha256": "4f054458693c0f2af687c547d9b3809f5bdfba788b655a62509e09fdb7d3e8fa",
+      "plan_response_sha256": "ff2438424cee173bde4e57f6a044d5359bb8a92465dbea690bf175eab8306e56"
+    },
+    {
+      "task": "java_overload",
+      "node_id": "method:studio.PermissionGate.permits:studio.AccessRequest|studio.PermissionTable:boolean",
+      "file": "src/main/java/studio/PermissionGate.java",
+      "backend": {
+        "analysis_engine": "joern",
+        "engine_version": "joern-4.0.520 / cpg-1.7.62",
+        "semantic_level": "best_effort"
+      },
+      "admission": {
+        "expected_source_files": 24,
+        "indexed_source_files": 24
+      },
+      "snapshot_id": "a7c62359caef861f",
+      "file_hash": "37a42d2659a3bce8b37e71cf1b934751a16facc0e30627afc9ae2de89a8d736f",
+      "source_has_byte_span": false,
+      "source_provenance": null,
+      "replacement_characters": 223,
+      "http_status": 422,
+      "plan_created": false,
+      "error": {
+        "code": "target_not_found",
+        "message": "No parser-confirmed method matches the requested node.",
+        "details": {
+          "http_status": 422
+        }
+      },
+      "syntax_checked": null,
+      "project_tests_run": null,
+      "workspace_before_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+      "workspace_after_sha256": "f617a4340bf6507fb0c6bafa660db3732c499f3066c9a2307eac13a619d6a2d0",
+      "source_response_sha256": "31b8a923a0e970e97814a2c263ee166e0416c74a7590f6f27c92032136167dfd",
+      "plan_response_sha256": "b124725b6146a578d2761c19173f4ae00c2bff1bacfeb4d7cb6edc318429c3ad"
+    }
+  ]
+}
