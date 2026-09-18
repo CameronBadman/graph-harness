@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "probe": "installed Codex MCP code-mode context conversion",
+  "codex_version": "codex-cli 0.154.0",
+  "model_name_configured_but_not_invoked": "gpt-5.6-terra",
+  "native_executable": {
+    "basename": "codex",
+    "sha256": "3188814c35471432d4123203e0eb38e5bddc60226e3d7ddf0e59e649ea140022",
+    "bytes": 262858016,
+    "observation": "live /proc descendant executable"
+  },
+  "launcher": {
+    "basename": "codex.js",
+    "sha256": "61b0194f3bb6534439c8d26a3ed57d0805f84b884588b761795323eeb92fcf70"
+  },
+  "probe_script_sha256": "69b80b5830e8c4f03465c6c690739c538cede24ac2d49c5c990918194a310036",
+  "real_model_invocations": 0,
+  "usage_counters": "Fixed mock zero counters; not a token measurement.",
+  "responses_requests": 4,
+  "completed_mcp_calls": 2,
+  "successful_mcp_calls": 2,
+  "mock_get_requests_returning_404": {
+    "/v1/models": 1
+  },
+  "observations": {
+    "initial_request_contains_graph_tool_name": false,
+    "initial_request_contains_initialization_guidance": false,
+    "discovery_output_contains_graph_tool_name": true,
+    "discovery_output_contains_initialization_guidance": true,
+    "original_call_output_contains_text_marker": true,
+    "original_call_output_contains_structured_marker": true,
+    "projected_call_output_contains_text_marker": false,
+    "projected_call_output_contains_structured_marker": true,
+    "initial_request_contains_global_working_instructions": true
+  },
+  "expected_observations_match": true,
+  "first_request_serialized_json_bytes": 64311,
+  "first_request_items": [
+    {
+      "type": "additional_tools",
+      "role": "developer",
+      "serialized_json_bytes": 20037
+    },
+    {
+      "type": "message",
+      "role": "developer",
+      "serialized_json_bytes": 18138
+    },
+    {
+      "type": "message",
+      "role": "developer",
+      "serialized_json_bytes": 11133
+    },
+    {
+      "type": "message",
+      "role": "developer",
+      "serialized_json_bytes": 2438
+    },
+    {
+      "type": "message",
+      "role": "developer",
+      "serialized_json_bytes": 410
+    },
+    {
+      "type": "message",
+      "role": "user",
+      "serialized_json_bytes": 10300
+    },
+    {
+      "type": "message",
+      "role": "user",
+      "serialized_json_bytes": 189
+    }
+  ],
+  "raw_evidence_sha256": {
+    "command.json": "86411e25852ba8ff5131c02eacb2d6e6f2df2041d3c87ffbb7a2421d69cb7c80",
+    "probe.py": "69b80b5830e8c4f03465c6c690739c538cede24ac2d49c5c990918194a310036",
+    "request-1.json": "0755c5f883c4d5f7f692def9db04865438ebaa0ff94d7927dfd6a6753baa2031",
+    "request-2.json": "11458c8b9dd426ef9cb44c61e61a6b24875baa9a8862b8916b01d22384bc1a67",
+    "request-3.json": "fa7e5ea8eebe4f5d4ddf83a5edd4d66ef6daa16635b8598f23eb547620f607db",
+    "request-4.json": "090f88e5fe6e56bbfab3e512cefa7e0c72d878bd689b09bcd1d31ef912584351",
+    "stderr.log": "ef8be6167b2b1287eaf111ade830336b4e4558617cbde207bafa14544e7817df",
+    "stdout.jsonl": "e935fe3424d3654b87d615907baffbe51690c5f9ac3f3e62f33c013e1d8d6838"
+  },
+  "limitations": [
+    "Local custom Responses provider; model-list endpoint deliberately returns 404 and client uses fallback metadata.",
+    "Mock responses prescribe tool actions; this tests client behavior, not model routing compliance or efficiency.",
+    "Projection observations refer to that call's output. Prior unprojected output remains in conversation history.",
+    "Request byte counts are not token counts, prices, or demonstrated end-to-end savings.",
+    "Host instructions and policy are inherited; raw request bodies are private and excluded from Git."
+  ],
+  "reproduce": "python3 benchmarks/token_followup/client_probe.py --artifacts artifacts/token-fix/client-probe-new --report debug/client-probe-new.json"
+}
