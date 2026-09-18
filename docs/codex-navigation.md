@@ -31,10 +31,11 @@ graphharness codex-instructions
 ```
 
 Include that text in the task instructions or the checkout's agent instructions
-when using this workflow. It discovers and invokes the bundle in one code-mode
-tool call and emits `structuredContent ?? content` once. Do not dump the whole tool
-catalogue merely to locate a known tool. Native inspection remains available when
-the graph lacks the required evidence.
+when using this workflow. It discovers the bundle and optional node editor together,
+invokes the bundle, and emits `structuredContent ?? content` once. The same guidance
+applies to read-only and edit-enabled profiles; actual tool availability determines
+the route. Do not dump the whole tool catalogue merely to locate a known tool.
+Native inspection remains available when the graph lacks the required evidence.
 
 This explicit setup matters in Codex CLI 0.154.0 code mode: a local mock-provider
 diagnostic found MCP tools behind `ALL_TOOLS`, with initialization guidance visible
@@ -47,6 +48,10 @@ not force model compliance; the benchmark records actual graph usage.
 
 Use qualified identifiers such as `OrderPolicy.accept`, or `web/orders.ts:resolve`.
 Ambiguous names return candidate nodes without arbitrarily selecting their source.
+For an overload, match the candidate's file and parameter signature, then pass its
+exact ID as an argument: `build_context_bundle({node_id: candidate.id, token_budget: 1800})`
+or `get_source({node_id: candidate.id})`. Putting the ID inside the natural-language
+`task` field does not select that node. Do not choose the first candidate arbitrarily.
 Behavior-only descriptions are not semantic search. The bundle source budget
 remains approximate; notes report omitted slices. Structural navigation does not
 imply complete runtime call resolution.
@@ -70,9 +75,17 @@ fresh identifiers/hash from source and the complete body statements, without the
 outer braces. The existing limit is 4,096 characters per argument. Only supported
 Java method bodies can change; imports, signatures and other languages cannot.
 
+The printed guidance now directs agents to use the advertised node editor for an
+eligible body-only change before native editing. It includes an executable call
+example with the fresh selected node ID, snapshot ID and file hash. An absent tool,
+unsupported or oversized change, or actual tool error allows native editing.
+This is a guided workflow, different from merely making the editor available in
+the earlier experiment; it is not evidence that the route saves tokens.
+
 The tool acquires and releases its own brief file reservation. An existing
 reservation, including your own, returns `lease_busy` and remains untouched. The
 small receipt reports commit/hash/indexing state; the browser retains the preview.
+Only `committed=true` confirms a write; a rejected call is not a successful edit.
 Syntax validation is not project testing. Use native tools to run the actual tests.
 After a lost response or restart, reread source before another edit; a repeated
 MCP call is not automatically a replay of the original write.
@@ -86,8 +99,19 @@ called the node editor. The experiment therefore does not establish the token
 efficiency of actually writing through nodes.
 
 The separate [eligibility diagnostic](../reviews/token-interface/edit-eligibility.json)
-found an inherited Joern restriction: methods using custom parameter types can
-return `target_not_found` because backend-qualified types do not match compiler
-source spellings. Two of the three benchmark targets were rejected by this check.
-Do not infer edit support from navigation support or body size alone. The editor
-fails closed; native editing remains available.
+found an inherited Joern restriction in that study's frozen build: backend-qualified
+custom parameter types did not match compiler source spellings, rejecting two of
+the three targets with `target_not_found`. That historical result remains recorded.
+Do not infer edit support from navigation support, a byte span or body size alone;
+the current parser and version checks still decide eligibility and fail closed.
+
+The current matcher resolves matching custom types from immutable snapshot
+declarations and explicit imports while preserving full package identity, array
+rank, generic structure and overload checks. It does not compare only short type
+names. Ambiguous or unresolved wildcard/static imports, inherited type names and
+backend-erased generics can still be unsupported. The declaration inventory is
+bounded to 512 Java files and 8 MiB; an incomplete inventory or parse errors can
+prevent reference-type resolution. Primitive, exact qualified and locally declared
+cases can remain usable. The [guided rerun](../benchmarks/token_node_followup/PROTOCOL.md)
+requires successful real node commits for all three target families before model
+trials.
