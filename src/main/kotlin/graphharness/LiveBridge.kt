@@ -17,6 +17,7 @@ class LiveBridge(
     private val agentLabel: String = "GraphHarness MCP",
     private val clientName: String = "graphharness-bridge",
     private val clientVersion: String = "0.1.0",
+    private val navigationProfile: Boolean = false,
 ) : AutoCloseable {
     private var descriptor: RuntimeDescriptor? = null
     private var sessionId: String? = null
@@ -91,7 +92,7 @@ class LiveBridge(
             when (method) {
                 "initialize" -> initialize(id ?: JNull, params)
                 "ping" -> result(id ?: JNull, emptyJsonObject())
-                "tools/list" -> requireInitialized(id ?: JNull) ?: result(id ?: JNull, jObject("tools" to request("GET", "/tools", null, session = true).asObject().fields.getValue("tools")))
+                "tools/list" -> requireInitialized(id ?: JNull) ?: listTools(id ?: JNull)
                 "tools/call" -> requireInitialized(id ?: JNull) ?: toolCall(id ?: JNull, params)
                 else -> error(id ?: JNull, -32601, "Method not found")
             }
@@ -104,17 +105,27 @@ class LiveBridge(
 
     private fun toolCall(id: JsonValue, params: JObject): JObject {
         val name = params.optionalString("name") ?: return error(id, -32602, "Invalid params")
+        if (navigationProfile && name !in NavigationProfile.tools) return error(id, -32602, "Tool is not available in the navigation profile")
         val argumentsValue = params["arguments"]
         if (argumentsValue != null && argumentsValue !is JObject) return error(id, -32602, "Invalid params")
         val arguments = argumentsValue as? JObject ?: emptyJsonObject()
         val operation = (++nextOperation).toString()
         val response = request("POST", "/tools/call", jObject("schema_version" to 1, "operation_id" to operation, "name" to name, "arguments" to arguments), session = true).asObject()
-        val value = response.fields.getValue("result")
+        val original = response.fields.getValue("result")
+        val value = if (navigationProfile) NavigationProfile.compact(name, original) else original
         return result(id, jObject(
             "content" to listOf(mapOf("type" to "text", "text" to value.stringify())),
             "structuredContent" to (value as? JObject),
             "isError" to false,
         ))
+    }
+
+    private fun listTools(id: JsonValue): JObject {
+        val available = request("GET", "/tools", null, session = true).asObject().fields.getValue("tools") as JArray
+        val selected = if (navigationProfile) JArray(available.values.filter {
+            (it as? JObject)?.optionalString("name") in NavigationProfile.tools
+        }) else available
+        return result(id, jObject("tools" to selected))
     }
 
     private fun initialize(id: JsonValue, params: JObject): JObject {
@@ -124,6 +135,7 @@ class LiveBridge(
             "protocolVersion" to "2025-06-18",
             "serverInfo" to jObject("name" to "graphharness-live-bridge", "version" to clientVersion),
             "capabilities" to jObject("tools" to emptyMap<String, Any?>()),
+            "instructions" to NavigationProfile.instructions,
         ))
         initialized = true
         return response

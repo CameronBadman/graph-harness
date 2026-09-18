@@ -13,6 +13,11 @@ import java.util.concurrent.CountDownLatch
 fun main(args: Array<String>) {
     val runtimeDirectory = System.getenv("GRAPHHARNESS_RUNTIME_DIR")?.let { Path(it) } ?: LocalRuntime.defaultDirectory()
     when (args.firstOrNull()) {
+        "codex-instructions" -> {
+            require(args.size == 1) { "Usage: graphharness codex-instructions" }
+            println(NavigationProfile.codexInstructions)
+            return
+        }
         "daemon" -> {
             val arguments = args.drop(1).filter { it != "--allow-edits" }
             val allowEdits = "--allow-edits" in args
@@ -34,8 +39,10 @@ fun main(args: Array<String>) {
             return
         }
         "bridge" -> {
-            require(args.size in 2..3) { "Usage: graphharness bridge ROOT [AGENT_LABEL]" }
-            LiveBridge(Path(args[1]), runtimeDirectory, args.getOrNull(2) ?: "Coding agent").use { it.run(System.`in`, System.out) }
+            val arguments = args.drop(1).filter { it != "--navigation" }
+            require(arguments.size in 1..2) { "Usage: graphharness bridge ROOT [AGENT_LABEL] [--navigation]" }
+            LiveBridge(Path(arguments[0]), runtimeDirectory, arguments.getOrNull(1) ?: "Coding agent",
+                navigationProfile = "--navigation" in args).use { it.run(System.`in`, System.out) }
             return
         }
         "authorize-browser" -> {

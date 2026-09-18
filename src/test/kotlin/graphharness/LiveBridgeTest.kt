@@ -86,7 +86,55 @@ class LiveBridgeTest {
 
     private fun errorCode(response: JObject): String = response.fields.getValue("error").asObject().fields.getValue("code").stringify()
 
-    private fun fixture(): Fixture {
+    @Test
+    fun navigationProfilePreservesSourceAndVersionAndRejectsUnadvertisedTools() {
+        fixture(navigation = true).use { fixture ->
+            val payload = """
+                {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}
+                {"jsonrpc":"2.0","method":"notifications/initialized"}
+                {"jsonrpc":"2.0","id":2,"method":"tools/list"}
+                {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"build_context_bundle","arguments":{"task":"Example.value"}}}
+                {"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"apply_edit","arguments":{}}}
+                """.trimIndent() + "\n"
+            val output = ByteArrayOutputStream()
+            fixture.bridge.run(ByteArrayInputStream(payload.toByteArray(StandardCharsets.UTF_8)), output)
+            val responses = output.toString(StandardCharsets.UTF_8).trimEnd().lines().map { MiniJson.parse(it).asObject() }
+            assertTrue(responses[0].fields.getValue("result").asObject().requiredString("instructions").contains("source_slices"))
+            val tools = responses[1].fields.getValue("result").asObject().fields.getValue("tools") as JArray
+            assertEquals(NavigationProfile.tools, tools.values.map { it.asObject().requiredString("name") }.toSet())
+            val call = responses[2].fields.getValue("result").asObject()
+            val value = call.fields.getValue("structuredContent").asObject()
+            val text = ((call.fields.getValue("content") as JArray).values.single()).asObject().requiredString("text")
+            assertEquals(value.stringify(), text)
+            assertEquals("navigation-v1", value.requiredString("response_format"))
+            assertFalse(value.fields.containsKey("task"))
+            assertFalse(value.fields.containsKey("entrypoints"))
+            assertTrue(value.requiredString("snapshot_id").isNotBlank())
+            assertTrue(value.fields.containsKey("snapshot_state"))
+            assertTrue(value.fields.containsKey("semantic_level"))
+            assertTrue(value.fields.containsKey("notes"))
+            val sources = value.fields.getValue("source_slices") as JArray
+            assertTrue(sources.values.any { it.asObject().requiredString("source").contains("return 1;") })
+            assertTrue(sources.values.all { it.asObject().requiredString("file_hash").length == 64 })
+            assertEquals("-32602", errorCode(responses[3]))
+        }
+    }
+
+    @Test
+    fun compactProjectionRetainsEverySourceRelationshipAndCaveat() {
+        val source = jObject("node_id" to "n", "source" to "😀\r\nreturn 7;", "file_hash" to "a".repeat(64),
+            "byte_span" to jObject("start" to 2, "end" to 19))
+        val original = jObject("task" to "inspect", "source_slices" to listOf(source),
+            "relationships" to listOf(jObject("from" to "n", "to" to "m", "resolution" to "best_effort")),
+            "notes" to listOf("source_slices_truncated_for_budget", "structural_context_only"),
+            "snapshot_id" to "snapshot", "snapshot_state" to jObject("pending_rebuild" to true),
+            "semantic_level" to "best_effort", "analysis_engine" to "fallback-parser")
+        val compact = NavigationProfile.compact("build_context_bundle", original).asObject()
+        listOf("source_slices", "relationships", "notes", "snapshot_id", "snapshot_state", "semantic_level", "analysis_engine")
+            .forEach { key -> assertEquals(original.fields[key], compact.fields[key]) }
+    }
+
+    private fun fixture(navigation: Boolean = false): Fixture {
         val root = createTempDirectory("graphharness-bridge-root")
         Files.writeString(root.resolve("Example.java"), "class Example { int value() { return 1; } }")
         val ui = createTempDirectory("graphharness-bridge-ui")
@@ -96,7 +144,7 @@ class LiveBridgeTest {
         val runtime = LocalRuntime.acquire(root, runtimeDirectory)
         val manager = SnapshotManager(root, useJoern = false)
         val daemon = LiveDaemon(manager, runtime, ui)
-        return Fixture(manager, daemon, LiveBridge(root, runtimeDirectory))
+        return Fixture(manager, daemon, LiveBridge(root, runtimeDirectory, navigationProfile = navigation))
     }
 
     private class Fixture(private val manager: SnapshotManager, private val daemon: LiveDaemon, val bridge: LiveBridge) : AutoCloseable {
