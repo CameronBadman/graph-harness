@@ -39,10 +39,10 @@ fun main(args: Array<String>) {
             return
         }
         "bridge" -> {
-            val arguments = args.drop(1).filter { it != "--navigation" }
-            require(arguments.size in 1..2) { "Usage: graphharness bridge ROOT [AGENT_LABEL] [--navigation]" }
-            LiveBridge(Path(arguments[0]), runtimeDirectory, arguments.getOrNull(1) ?: "Coding agent",
-                navigationProfile = "--navigation" in args).use { it.run(System.`in`, System.out) }
+            val options = bridgeOptions(args.drop(1))
+            LiveBridge(Path(options.root), runtimeDirectory, options.agentLabel,
+                navigationProfile = options.navigation, responseFormat = options.responseFormat,
+                nodeEdits = options.nodeEdits).use { it.run(System.`in`, System.out) }
             return
         }
         "authorize-browser" -> {
@@ -71,6 +71,35 @@ fun main(args: Array<String>) {
         val transport = if (mode == "legacy-stdio") McpTransport.CONTENT_LENGTH else McpTransport.NEWLINE
         GraphHarnessServer(snapshotManager, transport).run(System.`in`, System.out)
     }
+}
+
+internal data class BridgeOptions(val root: String, val agentLabel: String, val navigation: Boolean, val responseFormat: String, val nodeEdits: Boolean)
+
+internal fun bridgeOptions(args: List<String>): BridgeOptions {
+    val positional = mutableListOf<String>()
+    var navigation = false
+    var nodeEdits = false
+    var responseFormat = "navigation-v1"
+    var index = 0
+    while (index < args.size) {
+        when (val argument = args[index++]) {
+            "--navigation" -> navigation = true
+            "--node-edits" -> nodeEdits = true
+            "--response-format" -> {
+                require(index < args.size) { "--response-format requires navigation-v1 or source-v1" }
+                responseFormat = args[index++]
+                require(responseFormat in setOf("navigation-v1", "source-v1")) { "Unsupported response format: $responseFormat" }
+            }
+            else -> {
+                require(!argument.startsWith("--")) { "Unknown bridge option: $argument" }
+                positional += argument
+            }
+        }
+    }
+    require(positional.size in 1..2) { "Usage: graphharness bridge ROOT [AGENT_LABEL] [--navigation] [--response-format source-v1] [--node-edits]" }
+    require(navigation || responseFormat == "navigation-v1") { "--response-format source-v1 requires --navigation" }
+    require(navigation || !nodeEdits) { "--node-edits requires --navigation" }
+    return BridgeOptions(positional[0], positional.getOrNull(1) ?: "Coding agent", navigation, responseFormat, nodeEdits)
 }
 
 private fun defaultUiDirectory(): java.nio.file.Path {

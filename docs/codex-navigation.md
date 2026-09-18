@@ -50,3 +50,34 @@ Ambiguous names return candidate nodes without arbitrarily selecting their sourc
 Behavior-only descriptions are not semantic search. The bundle source budget
 remains approximate; notes report omitted slices. Structural navigation does not
 imply complete runtime call resolution.
+
+## Experimental response format and node editing
+
+Two independent options are available on the navigation bridge:
+
+```toml
+args = ["bridge", "/absolute/path/to/checkout", "Codex", "--navigation", "--response-format", "source-v1", "--node-edits"]
+```
+
+`--response-format source-v1` groups source slices under their nodes and inherits
+identical metadata instead of repeating it. Source text, versions, relationships
+and limitations are preserved; retrieval selection and budget stay unchanged.
+Only context bundles use this format. Omit the option for the existing format.
+
+`--node-edits` requires a daemon started with `--allow-edits`. It adds one tool:
+`replace_node_body(node_id, snapshot_id, expected_file_hash, new_body)`. Supply
+fresh identifiers/hash from source and the complete body statements, without the
+outer braces. The existing limit is 4,096 characters per argument. Only supported
+Java method bodies can change; imports, signatures and other languages cannot.
+
+The tool acquires and releases its own brief file reservation. An existing
+reservation, including your own, returns `lease_busy` and remains untouched. The
+small receipt reports commit/hash/indexing state; the browser retains the preview.
+Syntax validation is not project testing. Use native tools to run the actual tests.
+After a lost response or restart, reread source before another edit; a repeated
+MCP call is not automatically a replay of the original write.
+
+Both options are experimental and disabled by default. Smaller response bytes or
+fewer coordination calls alone do not establish lower total Codex token use. The
+[registered comparison](../benchmarks/token_interface/PROTOCOL.md) tests them
+separately and together against native editing.

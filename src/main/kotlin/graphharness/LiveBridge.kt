@@ -18,7 +18,16 @@ class LiveBridge(
     private val clientName: String = "graphharness-bridge",
     private val clientVersion: String = "0.1.0",
     private val navigationProfile: Boolean = false,
+    private val responseFormat: String = "navigation-v1",
+    private val nodeEdits: Boolean = false,
 ) : AutoCloseable {
+    init {
+        require(responseFormat in setOf("navigation-v1", "source-v1")) { "Unsupported response format: $responseFormat" }
+        require(navigationProfile || responseFormat == "navigation-v1") { "--response-format source-v1 requires --navigation" }
+        require(navigationProfile || !nodeEdits) { "--node-edits requires --navigation" }
+    }
+
+    private val profileTools = NavigationProfile.tools + if (nodeEdits) setOf("replace_node_body") else emptySet()
     private var descriptor: RuntimeDescriptor? = null
     private var sessionId: String? = null
     private var credential: String? = null
@@ -28,8 +37,8 @@ class LiveBridge(
     private val heartbeats = Executors.newSingleThreadScheduledExecutor()
 
     fun run(input: InputStream, output: OutputStream) {
-        connect()
         try {
+            connect()
             while (true) {
                 val line = try {
                     readLine(input)
@@ -65,6 +74,12 @@ class LiveBridge(
         val result = created
         sessionId = result.requiredString("session_id")
         credential = result.requiredString("session_credential")
+        if (nodeEdits) {
+            val available = request("GET", "/tools", null, session = true).asObject().requiredArray("tools")
+            require(available.values.any { (it as? JObject)?.optionalString("name") == "replace_node_body" }) {
+                "--node-edits requires a daemon supporting replace_node_body; start an updated daemon with --allow-edits."
+            }
+        }
         heartbeats.scheduleAtFixedRate({ runCatching { request("POST", "/sessions/heartbeat", jObject("schema_version" to 1), session = true) } }, 10, 10, TimeUnit.SECONDS)
     }
 
@@ -105,14 +120,16 @@ class LiveBridge(
 
     private fun toolCall(id: JsonValue, params: JObject): JObject {
         val name = params.optionalString("name") ?: return error(id, -32602, "Invalid params")
-        if (navigationProfile && name !in NavigationProfile.tools) return error(id, -32602, "Tool is not available in the navigation profile")
+        if (name == "replace_node_body" && !nodeEdits) return error(id, -32602, "Node editing requires --node-edits")
+        if (navigationProfile && name !in profileTools) return error(id, -32602, "Tool is not available in the navigation profile")
         val argumentsValue = params["arguments"]
         if (argumentsValue != null && argumentsValue !is JObject) return error(id, -32602, "Invalid params")
         val arguments = argumentsValue as? JObject ?: emptyJsonObject()
         val operation = (++nextOperation).toString()
         val response = request("POST", "/tools/call", jObject("schema_version" to 1, "operation_id" to operation, "name" to name, "arguments" to arguments), session = true).asObject()
         val original = response.fields.getValue("result")
-        val value = if (navigationProfile) NavigationProfile.compact(name, original) else original
+        val compact = if (navigationProfile) NavigationProfile.compact(name, original) else original
+        val value = if (responseFormat == "source-v1" && name == "build_context_bundle") SourceResponseFormat.encode(compact) else compact
         return result(id, jObject(
             "content" to listOf(mapOf("type" to "text", "text" to value.stringify())),
             "structuredContent" to (value as? JObject),
@@ -122,9 +139,10 @@ class LiveBridge(
 
     private fun listTools(id: JsonValue): JObject {
         val available = request("GET", "/tools", null, session = true).asObject().fields.getValue("tools") as JArray
-        val selected = if (navigationProfile) JArray(available.values.filter {
-            (it as? JObject)?.optionalString("name") in NavigationProfile.tools
-        }) else available
+        val selected = JArray(available.values.filter {
+            val name = (it as? JObject)?.optionalString("name")
+            (nodeEdits || name != "replace_node_body") && (!navigationProfile || name in profileTools)
+        })
         return result(id, jObject("tools" to selected))
     }
 

@@ -9,6 +9,7 @@ import kotlin.io.path.createTempDirectory
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class LiveBridgeTest {
@@ -134,7 +135,92 @@ class LiveBridgeTest {
             .forEach { key -> assertEquals(original.fields[key], compact.fields[key]) }
     }
 
-    private fun fixture(navigation: Boolean = false): Fixture {
+    @Test
+    fun sourceFormatChangesOnlyBundlesAndKeepsBothMcpRepresentationsConsistent() {
+        fixture(navigation = true, responseFormat = "source-v1").use { fixture ->
+            val responses = call(fixture, """
+                {"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"build_context_bundle","arguments":{"task":"Example.value"}}}
+                {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"search_graph","arguments":{"query":"Example.value"}}}
+                {"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"replace_node_body","arguments":{}}}
+            """.trimIndent())
+            val bundleCall = responses[1].fields.getValue("result").asObject()
+            val bundle = bundleCall.fields.getValue("structuredContent").asObject()
+            assertEquals("source-v1", bundle.requiredString("format"))
+            assertEquals(bundle.stringify(), bundleCall.requiredArray("content").values.single().asObject().requiredString("text"))
+            val restored = SourceResponseFormat.decode(bundle)
+            assertEquals("navigation-v1", restored.requiredString("response_format"))
+            assertTrue(restored.requiredString("snapshot_id").isNotBlank())
+            assertTrue(restored.requiredArray("source_slices").values.any { it.asObject().requiredString("source").contains("return 1;") })
+            val search = responses[2].fields.getValue("result").asObject().fields.getValue("structuredContent").asObject()
+            assertEquals("navigation-v1", search.requiredString("response_format"))
+            assertFalse(search.fields.containsKey("format"))
+            assertEquals("-32602", errorCode(responses[3]))
+        }
+    }
+
+    @Test
+    fun nodeEditingProfileRequiresWriteCapableDaemonBeforeMcpStartup() {
+        fixture(navigation = true, nodeEdits = true).use { fixture ->
+            val output = ByteArrayOutputStream()
+            val failure = assertFailsWith<IllegalArgumentException> {
+                fixture.bridge.run(ByteArrayInputStream(ByteArray(0)), output)
+            }
+            assertTrue(failure.message.orEmpty().contains("--allow-edits"))
+            assertEquals(0, output.size())
+        }
+    }
+
+    @Test
+    fun nodeEditingProfileAdvertisesOnlyFourReadsAndOneWrite() {
+        fixture(navigation = true, nodeEdits = true, allowEdits = true).use { fixture ->
+            val responses = call(fixture, """
+                {"jsonrpc":"2.0","id":2,"method":"tools/list"}
+                {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"apply_edit","arguments":{}}}
+            """.trimIndent())
+            val tools = responses[1].fields.getValue("result").asObject().requiredArray("tools")
+            assertEquals(NavigationProfile.tools + "replace_node_body", tools.values.map { it.asObject().requiredString("name") }.toSet())
+            assertEquals("-32602", errorCode(responses[2]))
+        }
+    }
+
+    @Test
+    fun fullBridgeDoesNotExposeOrDispatchNodeEditsWithoutOptIn() {
+        fixture(allowEdits = true).use { fixture ->
+            val responses = call(fixture, """
+                {"jsonrpc":"2.0","id":2,"method":"tools/list"}
+                {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"replace_node_body","arguments":{}}}
+            """.trimIndent())
+            val names = responses[1].fields.getValue("result").asObject().requiredArray("tools")
+                .values.map { it.asObject().requiredString("name") }
+            assertTrue("plan_edit" in names)
+            assertFalse("replace_node_body" in names)
+            assertEquals("-32602", errorCode(responses[2]))
+        }
+    }
+
+    @Test
+    fun experimentalBridgeFlagsAreExplicitAndDefaultsRemainUnchanged() {
+        assertEquals(BridgeOptions("checkout", "Coding agent", false, "navigation-v1", false), bridgeOptions(listOf("checkout")))
+        assertEquals(BridgeOptions("checkout", "Agent", true, "source-v1", true),
+            bridgeOptions(listOf("checkout", "Agent", "--navigation", "--response-format", "source-v1", "--node-edits")))
+        listOf(listOf("checkout", "--response-format", "source-v1"), listOf("checkout", "--node-edits"),
+            listOf("checkout", "--navigation", "--response-format"), listOf("checkout", "--navigation", "--response-format", "unknown"),
+            listOf("checkout", "--unknown")).forEach { arguments ->
+            assertFailsWith<IllegalArgumentException> { bridgeOptions(arguments) }
+        }
+    }
+
+    private fun call(fixture: Fixture, requests: String): List<JObject> {
+        val payload = """
+            {"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18"}}
+            {"jsonrpc":"2.0","method":"notifications/initialized"}
+        """.trimIndent() + "\n" + requests + "\n"
+        val output = ByteArrayOutputStream()
+        fixture.bridge.run(ByteArrayInputStream(payload.toByteArray(StandardCharsets.UTF_8)), output)
+        return output.toString(StandardCharsets.UTF_8).trimEnd().lines().map { MiniJson.parse(it).asObject() }
+    }
+
+    private fun fixture(navigation: Boolean = false, responseFormat: String = "navigation-v1", nodeEdits: Boolean = false, allowEdits: Boolean = false): Fixture {
         val root = createTempDirectory("graphharness-bridge-root")
         Files.writeString(root.resolve("Example.java"), "class Example { int value() { return 1; } }")
         val ui = createTempDirectory("graphharness-bridge-ui")
@@ -143,8 +229,9 @@ class LiveBridgeTest {
         Files.setPosixFilePermissions(runtimeDirectory, ownerOnlyDirectoryPermissions)
         val runtime = LocalRuntime.acquire(root, runtimeDirectory)
         val manager = SnapshotManager(root, useJoern = false)
-        val daemon = LiveDaemon(manager, runtime, ui)
-        return Fixture(manager, daemon, LiveBridge(root, runtimeDirectory, navigationProfile = navigation))
+        val daemon = LiveDaemon(manager, runtime, ui, coordinatedWrites = allowEdits)
+        return Fixture(manager, daemon, LiveBridge(root, runtimeDirectory, navigationProfile = navigation,
+            responseFormat = responseFormat, nodeEdits = nodeEdits))
     }
 
     private class Fixture(private val manager: SnapshotManager, private val daemon: LiveDaemon, val bridge: LiveBridge) : AutoCloseable {
